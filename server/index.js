@@ -5,6 +5,8 @@ const logger = require('morgan')
 const passport = require("passport");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const multer = require('multer');
+const path = require("path");
 
 // Import routers
 const authRouter = require("./routes/authRouter")
