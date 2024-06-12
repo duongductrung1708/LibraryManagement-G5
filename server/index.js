@@ -5,17 +5,10 @@ const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const mongoose = require("mongoose");
 
 // Import routers
-const {
-  AuthRouter,
-  BookRouter,
-  AuthorRouter,
-  BorrowalRouter,
-  GenreRouter,
-  UserRouter,
-  ReviewRouter,
-} = require("./routes");
+const routes = require("./routes");
 
 // Configure dotenv for environment variables in production
 if (process.env.NODE_ENV !== "production") {
@@ -32,18 +25,6 @@ app.use(logger("dev"));
 // Set middleware to process form data
 app.use(express.urlencoded({ extended: false }));
 
-// Connect to DB
-const mongoose = require("mongoose");
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("Connected to DB on MongoDB Atlas");
-  })
-  .catch((err) => console.log("DB connection error", err));
-
 // Use CORS for Cross Origin Resource Sharing
 app.use(
   cors({
@@ -51,6 +32,12 @@ app.use(
     credentials: true,
   })
 );
+
+// Parse cookies used for session management
+app.use(cookieParser(process.env.SESSION_SECRET));
+
+// Parse JSON objects in request bodies
+app.use(express.json());
 
 // Set middleware to manage sessions
 app.use(
@@ -61,12 +48,6 @@ app.use(
   })
 );
 
-// Parse cookies used for session management
-app.use(cookieParser(process.env.SESSION_SECRET));
-
-// Parse JSON objects in request bodies
-app.use(express.json());
-
 // Use passport authentication middleware
 app.use(passport.initialize());
 app.use(passport.session());
@@ -76,14 +57,29 @@ const initializePassport = require("./passport-config");
 initializePassport(passport);
 
 // Implement routes for REST API
-app.use("/api/auth", AuthRouter);
-app.use("/api/book", BookRouter);
-app.use("/api/author", AuthorRouter);
-app.use("/api/borrowal", BorrowalRouter);
-app.use("/api/genre", GenreRouter);
-app.use("/api/user", UserRouter);
-app.use("/api/review", ReviewRouter);
+app.use("/api/auth", routes.AuthRouter);
+app.use("/api/book", routes.BookRouter);
+app.use("/api/author", routes.AuthorRouter);
+app.use("/api/borrowal", routes.BorrowalRouter);
+app.use("/api/genre", routes.GenreRouter);
+app.use("/api/user", routes.UserRouter);
+app.use("/api/review", routes.ReviewRouter);
 
 app.get("/", (req, res) => res.send("Welcome to Library Management System"));
+
+// Connect to DB
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Connected to MongoDB successfully");
+  } catch (err) {
+    console.error("Error connecting to MongoDB:", err.message);
+  }
+};
+
+connectDB();
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}!`));

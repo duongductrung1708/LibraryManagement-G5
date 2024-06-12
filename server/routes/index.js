@@ -1,17 +1,17 @@
-const AuthorRouter = require('./author.router')
-const AuthRouter = require('./auth.router')
-const BookRouter = require('./book.router')
-const BorrowalRouter = require('./borrowal.router')
-const GenreRouter = require('./genre.router')
-const ReviewRouter = require('./review.router')
-const UserRouter = require('./user.router')
+const AuthRouter = require("./auth.router");
+const BookRouter = require("./book.router");
+const AuthorRouter = require("./author.router");
+const BorrowalRouter = require("./borrowal.router");
+const GenreRouter = require("./genre.router");
+const UserRouter = require("./user.router");
+const ReviewRouter = require("./review.router");
 
 module.exports = {
-    AuthorRouter,
-    AuthRouter,
-    BookRouter,
-    BorrowalRouter,
-    GenreRouter,
-    ReviewRouter,
-    UserRouter,
-}
+  AuthRouter,
+  BookRouter,
+  AuthorRouter,
+  BorrowalRouter,
+  GenreRouter,
+  UserRouter,
+  ReviewRouter,
+};
