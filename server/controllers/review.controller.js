@@ -28,19 +28,13 @@ const getAllReviews = async (req, res) => {
     })
 }
 
-const addReview = async (req, res) => {
-    const newReview = req.body
+async function addReview (req, res,next) {
+    try {
+    
 
-    Review.create(newReview, (err, review) => {
-        if (err) {
-            return res.status(400).json({ success: false, err });
-        }
-
-        return res.status(200).json({
-            success: true,
-            newReview: review
-        });
-    })
+    } catch (error) {
+        
+    }
 }
 
 const updateReview = async (req, res) => {
