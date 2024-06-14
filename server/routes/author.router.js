@@ -4,21 +4,21 @@ const router = express.Router();
 
 // Import functions from controller
 const {
-    getAuthor,
-    getAllAuthors,
-    addAuthor,
-    updateAuthor,
-    deleteAuthor
+    getAuthor,// done
+    getAllAuthors,// done
+    addAuthor,//done
+    updateAuthor,//done
+    deleteAuthor//done
 } = require('../controllers/author.controller')
 
-router.get("/getAll", (req, res) => getAllAuthors(req, res))
+router.get("/getAll",getAllAuthors)
 
-router.get("/get/:id", (req, res) => getAuthor(req, res))
+router.get("/get/:id", getAuthor)
 
-router.post("/add", (req, res) => addAuthor(req, res))
+router.post("/add",addAuthor)
 
-router.put("/update/:id", (req, res) => updateAuthor(req, res))
+router.put("/update/:id",updateAuthor)
 
-router.delete("/delete/:id", (req, res) => deleteAuthor(req, res))
+router.delete("/delete/:id",deleteAuthor)
 
 module.exports = router;
