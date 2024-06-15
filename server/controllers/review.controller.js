@@ -12,10 +12,8 @@ async function getReviewById(req, res,next) {
 
 async function getReviewByBookId(req, res, next) {
     try {
-        const book = req.params.bid // Kiểm tra giá trị của bookId
-        const reviews = await Review.find({book: book })
-            .populate("book", "name")
-            .populate("reviewedBy", "name");
+        const bookId = req.params.bid; 
+        const reviews = await Review.find({ book: bookId})
 
         if (reviews.length === 0) {
             return res.status(404).json({ message: "No reviews found for this book ID." });
@@ -24,7 +22,7 @@ async function getReviewByBookId(req, res, next) {
         res.status(200).json({ reviews: reviews });
     } catch (error) {
         console.error("Error fetching reviews:", error);
-        next(error); // Chuyển tiếp bất kỳ lỗi nào đến middleware xử lý lỗi
+        next(error); 
     }
 }
 
@@ -32,7 +30,7 @@ async function getReviewByBookId(req, res, next) {
 
 async function getAllReviews (req, res,next) {
     try {
-        const reviews = await Review.find({}).populate("book", "name").populate("reviewedBy","name");
+        const reviews = await Review.find().populate("book", "name").populate("reviewedBy","name");
         res.status(200).send(reviews)
     } catch (error) {
         next(error)
