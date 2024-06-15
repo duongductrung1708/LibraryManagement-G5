@@ -1,29 +1,28 @@
 const mongoose = require('mongoose')
 
 const reviewSchema = new mongoose.Schema({
-    bookID: {
+    book: {
         type: mongoose.Schema.Types.ObjectId,
-        ref : "book",
+        ref : "Book",
         required: true
     },
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref : "user",
+        ref : "User",
+        required: true
+    },
+    review: {
+        type: String,
         required: true
     },
     reviewedAt: {
-        type: Date,
-        required: "reviewedAt",
-    },
-    star: {
-        type: String,
-        required: true
+        type: Date
     },
     rating: {
         type: Number,
         min: 1,
         max: 5,
-        required: "rating is required"
+        required:false
     },
     isDeleted: {
         type: Boolean,
