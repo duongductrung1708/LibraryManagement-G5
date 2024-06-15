@@ -12,14 +12,24 @@ async function getReviewById(req, res,next) {
 
 async function getReviewByBookId(req, res, next) {
     try {
-        const bookId = req.params.bid; 
-        const reviews = await Review.find({ book: bookId})
-
-        if (reviews.length === 0) {
-            return res.status(404).json({ message: "No reviews found for this book ID." });
-        }
-
-        res.status(200).json({ reviews: reviews });
+        const bookId = req.params.bid
+        const listReview = []
+        console.log(bookId);
+        const reviews = await Review.find().populate("book", "name").populate("reviewedBy","name");
+        const review = reviews.map(r => {
+            if (r.book._id == bookId)
+              listReview.push(r)
+        })
+        const listfromd = listReview.map(r => {
+            return {
+                rating: r.rating,
+                review: r.review,
+                reviewBy: r.reviewedBy.name,
+                book: r.name
+            }
+        })
+        res.status(200).json(listfromd)
+     
     } catch (error) {
         console.error("Error fetching reviews:", error);
         next(error); 
