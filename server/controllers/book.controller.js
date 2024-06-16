@@ -163,14 +163,14 @@ const updateBook = async (req, res) => {
         });
       }
       if (err.name === 'ValidationError') {
-        // Lỗi xác thực dữ liệu
+        // Database cannot validated
         return res.status(400).json({
           success: false,
           message: "Validation error",
           error: err.message
         });
       }
-      // Các lỗi khác
+      // Other errors
       return res.status(500).json({
         success: false,
         message: "An error occurred while updating the book",
@@ -179,14 +179,14 @@ const updateBook = async (req, res) => {
     }
 
     if (!book) {
-      // Trường hợp không tìm thấy sách với ID hợp lệ
+      // Cannot find book with valid bookID
       return res.status(404).json({
         success: false,
         message: "Book not found"
       });
     }
 
-    // Trường hợp cập nhật sách thành công
+    // Update successfully
     return res.status(200).json({
       success: true,
       updatedBook: book
