@@ -24,6 +24,10 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   },
+  isLibrarian: {
+    type: Boolean,
+    required: true,
+  },
   photoUrl: {
     type: String,
     required: true,
