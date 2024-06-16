@@ -2,7 +2,7 @@ const Borrowal = require('../models/borrowal.model');
 const mongoose = require("mongoose");
 const Book = require("../models/book.model");
 
-const getBorrowal = async (req, res) => {
+const getBorrowalById = async (req, res) => {
     const borrowalId = req.params.id;
 
     Borrowal.findById(borrowalId, (err, borrowal) => {
@@ -129,7 +129,7 @@ const deleteBorrowal = async (req, res) => {
 };
 
 module.exports = {
-    getBorrowal,
+    getBorrowalById,
     getAllBorrowals,
     addBorrowal,
     updateBorrowal,
