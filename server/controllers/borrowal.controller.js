@@ -104,11 +104,13 @@ async function deleteBorrowal(req, res, next) {
     }
 }
 
-
-module.exports = {
+const borrowalController ={
     getBorrowalById,
     getAllBorrowals,
     addBorrowal,
     updateBorrowal,
     deleteBorrowal
-};
+}
+
+
+module.exports =  borrowalController;
