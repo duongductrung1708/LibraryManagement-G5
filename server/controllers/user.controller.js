@@ -98,8 +98,7 @@ const deleteUser = async (req, res) => {
         });
     })
 }
-
-module.exports = {
+const userController ={
   getUser,
   getAllUsers,
   getAllMembers,
@@ -107,3 +106,5 @@ module.exports = {
   updateUser,
   deleteUser
 }
+
+module.exports = userController;

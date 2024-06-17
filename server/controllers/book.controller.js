@@ -222,11 +222,11 @@ const deleteBook = async (req, res, next) => {
   }
 };
 
-
-module.exports = {
+const  bookController ={
   getBook,
   getAllBooks,
   addBook,
   updateBook,
-  deleteBook
+  deleteBook,
 }
+module.exports = bookController;

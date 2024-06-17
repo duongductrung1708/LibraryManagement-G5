@@ -59,10 +59,12 @@ async function deleteAuthor(req, res,next) {
     }
 }
 
-module.exports = {
+const authorController={
     getAuthor,
     getAllAuthors,
     addAuthor,
     updateAuthor,
-    deleteAuthor
+    deleteAuthor,
 }
+
+module.exports = authorController;

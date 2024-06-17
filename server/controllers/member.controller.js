@@ -66,10 +66,12 @@ const deleteMember = async (req, res) => {
     })
 }
 
-module.exports = {
+const memberController ={
     getMember,
     getAllMembers,
     addMember,
     updateMember,
     deleteMember
 }
+
+module.exports =memberController;

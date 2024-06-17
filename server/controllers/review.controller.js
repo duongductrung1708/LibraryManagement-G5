@@ -88,7 +88,7 @@ async function deleteReview(req, res, next){
   }
 }
 
-module.exports = {
+const reviewController = {
     getReviewById,
     getAllReviews,
     addReview,
@@ -96,3 +96,4 @@ module.exports = {
     deleteReview,
     getReviewByBookId
 }
+module.exports = reviewController;

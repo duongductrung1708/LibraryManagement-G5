@@ -73,11 +73,11 @@ const deleteGenre = async (req, res) => {
         });
     })
 }
-
-module.exports = {
+const genreController ={
     getGenre,
     getAllGenres,
     addGenre,
     updateGenre,
     deleteGenre
 }
+module.exports = genreController;
