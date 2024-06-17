@@ -5,18 +5,21 @@ const router = express.Router()
 const {loginUser} = require("../controllers/auth.controller")
 // Import functions from controller
 const {
-    getReview,
+    getReviewById,
     getAllReviews,
     addReview,
     updateReview,
-    deleteReview
+    deleteReview,
+    getReviewByBookId
 } = require('../controllers/review.controller')
 
 router.get("/getAll",getAllReviews)   
 
-router.get("/get/:id",getReview)
+router.get("/get/:id",getReviewById)
 
-router.post("/add/:id",addReview)
+router.get("/getByBookId/:bid",getReviewByBookId)
+
+router.post("/add/:id",loginUser,addReview)
 
 router.put("/update/:id",updateReview)
 
