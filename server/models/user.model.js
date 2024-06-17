@@ -55,4 +55,6 @@ UserSchema.methods.isValidPassword = function (password) {
   return this.hash === hash;
 };
 
-module.exports = mongoose.model("User", UserSchema);
+const User = mongoose.model("User", UserSchema);
+
+module.exports = User;
