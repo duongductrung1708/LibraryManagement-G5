@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const borrowalController = require('../controllers/borrowal.controller')
+const { borrowalController } = require('../controllers')
 
 const borrowalRouter = express.Router();
 
