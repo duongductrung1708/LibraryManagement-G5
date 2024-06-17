@@ -15,6 +15,6 @@ borrowalRouter.put('/update/:id', borrowalController.updateBorrowal)
 borrowalRouter.delete('/delete/:id', borrowalController.deleteBorrowal)
 
 
-borrowalRouter.delete('/delete/:iddd', borrowalController.deleteBorrowal)
+
 
 module.exports = borrowalRouter;
