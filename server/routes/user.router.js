@@ -12,6 +12,15 @@ const {
   deleteUser
 } = require('../controllers/user.controller')
 
+function isAuthenticated(req, res, next) {
+  console.log(req.session)
+  if (req.session.passport) {
+    return next();
+  } else {
+    return "anl"
+  }
+}
+
 router.get("/getAll", (req, res) => getAllUsers(req, res))
 
 router.get("/getAllMembers", (req, res) => getAllMembers(req, res))

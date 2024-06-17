@@ -30,10 +30,18 @@ const UserSchema = new mongoose.Schema({
   },
   photoUrl: {
     type: String,
-    required: true,
+    required: false,
   },
-  hash: String,
-  salt: String,
+  hash: {
+    type:String,
+    require: true
+  },
+  salt: {
+    type:String,
+    require: true
+  },
+},{
+  versionKey:false
 });
 
 // Method to set salt and hash the password for a user
@@ -49,10 +57,10 @@ UserSchema.methods.setPassword = function (password) {
 
 // Method to check whether the entered password is correct or not
 UserSchema.methods.isValidPassword = function (password) {
-  const hash = crypto
+  const newhash = crypto
     .pbkdf2Sync(password, this.salt, 1000, 64, `sha512`)
     .toString(`hex`);
-  return this.hash === hash;
+  return this.hash === newhash;
 };
 
 module.exports = mongoose.model("User", UserSchema);

@@ -5,7 +5,11 @@ const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const validateCookies = require('./middlewares/cookies')
 const mongoose = require("mongoose");
+const initializePassport = require("./passport-config");
+const MongoStore = require('connect-mongo');
+
 
 // Import routers
 const routes = require("./routes");
@@ -34,7 +38,9 @@ app.use(
 );
 
 // Parse cookies used for session management
-app.use(cookieParser(process.env.SESSION_SECRET));
+// app.use(cookieParser(process.env.SESSION_SECRET));
+// app.use(validateCookies)
+
 
 // Parse JSON objects in request bodies
 app.use(express.json());
@@ -43,8 +49,19 @@ app.use(express.json());
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
+    cookie:{
+      maxAge: 1000 * 64 * 10,
+      sameSite: 'strict',
+      // secure: true
+    },
+    store: new MongoStore({ 
+      mongooseConnection: mongoose.connection,
+      mongoUrl:process.env.MONGO_URI,
+      collectionName: 'session',
+      autoRemove: 'native', }),
+      // stringify: false,
   })
 );
 
@@ -53,10 +70,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Initialise passport as authentication middleware
-const initializePassport = require("./passport-config");
 initializePassport(passport);
 
 // Implement routes for REST API
+
+
 app.use("/api/auth", routes.AuthRouter);
 app.use("/api/book", routes.BookRouter);
 app.use("/api/author", routes.AuthorRouter);

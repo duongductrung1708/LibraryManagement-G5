@@ -16,3 +16,5 @@ router.post("/register", (req, res) => registerUser(req, res))
 router.get("/logout", (req, res) => logoutUser(req, res))
 
 module.exports = router;
+
+
