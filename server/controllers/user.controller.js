@@ -1,4 +1,5 @@
-const User = require('../models/user.model')
+const db = require('../models');
+const User = db.user;
 
 const getUser = async (req, res) => {
     const userId = req.params.id;
@@ -97,8 +98,7 @@ const deleteUser = async (req, res) => {
         });
     })
 }
-
-module.exports = {
+const userController ={
   getUser,
   getAllUsers,
   getAllMembers,
@@ -106,3 +106,5 @@ module.exports = {
   updateUser,
   deleteUser
 }
+
+module.exports = userController;

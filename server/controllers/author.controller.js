@@ -1,5 +1,5 @@
-const Author = require('../models/author.model')
-
+const db = require('../models');
+const Author = db.author;
 
 //[GET] get author by id 
 
@@ -59,10 +59,12 @@ async function deleteAuthor(req, res,next) {
     }
 }
 
-module.exports = {
+const authorController={
     getAuthor,
     getAllAuthors,
     addAuthor,
     updateAuthor,
-    deleteAuthor
+    deleteAuthor,
 }
+
+module.exports = authorController;

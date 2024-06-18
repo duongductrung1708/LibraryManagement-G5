@@ -1,6 +1,7 @@
+
 const db = require('../models/index.js')
-const User = db.user
 const passport = require("passport");
+const User = db.user;
 
 const registerUser = async (req, res) => {
   User.findOne({ email: req.body.email }, (err, user) => {
@@ -40,8 +41,8 @@ const loginUser = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Password incorrect" });
     }
     console.log(req.session)
-    delete user.hash
-    delete user.
+    // delete user.hash
+    // delete user.
     passport.authenticate("local", (err, user, info) => {
       // console.log(req.session)
       req.logIn(user, (err) => {// Initiate a login session for `user`.
@@ -68,8 +69,10 @@ const logoutUser = async (req, res, next) => {
   return res.status(200).json({ success: true, message: "User logged out" });
 }
 
-module.exports = {
+const authController ={
   registerUser,
   loginUser,
   logoutUser
 }
+
+module.exports = authController;
