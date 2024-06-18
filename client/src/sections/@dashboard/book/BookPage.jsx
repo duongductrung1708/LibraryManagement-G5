@@ -57,7 +57,6 @@ const TruncatedTypography = styled(Typography)({
 });
 
 const BookPage = () => {
-  // const { user } = useAuth();
 
   // State variables
   const [book, setBook] = useState({
@@ -90,20 +89,52 @@ const BookPage = () => {
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [filterName, setFilterName] = useState('');
 
-  // API operations
+
 
   const getAllBooks = () => {
-    axios
-      .get(apiUrl(routes.BOOK, methods.GET_ALL))
-      .then((response) => {
-        setBooks(response.data.booksList);
-        setFilteredBooks(response.data.booksList);
+
+        setBooks([{
+          _id: 'sca',
+          name: 'acs',
+          isbn: 'acs',
+          summary: 'asc',
+          isAvailable: true,
+          author: { 
+            id: "fdsfdsf",
+            name: "fdsffds",
+            description: "fdfdf",
+            photoUrl: "sdfdsf"},
+          genre: {
+            id: "asd", 
+            name: "asd", 
+            description: "asd" 
+          },
+          photoUrl: 'sa',
+        }, {
+          _id: 'scas',
+          name: 'acs',
+          isbn: 'acs',
+          summary: 'asc',
+          isAvailable: true,
+          author: { 
+            id: "fdsfdsf",
+            name: "fdsffds",
+            description: "fdfdf",
+            photoUrl: "sdfdsf"},
+          genre: {
+            id: "asd", 
+            name: "asd", 
+            description: "asd" 
+          },
+          photoUrl: 'sa',
+        }]);
+        setFilteredBooks(books);
         setIsTableLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching books:', error);
-        toast.error('Failed to fetch books');
-      });
+      // })
+      // .catch((error) => {
+      //   console.error('Error fetching books:', error);
+      //   toast.error('Failed to fetch books');
+      // });
   };
 
   const addBook = () => {
@@ -250,7 +281,8 @@ const BookPage = () => {
           <Typography variant="h3" sx={{ mb: 5 }}>
             Books
           </Typography>
-          {/* {(user.isAdmin || user.isLibrarian) && (
+          {
+           (
             <Button
               variant="contained"
               onClick={() => {
@@ -261,7 +293,7 @@ const BookPage = () => {
             >
               New Book
             </Button>
-          )} */}
+          )}
         </Stack>
 
         <Box mb={3}>
@@ -297,7 +329,8 @@ const BookPage = () => {
                     >
                       {book.genre.name}
                     </Label>
-                    {/* {(user.isAdmin || user.isLibrarian) && (
+                    {
+                    (
                       <Label
                         variant="filled"
                         sx={{
@@ -323,7 +356,7 @@ const BookPage = () => {
                           <Iconify icon={'eva:more-vertical-fill'} />
                         </IconButton>
                       </Label>
-                    )} */}
+                    )}
 
                     <StyledBookImage alt={book.name} src={book.photoUrl} />
                   </Box>
@@ -394,7 +427,8 @@ const BookPage = () => {
           },
         }}
       >
-        {/* {(user.isAdmin || user.isLibrarian) && (
+        {
+         (
           <MenuItem
             onClick={() => {
               setIsUpdateForm(true);
@@ -406,14 +440,15 @@ const BookPage = () => {
             <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
             Edit
           </MenuItem>
-        )} */}
+        )}
 
-        {/* {(user.isAdmin || user.isLibrarian) && (
+        {
+         (
           <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
             Delete
           </MenuItem>
-        )} */}
+        )}
       </Popover>
 
       <BorrowalForm

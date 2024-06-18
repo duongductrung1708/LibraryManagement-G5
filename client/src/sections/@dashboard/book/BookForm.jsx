@@ -33,45 +33,6 @@ const BookForm = ({
                     handleUpdateBook
                   }) => {
 
-  const [isModalLoading, setIsModalLoading] = useState(true)
-  const [authors, setAuthors] = useState([]);
-  const [genres, setGenres] = useState([]);
-
-  const getAllAuthors = () => {
-    axios.get('http://localhost:8080/api/author/getAll')
-      .then((response) => {
-        // handle success
-        console.log(response.data)
-        setAuthors(response.data.authorsList)
-      })
-      .catch((error) => {
-        // handle error
-        toast.error("Error fetching authors")
-        console.log(error);
-      })
-  }
-
-  const getAllGenres = () => {
-    axios.get('http://localhost:8080/api/genre/getAll')
-      .then((response) => {
-        // handle success
-        console.log(response.data)
-        setGenres(response.data.genresList)
-        setIsModalLoading(false)
-      })
-      .catch((error) => {
-        // handle error
-        toast.error("Error fetching genres")
-        console.log(error);
-      })
-  }
-
-  // Load data on initial page load
-  useEffect(() => {
-    getAllAuthors();
-    getAllGenres();
-  }, []);
-
   const style = {
     position: 'absolute',
     top: '50%',
@@ -97,9 +58,7 @@ const BookForm = ({
           <Typography variant="h4" textAlign="center" paddingBottom={2} paddingTop={1}>
             {isUpdateForm ? <span>Update</span> : <span>Add</span>} book
           </Typography>
-
-          {
-            isModalLoading ? <Grid padding={4} style={{"textAlign": "center"}}><CircularProgress/></Grid> :
+            <Grid padding={4} style={{"textAlign": "center"}}><CircularProgress/></Grid> :
               <Stack spacing={3} paddingY={2} paddingX={3}
                      height="600px"
                      overflow="scroll">
@@ -118,7 +77,7 @@ const BookForm = ({
                     label="Author"
                     onChange={(e) => setBook({...book, authorId: e.target.value})}>
                     {
-                      authors.map((author) => <MenuItem key={author._id} value={author._id}>{author.name}</MenuItem>)
+                      // authors.map((author) => <MenuItem key={author._id} value={author._id}>{author.name}</MenuItem>)
                     }
                   </Select>
                 </FormControl>
@@ -131,7 +90,7 @@ const BookForm = ({
                     label="Genre"
                     onChange={(e) => setBook({...book, genreId: e.target.value})}>
                     {
-                      genres.map((genre) => <MenuItem key={genre._id} value={genre._id}>{genre.name}</MenuItem>)
+                      // genres.map((genre) => <MenuItem key={genre._id} value={genre._id}>{genre.name}</MenuItem>)
                     }
                   </Select>
                 </FormControl>
@@ -186,7 +145,6 @@ const BookForm = ({
                   </Button>
                 </Box>
               </Stack>
-          }
         </Container>
       </Box>
     </Modal>
