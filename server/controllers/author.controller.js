@@ -1,5 +1,5 @@
-const Author = require('../models/author.model')
-
+const db = require('../models');
+const Author = db.author;
 
 //[GET] get author by id 
 

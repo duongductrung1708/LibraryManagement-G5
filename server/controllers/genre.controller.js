@@ -1,4 +1,5 @@
-const Genre = require('../models/genre.model')
+const db = require('../models');
+const Genre = db.genre;
 
 const getGenre = async (req, res) => {
     const genreId = req.params.id;
