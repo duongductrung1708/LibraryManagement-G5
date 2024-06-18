@@ -1,5 +1,6 @@
-const User = require('../models/user.model')
 const passport = require("passport");
+const db = require('../models');
+const User = db.user;
 
 const registerUser = async (req, res) => {
   User.findOne({email: req.body.email}, (err, user) => {

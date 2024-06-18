@@ -1,7 +1,7 @@
-const Borrowal = require('../models/borrowal.model');
 const mongoose = require("mongoose");
-const Book = require("../models/book.model");
-
+const db = require('../models');
+const Borrowal = db.borrowal;
+const Book = db.book;
 
 async function getBorrowalById(req, res, next) {
     try {
