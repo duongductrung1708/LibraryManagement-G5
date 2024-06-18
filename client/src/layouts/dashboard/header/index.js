@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {styled} from '@mui/material/styles';
 import {AppBar, Box, IconButton, Stack, Toolbar} from '@mui/material';
 // utils
-import {bgBlur} from '../../../utils/cssStyle';
+import {bgBlur} from '../../../utils/cssStyles';
 // components
 import Iconify from '../../../components/iconify';
 //

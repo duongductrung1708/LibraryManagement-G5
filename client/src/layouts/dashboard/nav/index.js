@@ -1,17 +1,12 @@
 import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-// @mui
 import { alpha, styled } from "@mui/material/styles";
 import { Avatar, Box, Drawer, Link, Typography } from "@mui/material";
-// mock
-// hooks
 import useResponsive from "../../../hooks/useResponsive";
-// components
 import Logo from "../../../components/logo";
 import Scrollbar from "../../../components/scrollbar";
 import NavSection from "../../../components/nav-section";
-//
 import navConfig from "./config";
 import { useAuth } from "../../../hooks/useAuth";
 
@@ -19,7 +14,7 @@ import { useAuth } from "../../../hooks/useAuth";
 
 const NAV_WIDTH = 280;
 
-const StyledAccount = styled('div')(({theme}) => ({
+const StyledAccount = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: theme.spacing(2, 2.5),
@@ -34,11 +29,21 @@ Nav.propTypes = {
   onCloseNav: PropTypes.func,
 };
 
-export default function Nav({openNav, onCloseNav}) {
-  const {user} = useAuth();
-  console.log(user);
+export default function Nav({ openNav, onCloseNav }) {
+  // const { user } = useAuth();
+  // console.log(user);
+  const user = {
+    name: "minh",
+    email: "lvhm114@gmail.com",
+    isAdmin: true,
+    isLibrarian: false,
+    photoUrl:"asd",
+    _id: "66706707332ac58fab7fe156",
+    salt: "77d57e7d4a83284c049206b1d518542e",
+    hash: "7dd5d4c0c08af40cb69464c8495cf3d92e382bc0a541dbe48c060a2ec63b363702025277a0845c1272708039d9762edad14ad1e239a1e0e2807196d92a64b537"
+}
 
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -53,34 +58,42 @@ export default function Nav({openNav, onCloseNav}) {
     <Scrollbar
       sx={{
         height: 1,
-        '& .simplebar-content': {height: 1, display: 'flex', flexDirection: 'column'},
+        '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
       }}
     >
-      <Box sx={{px: 2.5, py: 3, display: 'inline-flex'}}>
-        <Logo/>
+      <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
+        <Logo />
       </Box>
 
-      <Box sx={{mb: 5, mx: 2.5}}>
+      <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none">
           <StyledAccount>
-            <Avatar src={user.photoUrl} alt="photoURL"/>
+            <Avatar src={user.photoUrl} alt="photoURL" />
 
-            <Box sx={{ml: 2}}>
-              <Typography variant="subtitle2" sx={{color: 'text.primary'}}>
+            <Box sx={{ ml: 2 }}>
+              <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
                 {user.name}
               </Typography>
 
-              <Typography variant="body2" sx={{color: 'text.secondary'}}>
-                {user.isAdmin ? "Librarian" : "Member"}
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                {user.isAdmin ? "Admin" : user.isLibrarian ? "Librarian" : "Member"}
               </Typography>
             </Box>
           </StyledAccount>
         </Link>
       </Box>
 
-      <NavSection data={navConfig.filter((navLink) => user.isAdmin || !(navLink.title === "Dashboard" || navLink.title === "Users"))}/>
+      <NavSection
+        data={navConfig}
+      />
 
-      <Box sx={{flexGrow: 1}}/>
+{/* <NavSection
+        data={navConfig.filter(
+          (navLink) => user.isAdmin || !(navLink.title === 'Dashboard' || navLink.title === 'Users')
+        )}
+      /> */}
+
+      <Box sx={{ flexGrow: 1 }} />
     </Scrollbar>
   );
 
@@ -88,8 +101,8 @@ export default function Nav({openNav, onCloseNav}) {
     <Box
       component="nav"
       sx={{
-        flexShrink: {lg: 0},
-        width: {lg: NAV_WIDTH},
+        flexShrink: { lg: 0 },
+        width: { lg: NAV_WIDTH },
       }}
     >
       {isDesktop ? (
@@ -114,7 +127,7 @@ export default function Nav({openNav, onCloseNav}) {
             keepMounted: true,
           }}
           PaperProps={{
-            sx: {width: NAV_WIDTH},
+            sx: { width: NAV_WIDTH },
           }}
         >
           {renderContent}

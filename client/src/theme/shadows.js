@@ -1,6 +1,9 @@
+// @mui
 import { alpha } from '@mui/material/styles';
-
+//
 import palette from './palette';
+
+// ----------------------------------------------------------------------
 
 const color = palette.grey[500];
 

@@ -1,5 +1,8 @@
 import { alpha } from '@mui/material/styles';
 
+// ----------------------------------------------------------------------
+
+// SETUP COLORS
 const GREY = {
   0: '#FFFFFF',
   100: '#F9FAFB',

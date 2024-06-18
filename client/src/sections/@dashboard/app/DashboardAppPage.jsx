@@ -7,7 +7,7 @@ import { useAuth } from "../../../hooks/useAuth";
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const theme = useTheme();
 
   return (
@@ -18,7 +18,7 @@ export default function DashboardAppPage() {
 
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{mb: 5}}>
-          Hi {user.name.split(' ')[0]}, Welcome back
+          {/* Hi {user.name.split(' ')[0]}, Welcome back */}
         </Typography>
 
         <Grid container spacing={3}>
