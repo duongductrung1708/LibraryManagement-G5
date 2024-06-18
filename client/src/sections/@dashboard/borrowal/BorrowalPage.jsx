@@ -10,12 +10,7 @@ const BorrowalPage = () => {
   useEffect(() => {
     const fetchBorrowals = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/borrowal/getall', {
-          headers: {
-            'Content-Type': 'application/json',
-            // Add any other headers if necessary
-          },
-        });
+        const response = await axios.get('http://localhost:8080/api/borrowal/getall');
         setBorrowals(response.data.borrowalsList);
         setIsLoading(false);
       } catch (error) {
@@ -57,10 +52,10 @@ const BorrowalPage = () => {
             <TableBody>
               {borrowals.map((borrowal) => (
                 <TableRow key={borrowal.borrowal._id}>
-                  <TableCell>{borrowal.member}</TableCell>
-                  <TableCell>{borrowal.book}</TableCell>
-                  <TableCell>{new Date(borrowal.borrowal.borrowedDate).toLocaleDateString('en-US')}</TableCell>
-                  <TableCell>{new Date(borrowal.borrowal.dueDate).toLocaleDateString('en-US')}</TableCell>
+                  <TableCell>{borrowal.borrowal.memberId.name}</TableCell> {/* Display member name */}
+                  <TableCell>{borrowal.borrowal.bookId.name}</TableCell> {/* Display book name */}
+                  <TableCell>{new Date(borrowal.borrowal.borrowedDate).toLocaleDateString('en-US')}</TableCell> {/* Format borrowedDate */}
+                  <TableCell>{new Date(borrowal.borrowal.dueDate).toLocaleDateString('en-US')}</TableCell> {/* Format dueDate */}
                   <TableCell>{borrowal.borrowal.status}</TableCell>
                 </TableRow>
               ))}
