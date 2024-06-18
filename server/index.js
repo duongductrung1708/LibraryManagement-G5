@@ -4,15 +4,16 @@ const cors = require("cors");
 const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
-const cookieParser = require("cookie-parser");
-const validateCookies = require('./middlewares/cookies')
+// const cookieParser = require("cookie-parser");
+// const validateCookies = require('./middlewares/cookies')
 const mongoose = require("mongoose");
-const initializePassport = require("./passport-config");
+const initializePassport = require("./middlewares/passport-config");
 const MongoStore = require('connect-mongo');
 
 
 // Import routers
 const routes = require("./routes");
+const initMiddleware = require("./middlewares/auth.middleware");
 
 // Configure dotenv for environment variables in production
 if (process.env.NODE_ENV !== "production") {
@@ -71,7 +72,8 @@ app.use(passport.session());
 
 // Initialise passport as authentication middleware
 initializePassport(passport);
-
+// Initialise middleware
+initMiddleware(app)
 // Implement routes for REST API
 
 

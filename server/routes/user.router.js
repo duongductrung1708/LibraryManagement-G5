@@ -13,11 +13,13 @@ const {
 } = require('../controllers/user.controller')
 
 function isAuthenticated(req, res, next) {
-  console.log(req.session)
-  if (req.session.passport) {
+
+  console.log("abc")
+  console.log(req.isAuthenticated())
+  if (req.session.passport ) {
     return next();
   } else {
-    return "anl"
+    return next(req.session)
   }
 }
 
@@ -25,7 +27,7 @@ router.get("/getAll", (req, res) => getAllUsers(req, res))
 
 router.get("/getAllMembers", (req, res) => getAllMembers(req, res))
 
-router.get("/get/:id", (req, res) => getUser(req, res))
+router.get("/get/:id",isAuthenticated, (req, res) => getUser(req, res))
 
 router.post("/add", (req, res) => addUser(req, res))
 

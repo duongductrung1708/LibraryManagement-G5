@@ -1,9 +1,11 @@
-// const cookieValidator = require('./cookieValidator')
-// const cookieParser = require('cookie-parser')
-// const cookieValidator = require('./cookies')
+const initMiddleware = (app) => {
+    const myLogger = function (req, res, next) {
+        console.log(req.cookies)
+        console.log('LOGGED')
+        next()
+    }
+    
+    app.use('/', myLogger)
+}
 
-
-// async function validateCookies (req, res, next) {
-//     await cookieValidator(req.cookies)
-//     next()
-//   } 
+module.exports=initMiddleware

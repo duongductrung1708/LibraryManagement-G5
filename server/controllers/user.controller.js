@@ -2,8 +2,6 @@ const User = require('../models/user.model')
 
 const getUser = async (req, res) => {
     const userId = req.params.id;
-    console.log("get me: "+ req.session)
-    console.log( req.session)
     User.findById(userId, (err, user) => {
         if (err) {
             return res.status(400).json({ success: false, err });

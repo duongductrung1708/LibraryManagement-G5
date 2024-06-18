@@ -36,11 +36,12 @@ const loginUser = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
-    // if (!user.isValidPassword(req.body.password)) {
     if (!user.isValidPassword(req.body.password)) {
       return res.status(401).json({ success: false, message: "Password incorrect" });
     }
     console.log(req.session)
+    delete user.hash
+    delete user.
     passport.authenticate("local", (err, user, info) => {
       // console.log(req.session)
       req.logIn(user, (err) => {// Initiate a login session for `user`.
