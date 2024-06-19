@@ -49,7 +49,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 const AuthorPage = () => {
-  // const { user } = useAuth();
+  const { user } = useAuth();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
@@ -62,21 +62,72 @@ const AuthorPage = () => {
     description: "",
     photoUrl: ""
   });
-  const [authors, setAuthors] = useState([{
-    id: "fdsfdsf",
-    name: "fdsffds",
-    description: "fdfdf",
-    photoUrl: "sdfdsf"
-  }]);
+  const [authors, setAuthors] = useState([]);
   const [selectedAuthorId, setSelectedAuthorId] = useState(null);
-  const [isTableLoading, setIsTableLoading] = useState(false);
+  const [isTableLoading, setIsTableLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUpdateForm, setIsUpdateForm] = useState(false);
 
-  
-  
+  useEffect(() => {
+    getAllAuthors();
+  }, []);
+
+  const getAllAuthors = () => {
+    axios.get(apiUrl(routes.AUTHOR, methods.GET_ALL))
+      .then((response) => {
+        setAuthors(response.data.authorsList);
+        setIsTableLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching authors:", error);
+      });
+  };
+
+  const addAuthor = () => {
+    axios.post(apiUrl(routes.AUTHOR, methods.POST), author)
+      .then((response) => {
+        toast.success("Author added successfully.");
+        handleCloseModal();
+        getAllAuthors();
+        clearForm();
+      })
+      .catch((error) => {
+        console.error("Error adding author:", error);
+        toast.error("Failed to add author. Please try again.");
+      });
+  };
+
+  const updateAuthor = () => {
+    axios.put(apiUrl(routes.AUTHOR, methods.PUT, selectedAuthorId), author)
+      .then((response) => {
+        toast.success("Author updated successfully.");
+        handleCloseModal();
+        handleCloseMenu();
+        getAllAuthors();
+        clearForm();
+      })
+      .catch((error) => {
+        console.error("Error updating author:", error);
+        toast.error("Failed to update author. Please try again.");
+      });
+  };
+
+  const deleteAuthor = (authorId) => {
+    axios.delete(apiUrl(routes.AUTHOR, methods.DELETE, authorId))
+      .then((response) => {
+        toast.success("Author deleted successfully.");
+        handleCloseDialog();
+        handleCloseMenu();
+        getAllAuthors();
+      })
+      .catch((error) => {
+        console.error("Error deleting author:", error);
+        toast.error("Failed to delete author. Please try again.");
+      });
+  };
+
   const getSelectedAuthorDetails = () => {
     const selectedAuthor = authors.find((element) => element._id === selectedAuthorId);
     setAuthor(selectedAuthor);
@@ -143,7 +194,7 @@ const AuthorPage = () => {
           <Typography variant="h3" gutterBottom>
             Authors
           </Typography>
-          {/* {(user.isAdmin || user.isLibrarian) && (
+          {(user.isAdmin || user.isLibrarian) && (
             <Button
               variant="contained"
               onClick={() => {
@@ -154,7 +205,7 @@ const AuthorPage = () => {
             >
               New Author
             </Button>
-          )} */}
+          )}
         </Stack>
 
         <OutlinedInput
@@ -204,7 +255,7 @@ const AuthorPage = () => {
                               </TableCell>
                               <TableCell align="left">{description}</TableCell>
                               <TableCell align="right">
-                                {/* {(user.isAdmin || user.isLibrarian) && (
+                                {(user.isAdmin || user.isLibrarian) && (
                                   <IconButton
                                     size="large"
                                     color="inherit"
@@ -215,7 +266,7 @@ const AuthorPage = () => {
                                   >
                                     <Iconify icon={'eva:more-vertical-fill'} />
                                   </IconButton>
-                                )} */}
+                                )}
                               </TableCell>
                             </TableRow>
                           );
@@ -286,14 +337,14 @@ const AuthorPage = () => {
         id={selectedAuthorId}
         author={author}
         setAuthor={setAuthor}
-        // handleAddAuthor={addAuthor}
-        // handleUpdateAuthor={updateAuthor}
+        handleAddAuthor={addAuthor}
+        handleUpdateAuthor={updateAuthor}
       />
 
       <AuthorDialog
         isDialogOpen={isDialogOpen}
         authorId={selectedAuthorId}
-        // handleDeleteAuthor={deleteAuthor}
+        handleDeleteAuthor={deleteAuthor}
         handleCloseDialog={handleCloseDialog}
       />
     </>

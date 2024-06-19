@@ -57,7 +57,7 @@ const TruncatedTypography = styled(Typography)({
 });
 
 const BookPage = () => {
-  // const { user } = useAuth();
+  const { user } = useAuth();
 
   // State variables
   const [book, setBook] = useState({
@@ -250,7 +250,7 @@ const BookPage = () => {
           <Typography variant="h3" sx={{ mb: 5 }}>
             Books
           </Typography>
-          {/* {(user.isAdmin || user.isLibrarian) && (
+          {(user.isAdmin || user.isLibrarian) && (
             <Button
               variant="contained"
               onClick={() => {
@@ -261,7 +261,7 @@ const BookPage = () => {
             >
               New Book
             </Button>
-          )} */}
+          )}
         </Stack>
 
         <Box mb={3}>
@@ -297,7 +297,7 @@ const BookPage = () => {
                     >
                       {book.genre.name}
                     </Label>
-                    {/* {(user.isAdmin || user.isLibrarian) && (
+                    {(user.isAdmin || user.isLibrarian) && (
                       <Label
                         variant="filled"
                         sx={{
@@ -323,7 +323,7 @@ const BookPage = () => {
                           <Iconify icon={'eva:more-vertical-fill'} />
                         </IconButton>
                       </Label>
-                    )} */}
+                    )}
 
                     <StyledBookImage alt={book.name} src={book.photoUrl} />
                   </Box>
@@ -394,7 +394,7 @@ const BookPage = () => {
           },
         }}
       >
-        {/* {(user.isAdmin || user.isLibrarian) && (
+        {(user.isAdmin || user.isLibrarian) && (
           <MenuItem
             onClick={() => {
               setIsUpdateForm(true);
@@ -406,14 +406,14 @@ const BookPage = () => {
             <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
             Edit
           </MenuItem>
-        )} */}
+        )}
 
-        {/* {(user.isAdmin || user.isLibrarian) && (
+        {(user.isAdmin || user.isLibrarian) && (
           <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
             Delete
           </MenuItem>
-        )} */}
+        )}
       </Popover>
 
       <BorrowalForm
