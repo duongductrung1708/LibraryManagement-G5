@@ -16,7 +16,8 @@ const methods = {
   POST: "add",
   PUT: "update",
   DELETE: "delete",
-  UPLOAD: "upload"
+  UPLOAD: "upload",
+  IMPORT: "import",
 };
 
 const apiUrl = (route, method, id = "") => `${backendApiUrl}/${route}/${method}${id && `/${id}`}`;
