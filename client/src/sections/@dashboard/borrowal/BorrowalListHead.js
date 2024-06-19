@@ -1,8 +1,5 @@
 import PropTypes from 'prop-types';
-// @mui
-import {Box, TableCell, TableHead, TableRow, TableSortLabel} from '@mui/material';
-
-// ----------------------------------------------------------------------
+import { Box, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
 
 const visuallyHidden = {
   border: 0,
@@ -16,19 +13,15 @@ const visuallyHidden = {
   clip: 'rect(0 0 0 0)',
 };
 
-BorrowalListHead.propTypes = {
-  order: PropTypes.oneOf(['asc', 'desc']),
-  orderBy: PropTypes.string,
-  headLabel: PropTypes.array,
-  onRequestSort: PropTypes.func,
-};
+const TABLE_HEAD = [
+  { id: 'member', label: 'Member Name', alignRight: false },
+  { id: 'book', label: 'Book Name', alignRight: false },
+  { id: 'borrowedDate', label: 'Borrowed On', alignRight: false },
+  { id: 'dueDate', label: 'Due On', alignRight: false },
+  { id: 'status', label: 'Status', alignRight: false },
+];
 
-export default function BorrowalListHead({
-                                           order,
-                                           orderBy,
-                                           headLabel,
-                                           onRequestSort,
-                                         }) {
+export default function BorrowalListHead({ order, orderBy, onRequestSort }) {
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -36,7 +29,7 @@ export default function BorrowalListHead({
   return (
     <TableHead>
       <TableRow>
-        {headLabel.map((headCell) => (
+        {TABLE_HEAD.map((headCell) => (
           <TableCell
             key={headCell.id}
             align={headCell.alignRight ? 'right' : 'left'}
@@ -50,7 +43,7 @@ export default function BorrowalListHead({
             >
               {headCell.label}
               {orderBy === headCell.id ? (
-                <Box sx={{...visuallyHidden}}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</Box>
+                <Box sx={visuallyHidden}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</Box>
               ) : null}
             </TableSortLabel>
           </TableCell>
@@ -59,3 +52,9 @@ export default function BorrowalListHead({
     </TableHead>
   );
 }
+
+BorrowalListHead.propTypes = {
+  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  orderBy: PropTypes.string.isRequired,
+  onRequestSort: PropTypes.func.isRequired,
+};
