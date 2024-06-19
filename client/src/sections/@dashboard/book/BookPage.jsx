@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -479,4 +477,3 @@ const BookPage = () => {
 };
 
 export default BookPage;
->>>>>>> Stashed changes
