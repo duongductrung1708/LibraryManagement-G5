@@ -57,7 +57,10 @@ const TruncatedTypography = styled(Typography)({
 });
 
 const BookPage = () => {
+<<<<<<< HEAD
   const { user } = useAuth();
+=======
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
 
   // State variables
   const [book, setBook] = useState({
@@ -90,20 +93,47 @@ const BookPage = () => {
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [filterName, setFilterName] = useState('');
 
-  // API operations
+
 
   const getAllBooks = () => {
-    axios
-      .get(apiUrl(routes.BOOK, methods.GET_ALL))
-      .then((response) => {
-        setBooks(response.data.booksList);
-        setFilteredBooks(response.data.booksList);
+
+        setBooks([{
+          _id: 'sca',
+          name: 'acs',
+          isbn: 'acs',
+          summary: 'asc',
+          isAvailable: true,
+          author: { 
+            id: "fdsfdsf",
+            name: "fdsffds",
+            description: "fdfdf",
+            photoUrl: "sdfdsf"},
+          genre: {
+            id: "asd", 
+            name: "asd", 
+            description: "asd" 
+          },
+          photoUrl: 'sa',
+        }, {
+          _id: 'scas',
+          name: 'acs',
+          isbn: 'acs',
+          summary: 'asc',
+          isAvailable: true,
+          author: { 
+            id: "fdsfdsf",
+            name: "fdsffds",
+            description: "fdfdf",
+            photoUrl: "sdfdsf"},
+          genre: {
+            id: "asd", 
+            name: "asd", 
+            description: "asd" 
+          },
+          photoUrl: 'sa',
+        }]);
+        setFilteredBooks(books);
         setIsTableLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching books:', error);
-        toast.error('Failed to fetch books');
-      });
   };
 
   const addBook = () => {
@@ -250,7 +280,12 @@ const BookPage = () => {
           <Typography variant="h3" sx={{ mb: 5 }}>
             Books
           </Typography>
+<<<<<<< HEAD
           {(user.isAdmin || user.isLibrarian) && (
+=======
+          {
+           (
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
             <Button
               variant="contained"
               onClick={() => {
@@ -297,7 +332,12 @@ const BookPage = () => {
                     >
                       {book.genre.name}
                     </Label>
+<<<<<<< HEAD
                     {(user.isAdmin || user.isLibrarian) && (
+=======
+                    {
+                    (
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
                       <Label
                         variant="filled"
                         sx={{
@@ -394,7 +434,12 @@ const BookPage = () => {
           },
         }}
       >
+<<<<<<< HEAD
         {(user.isAdmin || user.isLibrarian) && (
+=======
+        {
+         (
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
           <MenuItem
             onClick={() => {
               setIsUpdateForm(true);
@@ -408,7 +453,12 @@ const BookPage = () => {
           </MenuItem>
         )}
 
+<<<<<<< HEAD
         {(user.isAdmin || user.isLibrarian) && (
+=======
+        {
+         (
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
           <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
             Delete
