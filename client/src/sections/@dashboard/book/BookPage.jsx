@@ -57,6 +57,10 @@ const TruncatedTypography = styled(Typography)({
 });
 
 const BookPage = () => {
+<<<<<<< HEAD
+  const { user } = useAuth();
+=======
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
 
   // State variables
   const [book, setBook] = useState({
@@ -276,8 +280,12 @@ const BookPage = () => {
           <Typography variant="h3" sx={{ mb: 5 }}>
             Books
           </Typography>
+<<<<<<< HEAD
+          {(user.isAdmin || user.isLibrarian) && (
+=======
           {
            (
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
             <Button
               variant="contained"
               onClick={() => {
@@ -324,8 +332,12 @@ const BookPage = () => {
                     >
                       {book.genre.name}
                     </Label>
+<<<<<<< HEAD
+                    {(user.isAdmin || user.isLibrarian) && (
+=======
                     {
                     (
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
                       <Label
                         variant="filled"
                         sx={{
@@ -422,8 +434,12 @@ const BookPage = () => {
           },
         }}
       >
+<<<<<<< HEAD
+        {(user.isAdmin || user.isLibrarian) && (
+=======
         {
          (
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
           <MenuItem
             onClick={() => {
               setIsUpdateForm(true);
@@ -437,8 +453,12 @@ const BookPage = () => {
           </MenuItem>
         )}
 
+<<<<<<< HEAD
+        {(user.isAdmin || user.isLibrarian) && (
+=======
         {
          (
+>>>>>>> 44e541e289d0250dba899a792e198493bf1f17fb
           <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
             Delete
