@@ -3,11 +3,10 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField, Divider } from '@mui/material';
+import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { apiUrl, routes, methods } from '../../../constants';
 import Label from '../../../components/label';
-import Iconify from '../../../components/iconify'; // Assuming you reuse the styled component from BookPage
 import BorrowalForm from '../borrowal/BorrowalForm';
 
 // ----------------------------------------------------------------------

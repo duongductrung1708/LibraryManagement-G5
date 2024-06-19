@@ -12,7 +12,6 @@ import {
   Grid,
   IconButton,
   MenuItem,
-  Modal,
   OutlinedInput,
   Popover,
   Stack,
