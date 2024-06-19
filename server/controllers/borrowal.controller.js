@@ -15,16 +15,17 @@ async function getBorrowalById(req, res, next) {
 
 async function getAllBorrowals(req, res, next) {
     try {
+        // Lấy danh sách tất cả các mượn sách
         const borrowalsList = await Borrowal.find({})
-            .populate('memberId', 'name') 
-            .populate('bookId', 'name');   
+            .populate('memberId') 
+            .populate('bookId'); 
         
         res.status(200).json({
             success: true,
             borrowalsList: borrowalsList.map(borrowal => ({
                 borrowal: borrowal,
-                member: borrowal.memberId.name, 
-                book: borrowal.bookId.name      
+                member: borrowal.memberId,
+                book: borrowal.bookId
             }))
         });
     } catch (error) {
