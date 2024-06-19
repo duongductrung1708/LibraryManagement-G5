@@ -1,10 +1,7 @@
-import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import toast from 'react-hot-toast';
-
+import { CircularProgress, Container, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { Alert } from '@mui/lab';
-
 import Iconify from '../../../components/iconify';
 
 import toast from "react-hot-toast";
@@ -13,14 +10,12 @@ import {
   Avatar,
   Button,
   Card,
-
   IconButton,
   InputAdornment,
   MenuItem,
   OutlinedInput,
   Popover,
   Stack,
-
   TablePagination,
 } from "@mui/material";
 
@@ -84,7 +79,6 @@ const BorrowalPage = () => {
     setIsModalOpen(false);
   };
 
-
   return (
     <>
       <Container>
@@ -132,7 +126,6 @@ const BorrowalPage = () => {
           <Alert severity="warning">No borrowals found</Alert>
         )}
       </Container>
-
     </>
   );
 };
