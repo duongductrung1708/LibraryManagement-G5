@@ -21,7 +21,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const app = express();
-const PORT = process.env.PORT || 8080;
 
 app.use(logger("dev"));
 
@@ -76,21 +75,7 @@ app.use((err, req, res, next) => {
 
 app.get("/", (req, res) => res.send("Welcome to Library Management System"));
 
-
-// Connect to DB
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Connected to MongoDB successfully");
-  } catch (err) {
-    console.error("Error connecting to MongoDB:", err.message);
-  }
-};
-
-connectDB();
-
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}!`))
-
+app.listen(process.env.PORT, process.env.HOST_NAME, () => {
+  console.log("Server listening on port " + process.env.PORT);
+  db.connectDB();
+});

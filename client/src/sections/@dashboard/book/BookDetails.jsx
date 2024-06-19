@@ -38,6 +38,82 @@ const BookDetails = () => {
 
   const [review, setReview] = useState('');
 
+  const getBook = useCallback(() => {
+    setIsLoading(true);
+    axios
+      .get(apiUrl(routes.BOOK, methods.GET, id), { withCredentials: true })
+      .then((response) => {
+        const bookData = response.data.book;
+        setBook(bookData);
+        return Promise.all([
+          axios.get(apiUrl(routes.AUTHOR, methods.GET, bookData.authorId), { withCredentials: true }),
+          axios.get(apiUrl(routes.GENRE, methods.GET, bookData.genreId), { withCredentials: true }),
+          // axios.get(apiUrl(routes.REVIEW, methods.GET, { bookId: id }), { withCredentials: true }),
+        ]);
+      })
+      .then(([authorResponse, genreResponse, reviewResponse]) => {
+        setAuthor(authorResponse.data.author);
+        setGenre(genreResponse.data.genre);
+        // setReviews(reviewResponse.data.reviews);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching book details:', error);
+        toast.error('Failed to fetch book details');
+        setIsLoading(false);
+      });
+  }, [id]);
+
+  const getUser = useCallback(() => {
+    axios
+      .get(apiUrl(routes.USER, methods.GET, id), { withCredentials: true })
+      .then((response) => {
+        setUser(response.data.user);
+      })
+      .catch((error) => {
+        console.error('Error fetching user details:', error);
+        toast.error('Failed to fetch user details');
+      });
+  }, [id]);
+
+  useEffect(() => {
+    getBook();
+    getUser();
+  }, [getBook, getUser]);
+
+  const addBorrowal = () => {
+    axios
+      .post(apiUrl(routes.BORROWAL, methods.POST), borrowal)
+      .then((response) => {
+        toast.success('Borrowal added successfully');
+        handleCloseBorrowalModal();
+        clearBorrowForm();
+      })
+      .catch((error) => {
+        console.error('Error adding borrowal:', error);
+        toast.error('Failed to add borrowal');
+      });
+  };
+
+  const addReview = () => {
+    const reviewData = {
+      book: id,
+      reviewedBy: user._id,
+      review,
+      reviewedAt: new Date(),
+    };
+    axios
+      .post(apiUrl(routes.REVIEW, methods.POST), reviewData)
+      .then((response) => {
+        toast.success('Review added successfully');
+        setReview('');
+        setReviews([...reviews, response.data.review]);
+      })
+      .catch((error) => {
+        console.error('Error adding review:', error);
+        toast.error('Failed to add review');
+      });
+  };
 
   const backToBookPage = () => {
     navigate('/books');
@@ -146,9 +222,7 @@ const BookDetails = () => {
             onChange={(e) => setReview(e.target.value)}
             sx={{ mt: 2 }}
           />
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} 
-          // onClick={addReview}
-          >
+          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={addReview}>
             Submit Review
           </Button>
         </Grid>
@@ -172,7 +246,7 @@ const BookDetails = () => {
         id={selectedBookId}
         borrowal={borrowal}
         setBorrowal={setBorrowal}
-        // handleAddBorrowal={addBorrowal}
+        handleAddBorrowal={addBorrowal}
       />
     </Container>
   );
