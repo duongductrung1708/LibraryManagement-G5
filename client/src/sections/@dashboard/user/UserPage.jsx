@@ -228,6 +228,7 @@ const UserPage = () => {
           <Typography variant="h3" gutterBottom>
             Users
           </Typography>
+          <Grid style={{display: "flex", flexDirection: "column"}}>
           <Button
             variant="contained"
             onClick={() => {
@@ -239,6 +240,7 @@ const UserPage = () => {
             New User
           </Button>
           <Button
+          style={{ marginTop: "5px"}}
             variant="contained"
             onClick={() => {
               handleOpenImportModal();
@@ -247,6 +249,7 @@ const UserPage = () => {
           >
             Import New User
           </Button>
+          </Grid>
         </Stack>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
