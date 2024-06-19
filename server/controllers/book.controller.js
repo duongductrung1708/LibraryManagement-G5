@@ -1,6 +1,6 @@
-const Book = require('../models/book.model')
 const mongoose = require("mongoose");
-
+const db = require('../models');
+const Book = db.book;
 
 const getBook = async (req, res, next) => {
   try {
@@ -222,11 +222,11 @@ const deleteBook = async (req, res, next) => {
   }
 };
 
-
-module.exports = {
+const  bookController ={
   getBook,
   getAllBooks,
   addBook,
   updateBook,
-  deleteBook
+  deleteBook,
 }
+module.exports = bookController;
