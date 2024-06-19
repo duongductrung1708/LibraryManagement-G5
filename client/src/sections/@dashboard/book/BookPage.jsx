@@ -130,11 +130,6 @@ const BookPage = () => {
         }]);
         setFilteredBooks(books);
         setIsTableLoading(false);
-      // })
-      // .catch((error) => {
-      //   console.error('Error fetching books:', error);
-      //   toast.error('Failed to fetch books');
-      // });
   };
 
   const addBook = () => {
