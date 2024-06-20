@@ -1,13 +1,11 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField, Divider } from '@mui/material';
+import { useState } from 'react';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { Container, Typography, Box, Button, Grid, Avatar, TextField, Divider, Breadcrumbs, Link, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { apiUrl, routes, methods } from '../../../constants';
+import ImageGallery from 'react-image-gallery';
+import 'react-image-gallery/styles/css/image-gallery.css';
 import Label from '../../../components/label';
-import Iconify from '../../../components/iconify'; // Assuming you reuse the styled component from BookPage
 import BorrowalForm from '../borrowal/BorrowalForm';
 
 // ----------------------------------------------------------------------
@@ -25,19 +23,57 @@ const BookDetails = () => {
     status: '',
   });
 
-  const { id } = useParams();
   const navigate = useNavigate();
-  const [book, setBook] = useState(null);
-  const [author, setAuthor] = useState(null);
-  const [genre, setGenre] = useState(null);
-  const [user, setUser] = useState(null);
-  const [reviews, setReviews] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState(null);
-
   const [review, setReview] = useState('');
 
+  // Hardcoded data for testing
+  const book = {
+    _id: '1',
+    name: 'Sample Book',
+    photoUrls: [
+      'https://via.placeholder.com/600x800',
+      'https://via.placeholder.com/601x801',
+      'https://via.placeholder.com/600x800',
+      'https://via.placeholder.com/603x803',
+    ],
+    summary: 'This is a sample book summary.',
+    isbn: '123-456-789',
+    isAvailable: true,
+  };
+
+  const author = {
+    name: 'John Doe',
+    photoUrl: 'https://via.placeholder.com/50',
+  };
+
+  const genre = {
+    name: 'Fiction',
+  };
+
+  const user = {
+    name: 'Jane Doe',
+    photoUrl: 'https://via.placeholder.com/50',
+  };
+
+  const reviews = [
+    {
+      _id: '1',
+      reviewedBy: user,
+      review: 'Great book!',
+    },
+    {
+      _id: '2',
+      reviewedBy: user,
+      review: 'Interesting read.',
+    },
+  ];
+
+  const images = book.photoUrls.map((url) => ({
+    original: url,
+    thumbnail: url,
+  }));
 
   const backToBookPage = () => {
     navigate('/books');
@@ -61,27 +97,24 @@ const BookDetails = () => {
     });
   };
 
-  if (isLoading) {
-    return (
-      <Container>
-        <CircularProgress />
-      </Container>
-    );
-  }
-
-  if (!book || !author || !genre) {
-    return (
-      <Container>
-        <Typography variant="h5">Book not found</Typography>
-      </Container>
-    );
-  }
-
   return (
     <Container>
       <Helmet>
         <title>{book.name} - Book Details</title>
       </Helmet>
+
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link component={RouterLink} to="/">
+          Dashboard
+        </Link>
+        <Link component={RouterLink} to="/books">
+          Books
+        </Link>
+        <Link component={RouterLink} to={`/books/genres/${genre.name}`}>
+          {genre.name}
+        </Link>
+        <Typography color="text.primary">{book.name}</Typography>
+      </Breadcrumbs>
 
       <Button variant="outlined" color="primary" onClick={backToBookPage} sx={{ mb: 2 }}>
         Back to Books
@@ -89,7 +122,7 @@ const BookDetails = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
-          <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} />
+          <ImageGallery items={images} />
         </Grid>
         <Grid item xs={12} sm={8} style={{ paddingLeft: '3rem' }}>
           <Box>
@@ -153,7 +186,7 @@ const BookDetails = () => {
           </Button>
         </Grid>
       </Grid>
-      {/* <Box sx={{ mt: 4 }}>
+      <Box sx={{ mt: 4 }}>
         <Typography variant="h6">Reviews</Typography>
         {reviews.map((rev) => (
           <Box key={rev._id} sx={{ mt: 2 }}>
@@ -165,7 +198,7 @@ const BookDetails = () => {
             <Divider sx={{ mt: 2 }} />
           </Box>
         ))}
-      </Box> */}
+      </Box>
       <BorrowalForm
         isModalOpen={isBorrowalModalOpen}
         handleCloseModal={handleCloseBorrowalModal}
