@@ -1,10 +1,12 @@
 import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { Container, Typography, Box, Button, Grid, Avatar, TextField, Divider, Breadcrumbs, Link, Paper } from '@mui/material';
+import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField, Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import ImageGallery from 'react-image-gallery';
-import 'react-image-gallery/styles/css/image-gallery.css';
+import shuffle from 'lodash.shuffle';
+import { apiUrl, routes, methods } from '../../../constants';
 import Label from '../../../components/label';
 import BorrowalForm from '../borrowal/BorrowalForm';
 
@@ -24,9 +26,101 @@ const BookDetails = () => {
   });
 
   const navigate = useNavigate();
+  const [book, setBook] = useState(null);
+  const [author, setAuthor] = useState(null);
+  const [genre, setGenre] = useState(null);
+  const [user, setUser] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [relatedBooks, setRelatedBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState(null);
   const [review, setReview] = useState('');
+
+  const getBook = useCallback(() => {
+    setIsLoading(true);
+    axios
+      .get(apiUrl(routes.BOOK, methods.GET, id), { withCredentials: true })
+      .then((response) => {
+        const bookData = response.data.book;
+        setBook(bookData);
+        return Promise.all([
+          axios.get(apiUrl(routes.AUTHOR, methods.GET, bookData.authorId), { withCredentials: true }),
+          axios.get(apiUrl(routes.GENRE, methods.GET, bookData.genreId), { withCredentials: true }),
+        ]);
+      })
+      .then(([authorResponse, genreResponse]) => {
+        setAuthor(authorResponse.data.author);
+        setGenre(genreResponse.data.genre);
+        // Fetch related books
+        return axios.get(apiUrl(routes.BOOKS_BY_GENRE, methods.GET, genreResponse.data.genre._id), {
+          withCredentials: true,
+        });
+      })
+      .then((relatedBooksResponse) => {
+        const relatedBooks = relatedBooksResponse.data.books.filter((b) => b._id !== id);
+        const shuffledBooks = shuffle(relatedBooks).slice(0, 5);
+        setRelatedBooks(shuffledBooks);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching book details:', error);
+        toast.error('Failed to fetch book details');
+        setIsLoading(false);
+      });
+  }, [id]);
+
+  const getUser = useCallback(() => {
+    axios
+      .get(apiUrl(routes.USER, methods.GET, id), { withCredentials: true })
+      .then((response) => {
+        setUser(response.data.user);
+      })
+      .catch((error) => {
+        console.error('Error fetching user details:', error);
+        toast.error('Failed to fetch user details');
+      });
+  }, [id]);
+
+  useEffect(() => {
+    getBook();
+    getUser();
+  }, [getBook, getUser]);
+
+  const addBorrowal = () => {
+    axios
+      .post(apiUrl(routes.BORROWAL, methods.POST), borrowal)
+      .then((response) => {
+        toast.success('Borrowal added successfully');
+        handleCloseBorrowalModal();
+        clearBorrowForm();
+      })
+      .catch((error) => {
+        console.error('Error adding borrowal:', error);
+        toast.error('Failed to add borrowal');
+      });
+  };
+
+  const addReview = () => {
+    const reviewData = {
+      book: id,
+      reviewedBy: user._id,
+      review,
+      reviewedAt: new Date(),
+    };
+    axios
+      .post(apiUrl(routes.REVIEW, methods.POST), reviewData)
+      .then((response) => {
+        toast.success('Review added successfully');
+        setReview('');
+        setReviews([...reviews, response.data.review]);
+      })
+      .catch((error) => {
+        console.error('Error adding review:', error);
+        toast.error('Failed to add review');
+      });
+  };
 
   // Hardcoded data for testing
   const book = {
@@ -130,7 +224,11 @@ const BookDetails = () => {
             <Label color={book.isAvailable ? 'success' : 'error'} sx={{ mt: 1, mb: 2 }}>
               {book.isAvailable ? 'Available' : 'Not available'}
             </Label>
-            <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2, display: 'flex', alignItems: 'center' }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ color: '#888888', mt: 2, display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              onClick={() => navigate(`/author/${author._id}`)}
+            >
               <Avatar alt={author.name} src={author.photoUrl} /> {author.name}
             </Typography>
             <Box sx={{ position: 'relative', mt: 2 }}>
@@ -163,11 +261,15 @@ const BookDetails = () => {
         </Grid>
       </Grid>
       <Grid container spacing={2} sx={{ mt: 4 }}>
-        <Typography variant="h6" sx={{ mt: 2 }}>Write a Review</Typography>
-        <Grid item xs={12} style={{ paddingLeft: "3rem" }}>
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Write a Review
+        </Typography>
+        <Grid item xs={12} style={{ paddingLeft: '3rem' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Avatar alt={user?.name} src={user?.photoUrl} sx={{ mr: 2 }} />
-            <Typography variant="subtitle1" sx={{ color: '#888888' }}>{user?.name}</Typography>
+            <Typography variant="subtitle1" sx={{ color: '#888888' }}>
+              {user?.name}
+            </Typography>
           </Box>
           <TextField
             id="standard-basic"
@@ -179,12 +281,31 @@ const BookDetails = () => {
             onChange={(e) => setReview(e.target.value)}
             sx={{ mt: 2 }}
           />
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} 
-          // onClick={addReview}
-          >
+          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={addReview}>
             Submit Review
           </Button>
         </Grid>
+      </Grid>
+      <Grid container spacing={2} sx={{ mt: 4 }}>
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Related Books
+        </Typography>
+        {relatedBooks.map((relatedBook) => (
+          <Grid item xs={12} sm={2} key={relatedBook._id} style={{ paddingLeft: '3rem' }}>
+            <Card>
+              <Box sx={{ position: 'relative' }}>
+                <img alt={relatedBook.name} src={relatedBook.photoUrl} style={{ width: '100%', height: 'auto' }} />
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mt: 2, textAlign: 'center', cursor: 'pointer' }}
+                  onClick={() => navigate(`/books/${relatedBook._id}`)}
+                >
+                  {relatedBook.name}
+                </Typography>
+              </Box>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6">Reviews</Typography>
@@ -205,7 +326,7 @@ const BookDetails = () => {
         id={selectedBookId}
         borrowal={borrowal}
         setBorrowal={setBorrowal}
-        // handleAddBorrowal={addBorrowal}
+        handleAddBorrowal={addBorrowal}
       />
     </Container>
   );

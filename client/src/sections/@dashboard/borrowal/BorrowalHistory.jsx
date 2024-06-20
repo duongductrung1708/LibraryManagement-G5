@@ -61,21 +61,12 @@ const BorrowalHistory = () => {
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // Data
-  const [borrowal, setBorrowal] = useState({
-    bookId: '',
-    memberId: '',
-    borrowedDate: '',
-    dueDate: '',
-    status: '',
-  });
   const [borrowals, setBorrowals] = useState([]);
   const [selectedBorrowalId, setSelectedBorrowalId] = useState(null);
   const [isTableLoading, setIsTableLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // API operations
   const getAllBorrowals = useCallback(() => {
     axios
       .get(apiUrl(routes.BORROWAL, methods.GET_ALL))
@@ -94,7 +85,6 @@ const BorrowalHistory = () => {
       });
   }, [user.isAdmin, user._id]);
 
-  // Load data on initial page load
   useEffect(() => {
     getAllBorrowals();
   }, [getAllBorrowals]);

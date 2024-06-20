@@ -5,6 +5,7 @@ const passport = require("passport");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const db = require("./models");
+const createError = require("http-errors"); // Import http-errors
 
 const {
   AuthRouter,
@@ -21,7 +22,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const app = express();
-const PORT = process.env.PORT || 8080;
 
 app.use(logger("dev"));
 
@@ -60,8 +60,8 @@ app.use("/api/genre", GenreRouter);
 app.use("/api/user", UserRouter);
 app.use("/api/review", ReviewRouter);
 
-app.use(async (req, res, next) => {
-  next(httpError.NotFound());
+app.use((req, res, next) => {
+  next(createError(404));
 });
 
 app.use((err, req, res, next) => {
@@ -76,21 +76,7 @@ app.use((err, req, res, next) => {
 
 app.get("/", (req, res) => res.send("Welcome to Library Management System"));
 
-
-// Connect to DB
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Connected to MongoDB successfully");
-  } catch (err) {
-    console.error("Error connecting to MongoDB:", err.message);
-  }
-};
-
-connectDB();
-
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}!`))
-
+app.listen(process.env.PORT, process.env.HOST_NAME, () => {
+  console.log("Server listening on port " + process.env.PORT);
+  db.connectDB();
+});

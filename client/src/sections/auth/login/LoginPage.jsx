@@ -30,35 +30,35 @@ const StyledContent = styled("div")(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function LoginPage() {
-  // const { login, user } = useAuth();
+  const { login, user } = useAuth();
 
-  // if (user) {
-  //   if (user.isAdmin) {
-  //     return <Navigate to={"/dashboard"} replace />;
-  //   }
-  //   return <Navigate to={"/books"} replace />;
-  // }
+  if (user) {
+    if (user.isAdmin) {
+      return <Navigate to={"/dashboard"} replace />;
+    }
+    return <Navigate to={"/books"} replace />;
+  }
 
-  // const loginUser = (email, password) => {
-  //   if (email === "" || password === "") {
-  //     toast.error("Please enter email and password");
-  //   } else {
-  //     axios.post(`http://localhost:8080/api/auth/login`, { email, password }, { withCredentials: false })
-  //       .then((response) => {
-  //         // handle success
-  //         if (response.status === 200) {
-  //           console.log(response.data);
-  //           toast.success(`Successfully logged in as ${response.data.user.name}`);
-  //           login(response.data.user);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         // handle error
-  //         toast.error(error.response.data.message);
-  //         console.log(error);
-  //       });
-  //   }
-  // };
+  const loginUser = (email, password) => {
+    if (email === "" || password === "") {
+      toast.error("Please enter email and password");
+    } else {
+      axios.post(`http://localhost:8080/api/auth/login`, { email, password }, { withCredentials: false })
+        .then((response) => {
+          // handle success
+          if (response.status === 200) {
+            console.log(response.data);
+            toast.success(`Successfully logged in as ${response.data.user.name}`);
+            login(response.data.user);
+          }
+        })
+        .catch((error) => {
+          // handle error
+          toast.error(error.response.data.message);
+          console.log(error);
+        });
+    }
+  };
 
 
   return (
@@ -86,8 +86,8 @@ export default function LoginPage() {
               Sign in
             </Typography>
 
-            <LoginForm />
-            {/* loginUser={loginUser}  */}
+            <LoginForm loginUser={loginUser} />
+
           </StyledContent>
         </Container>
       </StyledRoot>

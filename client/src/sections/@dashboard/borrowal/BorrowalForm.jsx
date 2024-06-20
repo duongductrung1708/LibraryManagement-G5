@@ -32,61 +32,61 @@ const BorrowalForm = ({
   borrowal,
   setBorrowal,
 }) => {
-  // const { user } = useAuth();
+  const { user } = useAuth();
   const [members, setMembers] = useState([]);
   const [books, setBooks] = useState([]);
   const [availableBooks, setAvailableBooks] = useState([]);
 
-  // const getAllMembers = useCallback(() => {
-  //   axios
-  //     .get('http://localhost:8080/api/user/getAllMembers')
-  //     .then((response) => {
-  //       const filteredMembers = response.data.membersList.filter(
-  //         (member) => !(member.isLibrarian && user.isLibrarian)
-  //       );
-  //       if (user.isAdmin || user.isLibrarian) {
-  //         setMembers(filteredMembers);
-  //       } else {
-  //         setMembers(filteredMembers.filter((member) => user._id === member._id));
-  //       }
-  //       setBorrowal((prev) => ({ ...prev, memberId: user._id }));
-  //     })
-  //     .catch((error) => {
-  //       toast.error('Error fetching members');
-  //       console.log(error);
-  //     });
-  // }, [setBorrowal, user]);
+  const getAllMembers = useCallback(() => {
+    axios
+      .get('http://localhost:8080/api/user/getAllMembers')
+      .then((response) => {
+        const filteredMembers = response.data.membersList.filter(
+          (member) => !(member.isLibrarian && user.isLibrarian)
+        );
+        if (user.isAdmin || user.isLibrarian) {
+          setMembers(filteredMembers);
+        } else {
+          setMembers(filteredMembers.filter((member) => user._id === member._id));
+        }
+        setBorrowal((prev) => ({ ...prev, memberId: user._id }));
+      })
+      .catch((error) => {
+        toast.error('Error fetching members');
+        console.log(error);
+      });
+  }, [setBorrowal, user]);
 
-  // const getAllBooks = useCallback(() => {
-  //   axios
-  //     .get('http://localhost:8080/api/book/getAll')
-  //     .then((response) => {
-  //       const allBooks = response.data.booksList;
-  //       setBooks(allBooks);
-  //       const availableBooksList = allBooks.filter((book) => book.isAvailable);
-  //       setAvailableBooks(availableBooksList);
-  //     })
-  //     .catch((error) => {
-  //       toast.error('Error fetching books');
-  //       console.log(error);
-  //     });
-  // }, []);
+  const getAllBooks = useCallback(() => {
+    axios
+      .get('http://localhost:8080/api/book/getAll')
+      .then((response) => {
+        const allBooks = response.data.booksList;
+        setBooks(allBooks);
+        const availableBooksList = allBooks.filter((book) => book.isAvailable);
+        setAvailableBooks(availableBooksList);
+      })
+      .catch((error) => {
+        toast.error('Error fetching books');
+        console.log(error);
+      });
+  }, []);
 
-  // useEffect(() => {
-  //   getAllMembers();
-  //   getAllBooks();
-  // }, [getAllMembers, getAllBooks]);
+  useEffect(() => {
+    getAllMembers();
+    getAllBooks();
+  }, [getAllMembers, getAllBooks]);
 
-  // useEffect(() => {
-  //   if (!user.isAdmin && !user.isLibrarian) {
-  //     setBorrowal((prev) => ({
-  //       ...prev,
-  //       borrowedDate: new Date().toISOString().split('T')[0],
-  //       dueDate: new Date(new Date().setDate(new Date().getDate() + 14)).toISOString().split('T')[0],
-  //       status: 'pending',
-  //     }));
-  //   }
-  // }, [user, setBorrowal]);
+  useEffect(() => {
+    if (!user.isAdmin && !user.isLibrarian) {
+      setBorrowal((prev) => ({
+        ...prev,
+        borrowedDate: new Date().toISOString().split('T')[0],
+        dueDate: new Date(new Date().setDate(new Date().getDate() + 14)).toISOString().split('T')[0],
+        status: 'pending',
+      }));
+    }
+  }, [user, setBorrowal]);
 
   const style = {
     position: 'absolute',
@@ -100,7 +100,7 @@ const BorrowalForm = ({
     p: 4,
   };
 
-  // const isAdminOrLibrarian = user.isAdmin || user.isLibrarian;
+  const isAdminOrLibrarian = user.isAdmin || user.isLibrarian;
 
   return (
     <Modal
@@ -119,7 +119,7 @@ const BorrowalForm = ({
               <Grid item xs={12} md={6} paddingRight={1}>
                 <FormControl sx={{ m: 0 }} fullWidth>
                   <InputLabel id="member-label">Member</InputLabel>
-                  {/* <Select
+                  <Select
                     required
                     disabled={!isAdminOrLibrarian}
                     labelId="member-label"
@@ -133,7 +133,7 @@ const BorrowalForm = ({
                         {member.name}
                       </MenuItem>
                     ))}
-                  </Select> */}
+                  </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={6} paddingLeft={1}>
@@ -159,7 +159,7 @@ const BorrowalForm = ({
 
             <Grid container spacing={0} sx={{ paddingBottom: '4px' }}>
               <Grid item xs={12} md={6} paddingRight={1}>
-                {/* <TextField
+                <TextField
                   fullWidth
                   name="borrowedDate"
                   label="Borrowed date"
@@ -169,10 +169,10 @@ const BorrowalForm = ({
                   InputLabelProps={{ shrink: true }}
                   onChange={(e) => setBorrowal({ ...borrowal, borrowedDate: e.target.value })}
                   disabled={!isAdminOrLibrarian}
-                /> */}
+                />
               </Grid>
               <Grid item xs={12} md={6} paddingLeft={1}>
-                {/* <TextField
+                <TextField
                   fullWidth
                   name="dueDate"
                   label="Due date"
@@ -182,13 +182,13 @@ const BorrowalForm = ({
                   InputLabelProps={{ shrink: true }}
                   onChange={(e) => setBorrowal({ ...borrowal, dueDate: e.target.value })}
                   disabled={!isAdminOrLibrarian}
-                /> */}
+                />
               </Grid>
             </Grid>
 
             <FormControl sx={{ m: 0 }} fullWidth>
               <InputLabel id="status-label">Status</InputLabel>
-              {/* <Select
+              <Select
                 labelId="status-label"
                 id="status"
                 value={borrowal.status}
@@ -208,7 +208,7 @@ const BorrowalForm = ({
                 <MenuItem value="returned">
                   <ReplayIcon style={{ marginRight: 8 }} /> Returned
                 </MenuItem>
-              </Select> */}
+              </Select>
             </FormControl>
 
             <br />

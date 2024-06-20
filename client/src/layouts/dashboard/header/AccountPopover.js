@@ -6,25 +6,25 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 
 export default function AccountPopover() {
-  // const { user } = useAuth();
-  // const { logout } = useAuth();
+  const { user } = useAuth();
+  const { logout } = useAuth();
   const [open, setOpen] = useState(null);
 
-  // const logoutUser = () => {
-  //   handleClose();
-  //   axios
-  //     .get(`http://localhost:8080/api/auth/logout`, { withCredentials: true })
-  //     .then((response) => {
-  //       if (response.status === 200) {
-  //         console.log(response.data);
-  //         logout();
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       alert(error);
-  //       console.log(error);
-  //     });
-  // };
+  const logoutUser = () => {
+    handleClose();
+    axios
+      .get(`http://localhost:8080/api/auth/logout`, { withCredentials: true })
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          logout();
+        }
+      })
+      .catch((error) => {
+        alert(error);
+        console.log(error);
+      });
+  };
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -53,7 +53,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        {/* <Avatar src={user.photoUrl} alt={user.name} /> */}
+        <Avatar src={user.photoUrl} alt={user.name} />
       </IconButton>
 
       <Popover
@@ -77,22 +77,22 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <MenuItem style={{paddingLeft: "3px"}}>
-            {/* <Link to={`/userprofile/${user._id}`} style={{ textDecoration: 'none' }}>
+            <Link to={`/userprofile/${user._id}`} style={{ textDecoration: 'none' }}>
               <Typography variant="subtitle2" noWrap>
                 {user.name}
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
                 {user.email}
               </Typography>
-            </Link> */}
+            </Link>
           </MenuItem>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {/* <MenuItem onClick={logoutUser} sx={{ m: 1 }}>
+        <MenuItem onClick={logoutUser} sx={{ m: 1 }}>
           Logout
-        </MenuItem> */}
+        </MenuItem>
       </Popover>
     </>
   );

@@ -35,11 +35,11 @@ const Main = styled('div')(({ theme }) => ({
 
 export default function LibraryApp() {
   const [open, setOpen] = useState(false);
-  // const {user} = useAuth();
+  const {user} = useAuth();
 
-  // if (!user) {
-  //   return <Navigate to={'/login'} replace/>
-  // }
+  if (!user) {
+    return <Navigate to={'/login'} replace/>
+  }
 
   return (
     <StyledRoot>

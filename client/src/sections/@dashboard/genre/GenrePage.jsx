@@ -45,7 +45,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 const GenrePage = () => {
-  // const { user } = useAuth();
+  const { user } = useAuth();
 
   // State variables
   const [page, setPage] = useState(0);
@@ -178,7 +178,7 @@ const GenrePage = () => {
     setIsModalOpen(false);
   };
 
-  // const canManageGenres = user.isAdmin || user.isLibrarian;
+  const canManageGenres = user.isAdmin || user.isLibrarian;
 
   const filteredGenres = applySortFilter(genres, getComparator(order, orderBy), filterName);
 
@@ -193,7 +193,7 @@ const GenrePage = () => {
           <Typography variant="h3" gutterBottom>
             Genres
           </Typography>
-          {/* {canManageGenres && (
+          {canManageGenres && (
             <Button
               variant="contained"
               onClick={() => {
@@ -204,7 +204,7 @@ const GenrePage = () => {
             >
               New Genre
             </Button>
-          )} */}
+          )}
         </Stack>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <OutlinedInput
@@ -253,7 +253,7 @@ const GenrePage = () => {
                               <TableCell align="left">{description}</TableCell>
 
                               <TableCell align="right">
-                                {/* {canManageGenres && (
+                                {canManageGenres && (
                                   <IconButton
                                     size="large"
                                     color="inherit"
@@ -264,7 +264,7 @@ const GenrePage = () => {
                                   >
                                     <Iconify icon={"eva:more-vertical-fill"} />
                                   </IconButton>
-                                )} */}
+                                )}
                               </TableCell>
                             </TableRow>
                           );
