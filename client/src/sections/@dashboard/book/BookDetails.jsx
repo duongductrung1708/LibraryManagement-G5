@@ -25,7 +25,6 @@ const BookDetails = () => {
     status: '',
   });
 
-  const { id } = useParams();
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
   const [author, setAuthor] = useState(null);
@@ -34,9 +33,9 @@ const BookDetails = () => {
   const [reviews, setReviews] = useState([]);
   const [relatedBooks, setRelatedBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState(null);
-
   const [review, setReview] = useState('');
 
   const getBook = useCallback(() => {
@@ -123,6 +122,53 @@ const BookDetails = () => {
       });
   };
 
+  // Hardcoded data for testing
+  const book = {
+    _id: '1',
+    name: 'Sample Book',
+    photoUrls: [
+      'https://via.placeholder.com/600x800',
+      'https://via.placeholder.com/601x801',
+      'https://via.placeholder.com/600x800',
+      'https://via.placeholder.com/603x803',
+    ],
+    summary: 'This is a sample book summary.',
+    isbn: '123-456-789',
+    isAvailable: true,
+  };
+
+  const author = {
+    name: 'John Doe',
+    photoUrl: 'https://via.placeholder.com/50',
+  };
+
+  const genre = {
+    name: 'Fiction',
+  };
+
+  const user = {
+    name: 'Jane Doe',
+    photoUrl: 'https://via.placeholder.com/50',
+  };
+
+  const reviews = [
+    {
+      _id: '1',
+      reviewedBy: user,
+      review: 'Great book!',
+    },
+    {
+      _id: '2',
+      reviewedBy: user,
+      review: 'Interesting read.',
+    },
+  ];
+
+  const images = book.photoUrls.map((url) => ({
+    original: url,
+    thumbnail: url,
+  }));
+
   const backToBookPage = () => {
     navigate('/books');
   };
@@ -145,27 +191,24 @@ const BookDetails = () => {
     });
   };
 
-  if (isLoading) {
-    return (
-      <Container>
-        <CircularProgress />
-      </Container>
-    );
-  }
-
-  if (!book || !author || !genre) {
-    return (
-      <Container>
-        <Typography variant="h5">Book not found</Typography>
-      </Container>
-    );
-  }
-
   return (
     <Container>
       <Helmet>
         <title>{book.name} - Book Details</title>
       </Helmet>
+
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link component={RouterLink} to="/">
+          Dashboard
+        </Link>
+        <Link component={RouterLink} to="/books">
+          Books
+        </Link>
+        <Link component={RouterLink} to={`/books/genres/${genre.name}`}>
+          {genre.name}
+        </Link>
+        <Typography color="text.primary">{book.name}</Typography>
+      </Breadcrumbs>
 
       <Button variant="outlined" color="primary" onClick={backToBookPage} sx={{ mb: 2 }}>
         Back to Books
@@ -173,7 +216,7 @@ const BookDetails = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
-          <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} />
+          <ImageGallery items={images} />
         </Grid>
         <Grid item xs={12} sm={8} style={{ paddingLeft: '3rem' }}>
           <Box>
@@ -264,6 +307,19 @@ const BookDetails = () => {
           </Grid>
         ))}
       </Grid>
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6">Reviews</Typography>
+        {reviews.map((rev) => (
+          <Box key={rev._id} sx={{ mt: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Avatar alt={rev.reviewedBy.name} src={rev.reviewedBy.photoUrl} sx={{ mr: 2 }} />
+              <Typography variant="subtitle1" sx={{ color: '#888888' }}>{rev.reviewedBy.name}</Typography>
+            </Box>
+            <Typography variant="body1" sx={{ color: '#000000' }}>{rev.review}</Typography>
+            <Divider sx={{ mt: 2 }} />
+          </Box>
+        ))}
+      </Box>
       <BorrowalForm
         isModalOpen={isBorrowalModalOpen}
         handleCloseModal={handleCloseBorrowalModal}
