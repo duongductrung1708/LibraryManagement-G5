@@ -3,8 +3,9 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField } from '@mui/material';
+import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField, Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import shuffle from 'lodash.shuffle';
 import { apiUrl, routes, methods } from '../../../constants';
 import Label from '../../../components/label';
 import BorrowalForm from '../borrowal/BorrowalForm';
@@ -31,6 +32,7 @@ const BookDetails = () => {
   const [genre, setGenre] = useState(null);
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [relatedBooks, setRelatedBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState(null);
@@ -47,13 +49,20 @@ const BookDetails = () => {
         return Promise.all([
           axios.get(apiUrl(routes.AUTHOR, methods.GET, bookData.authorId), { withCredentials: true }),
           axios.get(apiUrl(routes.GENRE, methods.GET, bookData.genreId), { withCredentials: true }),
-          // axios.get(apiUrl(routes.REVIEW, methods.GET, { bookId: id }), { withCredentials: true }),
         ]);
       })
-      .then(([authorResponse, genreResponse, reviewResponse]) => {
+      .then(([authorResponse, genreResponse]) => {
         setAuthor(authorResponse.data.author);
         setGenre(genreResponse.data.genre);
-        // setReviews(reviewResponse.data.reviews);
+        // Fetch related books
+        return axios.get(apiUrl(routes.BOOKS_BY_GENRE, methods.GET, genreResponse.data.genre._id), {
+          withCredentials: true,
+        });
+      })
+      .then((relatedBooksResponse) => {
+        const relatedBooks = relatedBooksResponse.data.books.filter((b) => b._id !== id);
+        const shuffledBooks = shuffle(relatedBooks).slice(0, 5);
+        setRelatedBooks(shuffledBooks);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -172,7 +181,11 @@ const BookDetails = () => {
             <Label color={book.isAvailable ? 'success' : 'error'} sx={{ mt: 1, mb: 2 }}>
               {book.isAvailable ? 'Available' : 'Not available'}
             </Label>
-            <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2, display: 'flex', alignItems: 'center' }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ color: '#888888', mt: 2, display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              onClick={() => navigate(`/author/${author._id}`)}
+            >
               <Avatar alt={author.name} src={author.photoUrl} /> {author.name}
             </Typography>
             <Box sx={{ position: 'relative', mt: 2 }}>
@@ -205,11 +218,15 @@ const BookDetails = () => {
         </Grid>
       </Grid>
       <Grid container spacing={2} sx={{ mt: 4 }}>
-        <Typography variant="h6" sx={{ mt: 2 }}>Write a Review</Typography>
-        <Grid item xs={12} style={{ paddingLeft: "3rem" }}>
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Write a Review
+        </Typography>
+        <Grid item xs={12} style={{ paddingLeft: '3rem' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Avatar alt={user?.name} src={user?.photoUrl} sx={{ mr: 2 }} />
-            <Typography variant="subtitle1" sx={{ color: '#888888' }}>{user?.name}</Typography>
+            <Typography variant="subtitle1" sx={{ color: '#888888' }}>
+              {user?.name}
+            </Typography>
           </Box>
           <TextField
             id="standard-basic"
@@ -226,19 +243,27 @@ const BookDetails = () => {
           </Button>
         </Grid>
       </Grid>
-      {/* <Box sx={{ mt: 4 }}>
-        <Typography variant="h6">Reviews</Typography>
-        {reviews.map((rev) => (
-          <Box key={rev._id} sx={{ mt: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <Avatar alt={rev.reviewedBy.name} src={rev.reviewedBy.photoUrl} sx={{ mr: 2 }} />
-              <Typography variant="subtitle1" sx={{ color: '#888888' }}>{rev.reviewedBy.name}</Typography>
-            </Box>
-            <Typography variant="body1" sx={{ color: '#000000' }}>{rev.review}</Typography>
-            <Divider sx={{ mt: 2 }} />
-          </Box>
+      <Grid container spacing={2} sx={{ mt: 4 }}>
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Related Books
+        </Typography>
+        {relatedBooks.map((relatedBook) => (
+          <Grid item xs={12} sm={2} key={relatedBook._id} style={{ paddingLeft: '3rem' }}>
+            <Card>
+              <Box sx={{ position: 'relative' }}>
+                <img alt={relatedBook.name} src={relatedBook.photoUrl} style={{ width: '100%', height: 'auto' }} />
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mt: 2, textAlign: 'center', cursor: 'pointer' }}
+                  onClick={() => navigate(`/books/${relatedBook._id}`)}
+                >
+                  {relatedBook.name}
+                </Typography>
+              </Box>
+            </Card>
+          </Grid>
         ))}
-      </Box> */}
+      </Grid>
       <BorrowalForm
         isModalOpen={isBorrowalModalOpen}
         handleCloseModal={handleCloseBorrowalModal}
