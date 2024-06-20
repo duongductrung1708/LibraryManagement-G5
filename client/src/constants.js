@@ -7,7 +7,9 @@ const routes = {
   REVIEW: "review",
   BORROWAL: "borrowal",
   GENRE: "genre",
-  USER: "user"
+  USER: "user",
+  BOOKS_BY_GENRE: 'book/genre',
+  BOOKS_BY_AUTHOR: 'book/author',
 };
 
 const methods = {

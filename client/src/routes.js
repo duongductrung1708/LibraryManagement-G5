@@ -12,6 +12,7 @@ import { useAuth } from "./hooks/useAuth";
 import UserProfile from "./sections/@dashboard/user/UserProfile";
 import BorrowalHistory from "./sections/@dashboard/borrowal/BorrowalHistory";
 import BookDetails from "./sections/@dashboard/book/BookDetails";
+import AuthorProfile from "./sections/@dashboard/author/AuthorProfile";
 
 // ----------------------------------------------------------------------
 
@@ -25,7 +26,8 @@ export default function Router() {
     { path: "borrowals", element: <BorrowalPage /> },
     { path: "userprofile/:id", element: <UserProfile /> },
     { path: "userprofile/history/:id", element: <BorrowalHistory /> },
-    { path: "books/:id", element: <BookDetails /> }
+    { path: "books/:id", element: <BookDetails /> },
+    { path: "author/:id", element: <AuthorProfile /> },
   ];
 
   const adminRoutes = useRoutes([
