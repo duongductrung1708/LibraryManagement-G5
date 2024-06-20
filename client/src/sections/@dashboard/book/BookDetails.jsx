@@ -203,7 +203,11 @@ const BookDetails = () => {
             <Label color={book.isAvailable ? 'success' : 'error'} sx={{ mt: 1, mb: 2 }}>
               {book.isAvailable ? 'Available' : 'Not available'}
             </Label>
-            <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2, display: 'flex', alignItems: 'center' }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ color: '#888888', mt: 2, display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              onClick={() => navigate(`/author/${author._id}`)}
+            >
               <Avatar alt={author.name} src={author.photoUrl} /> {author.name}
             </Typography>
             <Box sx={{ position: 'relative', mt: 2 }}>
