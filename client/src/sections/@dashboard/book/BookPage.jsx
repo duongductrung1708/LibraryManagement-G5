@@ -355,7 +355,6 @@ const BookPage = () => {
             placeholder="Filter by Author"
           >
             <MenuItem value="">All Authors</MenuItem>
-            {/* Populate authors dynamically */}
             {authors.map((author) => (
               <MenuItem key={author._id} value={author._id}>
                 {author.name}
@@ -371,7 +370,7 @@ const BookPage = () => {
             input={<OutlinedInput />}
             placeholder="Filter by Availability"
           >
-            <MenuItem value="">All</MenuItem>
+            <MenuItem value="">All Status</MenuItem>
             <MenuItem value="true">Available</MenuItem>
             <MenuItem value="false">Not Available</MenuItem>
           </Select>
