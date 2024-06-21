@@ -9,7 +9,7 @@ const MongoStore = require('connect-mongo');
 
 // Import routers
 const routes = require("./routes");
-const initMiddleware = require("./middlewares/auth.middleware");
+// const initMiddleware = require("./middlewares/auth.middleware");
 
 const cookieParser = require("cookie-parser");
 const db = require("./models");
@@ -75,7 +75,7 @@ app.use(passport.session());
 // Initialise passport as authentication middleware
 initializePassport(passport);
 // Initialise middleware
-initMiddleware(app)
+// initMiddleware(app)
 // Implement routes for REST API
 
 
@@ -93,12 +93,9 @@ app.use(async (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  res.status(err.status || 500);
-  res.send({
-    error: {
-      status: err.status || 500,
-      message: err.message,
-    },
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Internal Server Error'
   });
 });
 

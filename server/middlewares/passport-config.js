@@ -13,15 +13,14 @@ const initializePassport = (passport) => {
       if (!user.isValidPassword(password)) {
         return cb(null, false, { message: "Password incorrect" });
       } else {
-        console.log("11111")
         return cb(null, user);
       }
     });
+    return cb(null, user);
   };
   passport.use(new LocalStrategy({ usernameField: "email" }, authenticateUser));
   passport.serializeUser((user, done) => done(null, user));
   passport.deserializeUser((user, done) => {
-    console.log("4444444444")
     User.findById(user._id, (err, user) => {
       done(err, user);//ham done() nhan 2 tham so 
     });

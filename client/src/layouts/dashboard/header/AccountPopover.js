@@ -14,9 +14,7 @@ export default function AccountPopover() {
     isLibrarian: false,
     photoUrl:"asd",
     _id: "66706707332ac58fab7fe156",
-    salt: "77d57e7d4a83284c049206b1d518542e",
-    hash: "7dd5d4c0c08af40cb69464c8495cf3d92e382bc0a541dbe48c060a2ec63b363702025277a0845c1272708039d9762edad14ad1e239a1e0e2807196d92a64b537"
-}
+  }
   // const { logout } = useAuth();
   const  logout  = () =>  console.log("heelo");
   const [open, setOpen] = useState(null);

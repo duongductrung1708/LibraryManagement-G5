@@ -1,6 +1,7 @@
 // Import required modules
 const express = require("express")
 const router = express.Router();
+const middle = require('../middlewares/auth.middleware')
 
 // Import functions from controller
 const {
@@ -12,22 +13,13 @@ const {
   deleteUser
 } = require('../controllers/user.controller')
 
-function isAuthenticated(req, res, next) {
 
-  console.log("abc")
-  console.log(req.isAuthenticated())
-  if (req.session.passport ) {
-    return next();
-  } else {
-    return next(req.session)
-  }
-}
 
 router.get("/getAll", (req, res) => getAllUsers(req, res))
 
 router.get("/getAllMembers", (req, res) => getAllMembers(req, res))
 
-router.get("/get/:id",isAuthenticated, (req, res) => getUser(req, res))
+router.get("/get/:id", middle.adminMiddle, (req, res) => getUser(req, res))
 
 router.post("/add", (req, res) => addUser(req, res))
 

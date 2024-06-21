@@ -31,16 +31,25 @@ export default function UserProfile() {
 
   const getUser = useCallback(() => {
     setLoading(true);
-    axios
-      .get(apiUrl(routes.USER, `${methods.GET}/${id}`), { withCredentials: true })
-      .then((response) => {
-        setUser(response.data.user);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setLoading(false);
-      });
+    setUser({
+      name: "minh",
+      email: "lvhm114@gmail.com",
+      isAdmin: true,
+      isLibrarian: false,
+      photoUrl:"asd",
+      _id: "66706707332ac58fab7fe156",
+    });
+    setLoading(false);
+    // axios
+    //   .get(apiUrl(routes.USER, `${methods.GET}/${id}`), { withCredentials: true })
+    //   .then((response) => {
+    //     setUser(response.data.user);
+    //     setLoading(false);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     setLoading(false);
+    //   });
   }, [id]);
 
   useEffect(() => {
