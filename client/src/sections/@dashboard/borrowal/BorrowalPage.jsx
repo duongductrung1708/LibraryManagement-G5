@@ -55,7 +55,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 const BorrowalPage = () => {
-  // const { user } = useAuth();
+  const { user } = useAuth();
   // State variables
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
@@ -80,116 +80,116 @@ const BorrowalPage = () => {
   const [isUpdateForm, setIsUpdateForm] = useState(false);
 
   // Load data on initial page load
-  // useEffect(() => {
-  //   getAllBorrowals();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  useEffect(() => {
+    getAllBorrowals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // API operations
-  // const getAllBorrowals = () => {
-  //   axios
-  //     .get(apiUrl(routes.BORROWAL, methods.GET_ALL))
-  //     .then((response) => {
-  //       // handle success
-  //       console.log(response.data);
-  //       if (user.isAdmin || user.isLibrarian) {
-  //         setBorrowals(response.data.borrowalsList);
-  //       } else {
-  //         setBorrowals(response.data.borrowalsList.filter((borrowal) => user._id === borrowal.memberId));
-  //       }
-  //       setIsTableLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       // handle error
-  //       console.log(error);
-  //     });
-  // };
+  const getAllBorrowals = () => {
+    axios
+      .get(apiUrl(routes.BORROWAL, methods.GET_ALL))
+      .then((response) => {
+        // handle success
+        console.log(response.data);
+        if (user.isAdmin || user.isLibrarian) {
+          setBorrowals(response.data.borrowalsList);
+        } else {
+          setBorrowals(response.data.borrowalsList.filter((borrowal) => user._id === borrowal.memberId));
+        }
+        setIsTableLoading(false);
+      })
+      .catch((error) => {
+        // handle error
+        console.log(error);
+      });
+  };
 
-  // const addBorrowal = () => {
-  //   axios
-  //     .post(apiUrl(routes.BORROWAL, methods.POST), borrowal)
-  //     .then((response) => {
-  //       toast.success('Borrowal added');
-  //       console.log(response.data);
-  //       handleCloseModal();
-  //       getAllBorrowals();
-  //       clearForm();
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       toast.error('Something went wrong, please try again');
-  //     });
-  // };
+  const addBorrowal = () => {
+    axios
+      .post(apiUrl(routes.BORROWAL, methods.POST), borrowal)
+      .then((response) => {
+        toast.success('Borrowal added');
+        console.log(response.data);
+        handleCloseModal();
+        getAllBorrowals();
+        clearForm();
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Something went wrong, please try again');
+      });
+  };
 
-  // const updateBorrowal = () => {
-  //   axios
-  //     .put(apiUrl(routes.BORROWAL, methods.PUT, selectedBorrowalId), borrowal)
-  //     .then((response) => {
-  //       const updatedStatus = borrowal.status;
-  //       let toastMessage = '';
+  const updateBorrowal = () => {
+    axios
+      .put(apiUrl(routes.BORROWAL, methods.PUT, selectedBorrowalId), borrowal)
+      .then((response) => {
+        const updatedStatus = borrowal.status;
+        let toastMessage = '';
 
-  //       switch (updatedStatus) {
-  //         case 'pending':
-  //           toastMessage = 'Borrowal status changed to pending';
-  //           break;
-  //         case 'accepted':
-  //           toastMessage = 'Borrowal status changed to accepted';
-  //           break;
-  //         case 'rejected':
-  //           toastMessage = 'Borrowal status changed to rejected';
-  //           break;
-  //         case 'returned':
-  //           toastMessage = 'Borrowal status changed to returned';
-  //           break;
-  //         default:
-  //           toastMessage = 'Borrowal status updated';
-  //           break;
-  //       }
+        switch (updatedStatus) {
+          case 'pending':
+            toastMessage = 'Borrowal status changed to pending';
+            break;
+          case 'accepted':
+            toastMessage = 'Borrowal status changed to accepted';
+            break;
+          case 'rejected':
+            toastMessage = 'Borrowal status changed to rejected';
+            break;
+          case 'returned':
+            toastMessage = 'Borrowal status changed to returned';
+            break;
+          default:
+            toastMessage = 'Borrowal status updated';
+            break;
+        }
 
-  //       toast.success(toastMessage);
+        toast.success(toastMessage);
 
-  //       console.log(response.data);
-  //       handleCloseModal();
-  //       handleCloseMenu();
-  //       getAllBorrowals();
-  //       clearForm();
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       toast.error('Something went wrong, please try again');
-  //     });
-  // };
+        console.log(response.data);
+        handleCloseModal();
+        handleCloseMenu();
+        getAllBorrowals();
+        clearForm();
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Something went wrong, please try again');
+      });
+  };
 
-  // const deleteBorrowal = () => {
-  //   axios
-  //     .delete(apiUrl(routes.BORROWAL, methods.DELETE, selectedBorrowalId))
-  //     .then((response) => {
-  //       toast.success('Borrowal deleted');
-  //       handleCloseDialog();
-  //       handleCloseMenu();
-  //       console.log(response.data);
-  //       getAllBorrowals();
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       toast.error('Something went wrong, please try again');
-  //     });
-  // };
+  const deleteBorrowal = () => {
+    axios
+      .delete(apiUrl(routes.BORROWAL, methods.DELETE, selectedBorrowalId))
+      .then((response) => {
+        toast.success('Borrowal deleted');
+        handleCloseDialog();
+        handleCloseMenu();
+        console.log(response.data);
+        getAllBorrowals();
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Something went wrong, please try again');
+      });
+  };
 
-  // const getSelectedBorrowalDetails = () => {
-  //   const selectedBorrowals = borrowals.find((element) => element._id === selectedBorrowalId);
-  //   setBorrowal(selectedBorrowals);
-  // };
+  const getSelectedBorrowalDetails = () => {
+    const selectedBorrowals = borrowals.find((element) => element._id === selectedBorrowalId);
+    setBorrowal(selectedBorrowals);
+  };
 
-  // const clearForm = () => {
-  //   setBorrowal({
-  //     bookId: '',
-  //     memberId: '',
-  //     borrowedDate: '',
-  //     dueDate: '',
-  //     status: '',
-  //   });
-  // };
+  const clearForm = () => {
+    setBorrowal({
+      bookId: '',
+      memberId: '',
+      borrowedDate: '',
+      dueDate: '',
+      status: '',
+    });
+  };
 
   // Handler functions
   const handleOpenMenu = (event) => {
@@ -390,7 +390,7 @@ const BorrowalPage = () => {
           },
         }}
       >
-        {/* <MenuItem
+        <MenuItem
           onClick={() => {
             setIsUpdateForm(true);
             getSelectedBorrowalDetails();
@@ -400,7 +400,7 @@ const BorrowalPage = () => {
         >
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
-        </MenuItem> */}
+        </MenuItem>
 
         <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
@@ -408,7 +408,7 @@ const BorrowalPage = () => {
         </MenuItem>
       </Popover>
 
-      {/* <BorrowalForm
+      <BorrowalForm
         isUpdateForm={isUpdateForm}
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
@@ -424,7 +424,7 @@ const BorrowalPage = () => {
         borrowalsId={selectedBorrowalId}
         handleDeleteBorrowal={deleteBorrowal}
         handleCloseDialog={handleCloseDialog}
-      /> */}
+      />
     </>
   );
 };

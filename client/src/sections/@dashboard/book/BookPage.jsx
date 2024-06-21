@@ -12,11 +12,11 @@ import {
   Grid,
   IconButton,
   MenuItem,
-  Modal,
   OutlinedInput,
   Popover,
   Stack,
   Typography,
+  Select,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Alert } from '@mui/lab';
@@ -57,7 +57,7 @@ const TruncatedTypography = styled(Typography)({
 });
 
 const BookPage = () => {
-  // const { user } = useAuth();
+  const { user } = useAuth();
 
   // State variables
   const [book, setBook] = useState({
@@ -89,6 +89,11 @@ const BookPage = () => {
   const [isUpdateForm, setIsUpdateForm] = useState(false);
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [filterName, setFilterName] = useState('');
+  const [filterGenre, setFilterGenre] = useState('');
+  const [filterAuthor, setFilterAuthor] = useState('');
+  const [filterIsAvailable, setFilterIsAvailable] = useState('');
+  const [genres, setGenres] = useState([]);
+  const [authors, setAuthors] = useState([]);
 
   // API operations
 
@@ -166,6 +171,35 @@ const BookPage = () => {
       });
   };
 
+  const fetchGenres = () => {
+    axios
+      .get(apiUrl(routes.GENRE, methods.GET_ALL))
+      .then((response) => {
+        setGenres(response.data.genresList);
+      })
+      .catch((error) => {
+        console.error('Error fetching genres:', error);
+        toast.error('Failed to fetch genres');
+      });
+  };
+
+  const fetchAuthors = () => {
+    axios
+      .get(apiUrl(routes.AUTHOR, methods.GET_ALL))
+      .then((response) => {
+        setAuthors(response.data.authorsList);
+      })
+      .catch((error) => {
+        console.error('Error fetching authors:', error);
+        toast.error('Failed to fetch authors');
+      });
+  };
+
+  useEffect(() => {
+    fetchGenres();
+    fetchAuthors();
+  }, []);
+
   const getSelectedBookDetails = () => {
     const selectedBook = books.find((element) => element._id === selectedBookId);
     setBook(selectedBook);
@@ -231,13 +265,33 @@ const BookPage = () => {
   }, []);
 
   useEffect(() => {
-    if (filterName.trim() === '') {
+    if (filterName.trim() === '' && filterGenre === '' && filterAuthor === '' && filterIsAvailable === '') {
       setFilteredBooks(books);
     } else {
-      const filteredResults = books.filter((book) => book.name.toLowerCase().includes(filterName.trim().toLowerCase()));
+      let filteredResults = books;
+
+      if (filterName.trim() !== '') {
+        filteredResults = filteredResults.filter((book) =>
+          book.name.toLowerCase().includes(filterName.trim().toLowerCase())
+        );
+      }
+
+      if (filterGenre !== '') {
+        filteredResults = filteredResults.filter((book) => book.genreId === filterGenre);
+      }
+
+      if (filterAuthor !== '') {
+        filteredResults = filteredResults.filter((book) => book.authorId === filterAuthor);
+      }
+
+      if (filterIsAvailable !== '') {
+        const isAvailableValue = filterIsAvailable === 'true';
+        filteredResults = filteredResults.filter((book) => book.isAvailable === isAvailableValue);
+      }
+
       setFilteredBooks(filteredResults);
     }
-  }, [filterName, books]);
+  }, [filterName, filterGenre, filterAuthor, filterIsAvailable, books]);
 
   return (
     <>
@@ -250,7 +304,7 @@ const BookPage = () => {
           <Typography variant="h3" sx={{ mb: 5 }}>
             Books
           </Typography>
-          {/* {(user.isAdmin || user.isLibrarian) && (
+          {(user.isAdmin || user.isLibrarian) && (
             <Button
               variant="contained"
               onClick={() => {
@@ -261,7 +315,7 @@ const BookPage = () => {
             >
               New Book
             </Button>
-          )} */}
+          )}
         </Stack>
 
         <Box mb={3}>
@@ -272,6 +326,54 @@ const BookPage = () => {
             fullWidth
             startAdornment={<Iconify icon="eva:search-outline" color="action" />}
           />
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+          <Select
+            value={filterGenre}
+            onChange={(e) => setFilterGenre(e.target.value)}
+            fullWidth
+            displayEmpty
+            input={<OutlinedInput />}
+            placeholder="Filter by Genre"
+          >
+            <MenuItem value="">All Genres</MenuItem>
+            {/* Populate genres dynamically */}
+            {genres.map((genre) => (
+              <MenuItem key={genre._id} value={genre._id}>
+                {genre.name}
+              </MenuItem>
+            ))}
+          </Select>
+
+          <Select
+            value={filterAuthor}
+            onChange={(e) => setFilterAuthor(e.target.value)}
+            fullWidth
+            displayEmpty
+            input={<OutlinedInput />}
+            placeholder="Filter by Author"
+          >
+            <MenuItem value="">All Authors</MenuItem>
+            {authors.map((author) => (
+              <MenuItem key={author._id} value={author._id}>
+                {author.name}
+              </MenuItem>
+            ))}
+          </Select>
+
+          <Select
+            value={filterIsAvailable}
+            onChange={(e) => setFilterIsAvailable(e.target.value)}
+            fullWidth
+            displayEmpty
+            input={<OutlinedInput />}
+            placeholder="Filter by Availability"
+          >
+            <MenuItem value="">All Status</MenuItem>
+            <MenuItem value="true">Available</MenuItem>
+            <MenuItem value="false">Not Available</MenuItem>
+          </Select>
         </Box>
 
         {isTableLoading ? (
@@ -297,7 +399,7 @@ const BookPage = () => {
                     >
                       {book.genre.name}
                     </Label>
-                    {/* {(user.isAdmin || user.isLibrarian) && (
+                    {(user.isAdmin || user.isLibrarian) && (
                       <Label
                         variant="filled"
                         sx={{
@@ -323,7 +425,7 @@ const BookPage = () => {
                           <Iconify icon={'eva:more-vertical-fill'} />
                         </IconButton>
                       </Label>
-                    )} */}
+                    )}
 
                     <StyledBookImage alt={book.name} src={book.photoUrl} />
                   </Box>
@@ -394,7 +496,7 @@ const BookPage = () => {
           },
         }}
       >
-        {/* {(user.isAdmin || user.isLibrarian) && (
+        {(user.isAdmin || user.isLibrarian) && (
           <MenuItem
             onClick={() => {
               setIsUpdateForm(true);
@@ -406,14 +508,14 @@ const BookPage = () => {
             <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
             Edit
           </MenuItem>
-        )} */}
+        )}
 
-        {/* {(user.isAdmin || user.isLibrarian) && (
+        {(user.isAdmin || user.isLibrarian) && (
           <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
             Delete
           </MenuItem>
-        )} */}
+        )}
       </Popover>
 
       <BorrowalForm

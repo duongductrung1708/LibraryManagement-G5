@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 
 export default function AccountPopover() {
+
   // const { user } = useAuth();
   const user = {
     name: "minh",
@@ -17,10 +18,12 @@ export default function AccountPopover() {
   }
   // const { logout } = useAuth();
   const  logout  = () =>  console.log("heelo");
+
   const [open, setOpen] = useState(null);
 
   const logoutUser = () => {
     handleClose();
+
     logout();
     // axios
     //   .get(`http://localhost:8080/api/auth/logout`, { withCredentials: true })
@@ -34,6 +37,7 @@ export default function AccountPopover() {
     //     alert(error);
     //     console.log(error);
     //   });
+
   };
 
   const handleOpen = (event) => {

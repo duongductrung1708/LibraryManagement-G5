@@ -30,6 +30,7 @@ Nav.propTypes = {
 };
 
 export default function Nav({ openNav, onCloseNav }) {
+
   // const { user } = useAuth();
   // console.log(user);
   const user = {
@@ -40,6 +41,7 @@ export default function Nav({ openNav, onCloseNav }) {
     photoUrl:"asd",
     _id: "66706707332ac58fab7fe156"
 }
+
 
   const { pathname } = useLocation();
 
@@ -82,14 +84,10 @@ export default function Nav({ openNav, onCloseNav }) {
       </Box>
 
       <NavSection
-        data={navConfig}
-      />
-
-{/* <NavSection
         data={navConfig.filter(
           (navLink) => user.isAdmin || !(navLink.title === 'Dashboard' || navLink.title === 'Users')
         )}
-      /> */}
+      />
 
       <Box sx={{ flexGrow: 1 }} />
     </Scrollbar>

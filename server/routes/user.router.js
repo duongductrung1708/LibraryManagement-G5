@@ -1,16 +1,15 @@
-// Import required modules
 const express = require("express")
 const router = express.Router();
 const middle = require('../middlewares/auth.middleware')
 
-// Import functions from controller
 const {
   getUser,
   getAllUsers,
   getAllMembers,
   addUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  importUsers
 } = require('../controllers/user.controller')
 
 
@@ -26,5 +25,7 @@ router.post("/add", (req, res) => addUser(req, res))
 router.put("/update/:id", (req, res) => updateUser(req, res))
 
 router.delete("/delete/:id", (req, res) => deleteUser(req, res))
+
+router.post("/import", (req, res) => importUsers(req, res))
 
 module.exports = router;
