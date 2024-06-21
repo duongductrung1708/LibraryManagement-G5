@@ -29,7 +29,14 @@ const bookSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-
+  pageUrls: {
+    type: [String],
+    required: false
+  },
+  position: {
+    type: String,
+    required: true
+  },
 
 })
 
