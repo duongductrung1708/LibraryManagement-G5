@@ -175,8 +175,8 @@ const BookForm = ({
                 <TextField name="photoURL" label="photoURL" value={book.photoUrl} required
                            onChange={(e) => setBook({...book, photoUrl: e.target.value})}/>
 
-                <TextField name="pageURLs" label="pageURLs" value={book.pageURLs} required
-                           onChange={(e) => setBook({...book, pageURLs: e.target.value})}/>              
+                <TextField name="pageUrls" label="pageUrls" value={book.pageUrls} required
+                           onChange={(e) => setBook({...book, pageUrls: e.target.value})}/>              
 
                 <br/>
                 <Box textAlign="center" paddingBottom={2}>
