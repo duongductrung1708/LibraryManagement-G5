@@ -106,7 +106,7 @@ const addBook = async (req, res, next) => {
       isAvailable: req.body.isAvailable,
       summary: req.body.summary,
       photoUrl: req.body.photoUrl,
-      pageUrls: req.body.pageUrls,
+      pageUrls: req.body.pageUrls || [],
       position: req.body.position,
     };
 
