@@ -16,14 +16,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import ReplayIcon from '@mui/icons-material/Replay';
 import Iconify from '../../../components/iconify';
 import { useAuth } from '../../../hooks/useAuth';
 
-const BorrowalForm = ({
+const BorrowalFormForUser = ({
   handleAddBorrowal,
   handleUpdateBorrowal,
   isUpdateForm,
@@ -78,15 +74,14 @@ const BorrowalForm = ({
   }, [getAllMembers, getAllBooks]);
 
   useEffect(() => {
-    if (!user.isAdmin && !user.isLibrarian) {
+    if (!isUpdateForm) {
       setBorrowal((prev) => ({
         ...prev,
-        borrowedDate: new Date(),
-        dueDate: new Date(),
-        status: 'pending',
+        requestDate: new Date().toISOString().split('T')[0], // Đặt giá trị mặc định cho requestDate
+        status: 'pending', // Đặt giá trị mặc định cho status
       }));
     }
-  }, [user, setBorrowal]);
+  }, [setBorrowal, isUpdateForm]);
 
   const style = {
     position: 'absolute',
@@ -101,6 +96,14 @@ const BorrowalForm = ({
   };
 
   const isAdminOrLibrarian = user.isAdmin || user.isLibrarian;
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setBorrowal((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   return (
     <Modal
@@ -161,55 +164,17 @@ const BorrowalForm = ({
               <Grid item xs={12} md={6} paddingRight={1}>
                 <TextField
                   fullWidth
-                  name="borrowedDate"
-                  label="Borrowed date"
+                  name="requestDate"
+                  label="Request date"
                   type="date"
-                  value={borrowal.borrowedDate}
+                  value={borrowal.requestDate}
                   required
                   InputLabelProps={{ shrink: true }}
-                  onChange={(e) => setBorrowal({ ...borrowal, borrowedDate: e.target.value })}
-                  disabled={!isAdminOrLibrarian}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} paddingLeft={1}>
-                <TextField
-                  fullWidth
-                  name="dueDate"
-                  label="Due date"
-                  type="date"
-                  value={borrowal.dueDate}
-                  required
-                  InputLabelProps={{ shrink: true }}
-                  onChange={(e) => setBorrowal({ ...borrowal, dueDate: e.target.value })}
-                  disabled={!isAdminOrLibrarian}
+                  onChange={(e) => setBorrowal({ ...borrowal, requestDate: e.target.value })}
+                  disabled={isAdminOrLibrarian}
                 />
               </Grid>
             </Grid>
-
-            <FormControl sx={{ m: 0 }} fullWidth>
-              <InputLabel id="status-label">Status</InputLabel>
-              <Select
-                labelId="status-label"
-                id="status"
-                value={borrowal.status}
-                label="Status"
-                onChange={(e) => setBorrowal({ ...borrowal, status: e.target.value })}
-                disabled={!isAdminOrLibrarian}
-              >
-                <MenuItem value="pending">
-                  <HourglassEmptyIcon style={{ marginRight: 8 }} /> Pending
-                </MenuItem>
-                <MenuItem value="accepted">
-                  <CheckCircleIcon style={{ marginRight: 8 }} /> Accepted
-                </MenuItem>
-                <MenuItem value="rejected">
-                  <CancelIcon style={{ marginRight: 8 }} /> Rejected
-                </MenuItem>
-                <MenuItem value="returned">
-                  <ReplayIcon style={{ marginRight: 8 }} /> Returned
-                </MenuItem>
-              </Select>
-            </FormControl>
 
             <br />
             <Box textAlign="center">
@@ -243,7 +208,7 @@ const BorrowalForm = ({
   );
 };
 
-BorrowalForm.propTypes = {
+BorrowalFormForUser.propTypes = {
   isUpdateForm: PropTypes.bool,
   isModalOpen: PropTypes.bool,
   handleCloseModal: PropTypes.func,
@@ -253,4 +218,4 @@ BorrowalForm.propTypes = {
   handleUpdateBorrowal: PropTypes.func,
 };
 
-export default BorrowalForm;
+export default BorrowalFormForUser;
