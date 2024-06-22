@@ -88,7 +88,8 @@ const BookForm = ({
 
 
   const handlePageUrlsChange = (event) => {
-    const pageUrlsArray = parsePageUrls(event.target.value);
+    const pageUrlsString = event.target.value;
+    const pageUrlsArray = parsePageUrls(pageUrlsString);
     setBook({ ...book, pageUrls: pageUrlsArray });
   };
 
@@ -207,7 +208,7 @@ const BookForm = ({
                 <TextField
                   name="pageUrls"
                   label="Page URLs (semicolon separated)"
-                  value={book.pageUrls}
+                  value={book.pageUrls.join('; ')}
                   required
                   onChange={handlePageUrlsChange}
                 />
