@@ -19,38 +19,50 @@ const getBorrowal = async (req, res) => {
 }
 
 const getAllBorrowals = async (req, res) => {
-    Borrowal.aggregate([{
-        $lookup: {
-            from: "users",
-            localField: "memberId",
-            foreignField: "_id",
-            as: "member"
-        },
-    },
-        {
-            $unwind: "$member"
-        },
-        {
-            $lookup: {
-                from: "books",
-                localField: "bookId",
-                foreignField: "_id",
-                as: "book"
+    try {
+        const borrowals = await Borrowal.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "memberId",
+                    foreignField: "_id",
+                    as: "member"
+                }
             },
-        },
-        {
-            $unwind: "$book"
-        },]).exec((err, borrowals) => {
-        if (err) {
-            return res.status(400).json({success: false, err});
+            {
+                $unwind: "$member"
+            },
+            {
+                $lookup: {
+                    from: "books",
+                    localField: "bookId",
+                    foreignField: "_id",
+                    as: "book"
+                }
+            },
+            {
+                $unwind: "$book"
+            }
+        ]);
+
+        // Cập nhật trường overdue
+        const currentDate = new Date();
+        for (const borrowal of borrowals) {
+            if (borrowal.dueDate < currentDate) {
+                await Borrowal.findByIdAndUpdate(borrowal._id, { overdue: true });
+                borrowal.overdue = true; // Cập nhật giá trị trong kết quả trả về
+            }
         }
 
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
             borrowalsList: borrowals
         });
-    })
+    } catch (err) {
+        res.status(400).json({ success: false, err });
+    }
 }
+
 
 const addBorrowal = async (req, res) => {
     const newBorrowal = {
