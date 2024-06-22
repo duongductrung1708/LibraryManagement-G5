@@ -81,12 +81,17 @@ const BorrowalForm = ({
     if (!user.isAdmin && !user.isLibrarian) {
       setBorrowal((prev) => ({
         ...prev,
-        borrowedDate: new Date(),
-        dueDate: new Date(),
+        borrowedDate: new Date().toISOString(),
+        dueDate: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(), // Assuming a default due date 7 days from borrowed date
         status: 'pending',
       }));
     }
   }, [user, setBorrowal]);
+
+  const handleDateChange = (field, value) => {
+    const isoDate = new Date(value).toISOString();
+    setBorrowal((prev) => ({ ...prev, [field]: isoDate }));
+  };
 
   const style = {
     position: 'absolute',
@@ -164,10 +169,10 @@ const BorrowalForm = ({
                   name="borrowedDate"
                   label="Borrowed date"
                   type="date"
-                  value={borrowal.borrowedDate}
+                  value={borrowal.borrowedDate ? new Date(borrowal.borrowedDate).toISOString().split('T')[0] : ''}
                   required
                   InputLabelProps={{ shrink: true }}
-                  onChange={(e) => setBorrowal({ ...borrowal, borrowedDate: e.target.value })}
+                  onChange={(e) => handleDateChange('borrowedDate', e.target.value)}
                   disabled={!isAdminOrLibrarian}
                 />
               </Grid>
@@ -177,10 +182,10 @@ const BorrowalForm = ({
                   name="dueDate"
                   label="Due date"
                   type="date"
-                  value={borrowal.dueDate}
+                  value={borrowal.dueDate ? new Date(borrowal.dueDate).toISOString().split('T')[0] : ''}
                   required
                   InputLabelProps={{ shrink: true }}
-                  onChange={(e) => setBorrowal({ ...borrowal, dueDate: e.target.value })}
+                  onChange={(e) => handleDateChange('dueDate', e.target.value)}
                   disabled={!isAdminOrLibrarian}
                 />
               </Grid>
