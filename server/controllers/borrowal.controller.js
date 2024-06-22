@@ -90,20 +90,42 @@ const addBorrowal = async (req, res) => {
 }
 
 const updateBorrowal = async (req, res) => {
-    const borrowalId = req.params.id
-    const updatedBorrowal = req.body
+    const borrowalId = req.params.id;
+    const { borrowedDate, dueDate, status } = req.body;
+  
+  // Tạo một đối tượng rỗng để lưu các trường cập nhật
+  let updatedFields = {};
+  if (borrowedDate) {
+    updatedFields.borrowedDate = new Date(borrowedDate).toISOString();
+  }
 
-    Borrowal.findByIdAndUpdate(borrowalId,updatedBorrowal, (err, borrowal) => {
+  if (dueDate) {
+    updatedFields.dueDate = new Date(dueDate).toISOString();
+  }
+  if (status) {
+    updatedFields.status = status;
+  }
+    console.log('Updating borrowal with ID:', borrowalId);
+    console.log('Fields to update:', updatedFields);
+  
+    Borrowal.findByIdAndUpdate(
+      borrowalId,
+      { $set: updatedFields },
+      { new: true }, // Option to return the updated document
+      (err, borrowal) => {
         if (err) {
-            return res.status(400).json({ success: false, err });
+          return res.status(400).json({ success: false, err });
         }
-
+  
         return res.status(200).json({
-            success: true,
-            updatedBorrowal: borrowal
+          success: true,
+          updatedBorrowal: borrowal
         });
-    })
-}
+      }
+    );
+  };
+  
+  
 
 const deleteBorrowal = async (req, res) => {
     const borrowalId = req.params.id
