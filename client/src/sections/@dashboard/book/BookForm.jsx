@@ -108,6 +108,8 @@ const BookForm = ({
                            onChange={(e) => setBook({...book, name: e.target.value})}/>
                 <TextField name="isbn" label="ISBN" value={book.isbn} required
                            onChange={(e) => setBook({...book, isbn: e.target.value})}/>
+                <TextField name="position" label="Book position" value={book.position} autoFocus required
+                           onChange={(e) => setBook({...book, position: e.target.value})}/>
 
                 <FormControl sx={{m: 1}}>
                   <InputLabel id="author-label">Author</InputLabel>
@@ -122,6 +124,7 @@ const BookForm = ({
                     }
                   </Select>
                 </FormControl>
+
                 <FormControl sx={{m: 1, minWidth: 120}}>
                   <InputLabel id="genre-label">Genre</InputLabel>
                   <Select
@@ -135,7 +138,6 @@ const BookForm = ({
                     }
                   </Select>
                 </FormControl>
-
 
                 <FormControl>
                   <FormLabel id="available-label">Availability</FormLabel>
@@ -172,6 +174,9 @@ const BookForm = ({
 
                 <TextField name="photoURL" label="photoURL" value={book.photoUrl} required
                            onChange={(e) => setBook({...book, photoUrl: e.target.value})}/>
+
+                <TextField name="pageURLs" label="pageURLs" value={book.pageURLs} required
+                           onChange={(e) => setBook({...book, pageURLs: e.target.value})}/>              
 
                 <br/>
                 <Box textAlign="center" paddingBottom={2}>

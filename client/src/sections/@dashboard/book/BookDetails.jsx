@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
-import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField, Card, Divider, Breadcrumbs, Link, Paper } from '@mui/material';
+import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField, Card, Breadcrumbs, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import shuffle from 'lodash.shuffle';
 import { apiUrl, routes, methods } from '../../../constants';
@@ -17,7 +17,6 @@ import 'react-image-gallery/styles/css/image-gallery.css';
 const TruncatedTypography = styled(Typography)({
   color: 'black',
 });
-
 
 const BookDetails = () => {
   const [borrowal, setBorrowal] = useState({
@@ -39,11 +38,6 @@ const BookDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState(null);
-
-  // const images = book.photoUrl.map((url) => ({
-  //   original: url,
-  //   thumbnail: url,
-  // }));
 
   const [review, setReview] = useState('');
 
@@ -131,6 +125,33 @@ const BookDetails = () => {
       });
   };
 
+  if (isLoading) {
+    return (
+      <Container>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (!book || !author || !genre) {
+    return (
+      <Container>
+        <Typography variant="h5">Book not found</Typography>
+      </Container>
+    );
+  }
+
+  const images = [
+    {
+      original: book.photoUrl,
+      thumbnail: book.photoUrl,
+    },
+    ...book.pageUrls.map((url) => ({
+      original: url,
+      thumbnail: url,
+    })),
+  ];
+
   const backToBookPage = () => {
     navigate('/books');
   };
@@ -152,22 +173,6 @@ const BookDetails = () => {
       status: '',
     });
   };
-
-  if (isLoading) {
-    return (
-      <Container>
-        <CircularProgress />
-      </Container>
-    );
-  }
-
-  if (!book || !author || !genre) {
-    return (
-      <Container>
-        <Typography variant="h5">Book not found</Typography>
-      </Container>
-    );
-  }
 
   return (
     <Container>
@@ -194,8 +199,8 @@ const BookDetails = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
-          {/* <ImageGallery items={images} /> */}
-            <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} />
+          {/* <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} /> */}
+          <ImageGallery items={images} />
         </Grid>
         <Grid item xs={12} sm={8} style={{ paddingLeft: '3rem' }}>
           <Box>
@@ -215,6 +220,9 @@ const BookDetails = () => {
             </Box>
             <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2 }}>
               ISBN: {book.isbn}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2 }}>
+              Position: {book.position}
             </Typography>
             <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2 }}>
               GENRE: {genre.name}

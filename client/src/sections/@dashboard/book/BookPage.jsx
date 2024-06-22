@@ -69,6 +69,8 @@ const BookPage = () => {
     authorId: '',
     genreId: '',
     photoUrl: '',
+    pageUrls: [],
+    position: '',
   });
 
   const [borrowal, setBorrowal] = useState({
@@ -215,6 +217,8 @@ const BookPage = () => {
       authorId: '',
       genreId: '',
       photoUrl: '',
+      pageUrls: [],
+      position: '',
     });
   };
 
