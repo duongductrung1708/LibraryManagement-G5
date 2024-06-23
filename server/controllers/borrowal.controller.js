@@ -66,35 +66,45 @@ const getAllBorrowals = async (req, res) => {
 }
 
 
-const addBorrowal = async (req, res) => {
-    const newBorrowal = {
-        ...req.body,
-        memberId: mongoose.Types.ObjectId(req.body.memberId),
-        bookId: mongoose.Types.ObjectId(req.body.bookId)
-    }
+async function addBorrowal(req, res, next) {
+    try {
+        const { memberId, bookId } = req.body;
 
-    Borrowal.create(newBorrowal, (err, borrowal) => {
-        if (err) {
-            return res.status(400).json({success: false, err});
+        // Kiểm tra nếu Borrowal đã tồn tại với bookId nhất định
+        const existingBorrowal = await Borrowal.findOne({ bookId: mongoose.Types.ObjectId(bookId) });
+
+        if (existingBorrowal) {
+            return res.status(400).json({ success: false, error: 'This book has already been borrowed.' });
         }
 
-        Book.findByIdAndUpdate(newBorrowal.bookId, {isAvailable: false}, (err, book) => {
-            if (err) {
-                return res.status(400).json({success: false, err});
-            }
+        // Nếu không có Borrowal nào tồn tại với bookId này, thêm mới Borrowal
+        const newBorrowal = {
+            ...req.body,
+            memberId: mongoose.Types.ObjectId(memberId),
+            bookId: mongoose.Types.ObjectId(bookId)
+        };
 
-            return res.status(200).json({
-                success: true,
-                newBorrowal: borrowal
-            });
+        const borrowal = await Borrowal.create(newBorrowal);
+
+        // Đánh dấu sách là không có sẵn (isAvailable: false) sau khi được mượn
+        await Book.findByIdAndUpdate(newBorrowal.bookId, { isAvailable: false });
+
+        // Trả về thông tin borrowal mới
+        res.status(200).json({
+            success: true,
+            newBorrowal: borrowal
         });
-    })
+    } catch (err) {
+        next(err);
+    }
 }
-const updateBorrowal = async (req, res) => {
-    const borrowalId = req.params.id;
-    const { borrowedDate, dueDate, status } = req.body;
 
+
+async function updateBorrowal(req, res, next) {
     try {
+        const borrowalId = req.params.id;
+        const { borrowedDate, dueDate, status } = req.body;
+
         // Tạo một đối tượng rỗng để lưu các trường cập nhật
         let updatedFields = {};
         
@@ -113,14 +123,8 @@ const updateBorrowal = async (req, res) => {
         console.log('Updating borrowal with ID:', borrowalId);
         console.log('Fields to update:', updatedFields);
 
-        // Sử dụng getEmailFromBorrowalId để lấy email của thành viên
-        const memberEmail = await getEmailFromBorrowalId(borrowalId);
-
-        if (!memberEmail) {
-            return res.status(404).json({ success: false, error: 'Email not found for the member associated with the borrowal' });
-        }
-
-        // Sử dụng findByIdAndUpdate để cập nhật borrowal và lấy borrowal đã cập nhật
+      
+        // Sử dụng findByIdAndUpdate để cập nhật borrowal
         const updatedBorrowal = await Borrowal.findByIdAndUpdate(
             borrowalId,
             { $set: updatedFields },
@@ -131,12 +135,24 @@ const updateBorrowal = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Borrowal not found' });
         }
 
+
+          // Sử dụng getEmailFromBorrowalId để lấy email của thành viên
+          const memberEmail = await getEmailFromBorrowalId(borrowalId);
+
+          if (!memberEmail) {
+              return res.status(404).json({ success: false, error: 'Email not found for the member associated with the borrowal' });
+          }
+
         // Gửi email thông báo khi cập nhật thành công
         try {
             await sendMail({
-                email: memberEmail,
+                email: memberEmail.email,
                 subject: 'Thông báo cập nhật thông tin mượn sách',
-                html: `<p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>`
+                html: `
+                    <p>Hello, ${memberEmail.name}</p>
+                    <p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>
+                    <p>Best regards,<br>Your Team</p>
+                `
             });
         } catch (mailError) {
             console.error('Error sending email:', mailError);
@@ -144,15 +160,13 @@ const updateBorrowal = async (req, res) => {
         }
 
         // Trả về thông tin borrowal đã cập nhật
-        return res.status(200).json({
-            success: true,
-            updatedBorrowal
-        });
+        res.status(200).json({ updatedBorrowal });
     } catch (err) {
         console.error('Error updating borrowal:', err);
-        return res.status(400).json({ success: false, error: err.message });
+        next(err);
     }
-};
+}
+
 
 const getEmailFromBorrowalId = async (borrowalId) => {
     try {
@@ -167,7 +181,10 @@ const getEmailFromBorrowalId = async (borrowalId) => {
             throw new Error('Member not found');
         }
 
-        return member.email;
+        return {
+            email: member.email,
+            name: member.name,
+        };
     } catch (err) {
         throw new Error(err.message);
     }

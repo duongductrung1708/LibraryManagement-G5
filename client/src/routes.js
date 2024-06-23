@@ -13,6 +13,7 @@ import UserProfile from "./sections/@dashboard/user/UserProfile";
 import BorrowalHistory from "./sections/@dashboard/borrowal/BorrowalHistory";
 import BookDetails from "./sections/@dashboard/book/BookDetails";
 import AuthorProfile from "./sections/@dashboard/author/AuthorProfile";
+import ChangePassword from "./sections/auth/login/ChangePassword";
 
 // ----------------------------------------------------------------------
 
@@ -42,6 +43,7 @@ export default function Router() {
       ],
     },
     { path: "login", element: <LoginPage /> },
+    { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
   ]);
@@ -57,6 +59,7 @@ export default function Router() {
       ],
     },
     { path: "login", element: <LoginPage /> },
+    { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
   ]);
@@ -71,12 +74,14 @@ export default function Router() {
       ],
     },
     { path: "login", element: <LoginPage /> },
+    { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
   ]);
 
   const guestRoutes = useRoutes([
     { path: "login", element: <LoginPage /> },
+    { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/login" replace /> },
   ]);

@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: false,
+    required: true,
   },
   dob: {
     type: Date,
@@ -41,6 +41,10 @@ const UserSchema = new mongoose.Schema({
   salt: {
     type:String,
     require: true
+  },
+  firstLogin: {
+    type: Boolean,
+    default: true,
   },
 },{
   versionKey:false

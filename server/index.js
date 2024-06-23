@@ -4,7 +4,7 @@ const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
 const mongoose = require("mongoose");
-const initializePassport = require("./middlewares/passport-config");
+const initializePassport = require("./middleware/passport-config");
 const MongoStore = require('connect-mongo');
 
 // Import routers
@@ -42,11 +42,8 @@ app.use(
   })
 );
 
-
 // Parse cookies used for session management
 // app.use(cookieParser(process.env.SESSION_SECRET));
-
-
 
 app.use(express.json());
 
@@ -70,8 +67,8 @@ app.use(
 );
 
 app.use(passport.initialize());
-app.use(passport.session());
 
+app.use(passport.session());
 // Initialise passport as authentication middleware
 initializePassport(passport);
 // Initialise middleware

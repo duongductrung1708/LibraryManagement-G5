@@ -1,7 +1,7 @@
 // Import required modules
 const express = require("express")
 const router = express.Router();
-const middle = require('../middlewares/auth.middleware')
+const middle = require('../middleware/validateUser.middleware')
 
 // Import functions from controller
 const {

@@ -29,6 +29,7 @@ import BookForm from './BookForm';
 import Iconify from '../../../components/iconify';
 import { apiUrl, methods, routes } from '../../../constants';
 import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
+import BorrowalForm from '../borrowal/BorrowalForm';
 
 // ----------------------------------------------------------------------
 
@@ -297,6 +298,7 @@ const BookPage = () => {
     }
   }, [filterName, filterGenre, filterAuthor, filterIsAvailable, books]);
 
+  console.log(user.isAdmin);
   return (
     <>
       <Helmet>
@@ -458,18 +460,7 @@ const BookPage = () => {
                     </Typography>
                     <TruncatedTypography variant="body2">{book.summary}</TruncatedTypography>
 
-                    {book.isAvailable && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={(e) => {
-                          setSelectedBookId(book._id);
-                          handleOpenBorrowalModal(e);
-                        }}
-                      >
-                        Borrow
-                      </Button>
-                    )}
+
                   </Stack>
                 </Card>
               </Grid>
@@ -521,15 +512,26 @@ const BookPage = () => {
           </MenuItem>
         )}
       </Popover>
-
-      <BorrowalFormForUser
-        isModalOpen={isBorrowalModalOpen}
-        handleCloseModal={handleCloseBorrowalModal}
-        id={selectedBookId}
-        borrowal={borrowal}
-        setBorrowal={setBorrowal}
-        handleAddBorrowal={addBorrowal}
-      />
+      
+      {user && (user.isAdmin || user.isLibrarian) ? (
+        <BorrowalForm
+          isModalOpen={isBorrowalModalOpen}
+          handleCloseModal={handleCloseBorrowalModal}
+          id={selectedBookId}
+          borrowal={borrowal}
+          setBorrowal={setBorrowal}
+          handleAddBorrowal={addBorrowal}
+        />
+      ) : (
+        <BorrowalFormForUser
+          isModalOpen={isBorrowalModalOpen}
+          handleCloseModal={handleCloseBorrowalModal}
+          id={selectedBookId}
+          borrowal={borrowal}
+          setBorrowal={setBorrowal}
+          handleAddBorrowal={addBorrowal}
+        />
+      )}
 
       <BookDialog
         isDialogOpen={isDialogOpen}

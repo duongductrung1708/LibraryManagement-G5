@@ -30,49 +30,36 @@ const registerUser = async (req, res) => {
 }
 
 const loginUser = async (req, res, next) => {
+
   const email = req.body.email
   const password = req.body.password
-  // User.findOne({ email: req.body.email }, (err, user) => {
-  //   if (err) {
-  //     return res.status(500).json({ success: false, err });
-  //   }
-  //   if (!user) {
-  //     return res.status(404).json({ success: false, message: "User not found" });
-  //   }
-  //   if (!user.isValidPassword(req.body.password)) {
-  //     return res.status(401).json({ success: false, message: "Password incorrect" });
-  //   }
-  //   console.log(req.session)
-  //   // delete user.hash
-  //   // delete user.
-  //   passport.authenticate("local", (err, user, info) => {
-  //     // console.log(req.session)
-  //     req.logIn(user, (err) => {// Initiate a login session for `user`.
-  //       if (err) {
-  //         throw err;
-  //       }
-  //       return res.status(200).json({
-  //         success: true,
-  //         user
-  //       });
-  //     });
-  //   },)(req, res, next);
-
-  // })
-  passport.authenticate("local", (err, email, password, info) => {
-    console.log("abc")
-    console.log(email)
-    console.log(password)
-    req.logIn(user, (err) => {// Initiate a login session for `user`.
-      if (err) {
-        throw err;
-      }
-      return res.status(200).json({
-        success: true,
-        user
+ 
+  User.findOne({email: req.body.email}, (err, user) => {
+    if (err) {
+      return res.status(500).json({success: false, err});
+    }
+    if (!user) {
+      return res.status(404).json({success: false, message: "User not found"});
+    }
+    if (!user.isValidPassword(req.body.password)) {
+      return res.status(401).json({success: false, message: "Password incorrect"});
+    }
+    console.log(user)
+    passport.authenticate("local", (err, user, info) => {
+      console.log(user)
+      req.logIn(user, (err) => {
+        if (err) {
+          throw err;
+        }
+        const redirectUrl = user.firstLogin ? '/change-password' : user.isAdmin ? '/dashboard' : '/books';
+        return res.status(200).json({
+          success: true,
+          user,
+          redirectUrl
+        });
       });
-    });
-  },)(req, res, next);
+    },)(req, res, next);
+  })
 }
 
 const logoutUser = async (req, res, next) => {
@@ -80,7 +67,6 @@ const logoutUser = async (req, res, next) => {
     if (err) {
       return next(err);
     }
-    // res.redirect('/login');
   });
   return res.status(200).json({ success: true, message: "User logged out" });
 }
