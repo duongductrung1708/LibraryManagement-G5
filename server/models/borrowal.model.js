@@ -29,6 +29,10 @@ const borrowalSchema = new mongoose.Schema({
       type: Boolean,
       required: false,
       default: false
+    },
+    note : {
+      type : String,
+      required: false
     }
 })
 

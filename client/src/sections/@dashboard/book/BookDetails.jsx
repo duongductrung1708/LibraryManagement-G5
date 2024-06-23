@@ -9,14 +9,29 @@ import shuffle from 'lodash.shuffle';
 import { apiUrl, routes, methods } from '../../../constants';
 import Label from '../../../components/label';
 import BorrowalForm from '../borrowal/BorrowalForm';
-
-// ----------------------------------------------------------------------
+import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
+import { useAuth } from '../../../hooks/useAuth.js';
 
 const TruncatedTypography = styled(Typography)({
   color: 'black',
 });
 
 const BookDetails = () => {
+  const { user } = useAuth(); // Correctly get the user from the Auth context
+  console.log(user); // This should log the user object or null if not logged in
+
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [book, setBook] = useState(null);
+  const [author, setAuthor] = useState(null);
+  const [genre, setGenre] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [relatedBooks, setRelatedBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
+  const [selectedBookId, setSelectedBookId] = useState(null);
+  const [review, setReview] = useState('');
+
   const [borrowal, setBorrowal] = useState({
     bookId: '',
     memberId: '',
@@ -24,20 +39,6 @@ const BookDetails = () => {
     dueDate: '',
     status: '',
   });
-
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [book, setBook] = useState(null);
-  const [author, setAuthor] = useState(null);
-  const [genre, setGenre] = useState(null);
-  const [user, setUser] = useState(null);
-  const [reviews, setReviews] = useState([]);
-  const [relatedBooks, setRelatedBooks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
-  const [selectedBookId, setSelectedBookId] = useState(null);
-
-  const [review, setReview] = useState('');
 
   const getBook = useCallback(() => {
     setIsLoading(true);
@@ -72,23 +73,6 @@ const BookDetails = () => {
       });
   }, [id]);
 
-  const getUser = useCallback(() => {
-    axios
-      .get(apiUrl(routes.USER, methods.GET, id), { withCredentials: true })
-      .then((response) => {
-        setUser(response.data.user);
-      })
-      .catch((error) => {
-        console.error('Error fetching user details:', error);
-        toast.error('Failed to fetch user details');
-      });
-  }, [id]);
-
-  useEffect(() => {
-    getBook();
-    getUser();
-  }, [getBook, getUser]);
-
   const addBorrowal = () => {
     axios
       .post(apiUrl(routes.BORROWAL, methods.POST), borrowal)
@@ -106,7 +90,7 @@ const BookDetails = () => {
   const addReview = () => {
     const reviewData = {
       book: id,
-      reviewedBy: user._id,
+      reviewedBy: user?._id,
       review,
       reviewedAt: new Date(),
     };
@@ -145,6 +129,10 @@ const BookDetails = () => {
     });
   };
 
+  useEffect(() => {
+    getBook();
+  }, [getBook]);
+
   if (isLoading) {
     return (
       <Container>
@@ -161,6 +149,7 @@ const BookDetails = () => {
     );
   }
 
+  console.log(book.name);
   return (
     <Container>
       <Helmet>
@@ -237,43 +226,58 @@ const BookDetails = () => {
             value={review}
             onChange={(e) => setReview(e.target.value)}
             sx={{ mt: 2 }}
-          />
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={addReview}>
-            Submit Review
-          </Button>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} sx={{ mt: 4 }}>
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          Related Books
-        </Typography>
-        {relatedBooks.map((relatedBook) => (
-          <Grid item xs={12} sm={2} key={relatedBook._id} style={{ paddingLeft: '3rem' }}>
-            <Card>
-              <Box sx={{ position: 'relative' }}>
-                <img alt={relatedBook.name} src={relatedBook.photoUrl} style={{ width: '100%', height: 'auto' }} />
-                <Typography
-                  variant="subtitle2"
-                  sx={{ mt: 2, textAlign: 'center', cursor: 'pointer' }}
-                  onClick={() => navigate(`/books/${relatedBook._id}`)}
-                >
-                  {relatedBook.name}
-                </Typography>
-              </Box>
-            </Card>
+            />
+            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={addReview}>
+              Submit Review
+            </Button>
           </Grid>
-        ))}
-      </Grid>
-      <BorrowalForm
-        isModalOpen={isBorrowalModalOpen}
-        handleCloseModal={handleCloseBorrowalModal}
-        id={selectedBookId}
-        borrowal={borrowal}
-        setBorrowal={setBorrowal}
-        handleAddBorrowal={addBorrowal}
-      />
-    </Container>
-  );
-};
+        </Grid>
+        <Grid container spacing={2} sx={{ mt: 4 }}>
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Related Books
+          </Typography>
+          {relatedBooks.map((relatedBook) => (
+            <Grid item xs={12} sm={2} key={relatedBook._id} style={{ paddingLeft: '3rem' }}>
+              <Card>
+                <Box sx={{ position: 'relative' }}>
+                  <img alt={relatedBook.name} src={relatedBook.photoUrl} style={{ width: '100%', height: 'auto' }} />
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ mt: 2, textAlign: 'center', cursor: 'pointer' }}
+                    onClick={() => navigate(`/books/${relatedBook._id}`)}
+                  >
+                    {relatedBook.name}
+                  </Typography>
+                </Box>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
-export default BookDetails;
+        {user && (user.isAdmin || user.isLibrarian) ? (
+          <BorrowalForm
+          isModalOpen={isBorrowalModalOpen}
+          handleCloseModal={handleCloseBorrowalModal}
+          id={selectedBookId}
+          borrowal={borrowal}
+          setBorrowal={setBorrowal}
+          handleAddBorrowal={addBorrowal}
+          bookName = {book.name}
+          />
+        ) : (
+          <BorrowalFormForUser
+          isModalOpen={isBorrowalModalOpen}
+          handleCloseModal={handleCloseBorrowalModal}
+          id={selectedBookId}
+          borrowal={borrowal}
+          setBorrowal={setBorrowal}
+          handleAddBorrowal={addBorrowal}
+          bookName = {book.name}
+          />
+        )}
+      </Container>
+    );
+  };
+
+  export default BookDetails;
+

@@ -65,29 +65,45 @@ const getAllBorrowals = async (req, res) => {
 
 
 const addBorrowal = async (req, res) => {
-    const newBorrowal = {
-        ...req.body,
-        memberId: mongoose.Types.ObjectId(req.body.memberId),
-        bookId: mongoose.Types.ObjectId(req.body.bookId)
-    }
+    const { memberId, bookId } = req.body;
 
-    Borrowal.create(newBorrowal, (err, borrowal) => {
+    // Kiểm tra nếu Borrowal đã tồn tại với bookId nhất định
+    Borrowal.findOne({ bookId: mongoose.Types.ObjectId(bookId) }, (err, existingBorrowal) => {
         if (err) {
-            return res.status(400).json({success: false, err});
+            return res.status(400).json({ success: false, error: err });
         }
 
-        Book.findByIdAndUpdate(newBorrowal.bookId, {isAvailable: false}, (err, book) => {
+        if (existingBorrowal) {
+            return res.status(400).json({ success: false, error: 'This book has already been borrowed.' });
+        }
+
+        // Nếu không có Borrowal nào tồn tại với bookId này, thêm mới Borrowal
+        const newBorrowal = {
+            ...req.body,
+            memberId: mongoose.Types.ObjectId(memberId),
+            bookId: mongoose.Types.ObjectId(bookId)
+        };
+
+        Borrowal.create(newBorrowal, (err, borrowal) => {
             if (err) {
-                return res.status(400).json({success: false, err});
+                return res.status(400).json({ success: false, error: err });
             }
 
-            return res.status(200).json({
-                success: true,
-                newBorrowal: borrowal
+            // Đánh dấu sách là không có sẵn (isAvailable: false) sau khi được mượn
+            Book.findByIdAndUpdate(newBorrowal.bookId, { isAvailable: false }, (err, book) => {
+                if (err) {
+                    return res.status(400).json({ success: false, error: err });
+                }
+
+                return res.status(200).json({
+                    success: true,
+                    newBorrowal: borrowal
+                });
             });
         });
-    })
-}
+    });
+};
+
 
 const updateBorrowal = async (req, res) => {
     const borrowalId = req.params.id;
