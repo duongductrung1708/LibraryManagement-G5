@@ -92,7 +92,7 @@ const addBorrowal = async (req, res) => {
 }
 const updateBorrowal = async (req, res) => {
     const borrowalId = req.params.id;
-    const { borrowedDate, dueDate, status } = req.body;
+    const {  borrowedDate, dueDate, status } = req.body;
 
     try {
         // Tạo một đối tượng rỗng để lưu các trường cập nhật
@@ -134,9 +134,13 @@ const updateBorrowal = async (req, res) => {
         // Gửi email thông báo khi cập nhật thành công
         try {
             await sendMail({
-                email: memberEmail,
+                email: memberEmail.email,
                 subject: 'Thông báo cập nhật thông tin mượn sách',
-                html: `<p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>`
+                html: `
+        <p>Hello, ${memberEmail.name}</p>
+        <p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>
+        <p>Best regards,<br>Your Team</p>
+    `
             });
         } catch (mailError) {
             console.error('Error sending email:', mailError);
@@ -167,7 +171,10 @@ const getEmailFromBorrowalId = async (borrowalId) => {
             throw new Error('Member not found');
         }
 
-        return member.email;
+        return {
+            email: member.email,
+            name: member.name,
+        };
     } catch (err) {
         throw new Error(err.message);
     }
