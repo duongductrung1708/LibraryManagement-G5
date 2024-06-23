@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router();
 const middle = require('../middlewares/auth.middleware')
+const sendEmail = require('../middleware/mailer');
 
 const {
   getUser,
@@ -20,12 +21,12 @@ router.get("/getAllMembers", (req, res) => getAllMembers(req, res))
 
 router.get("/get/:id", middle.adminMiddle, (req, res) => getUser(req, res))
 
-router.post("/add", (req, res) => addUser(req, res))
+router.post("/add",addUser,sendEmail)
 
 router.put("/update/:id", (req, res) => updateUser(req, res))
 
 router.delete("/delete/:id", (req, res) => deleteUser(req, res))
 
-router.post("/import", (req, res) => importUsers(req, res))
+router.post("/import", importUsers,sendEmail)
 
 module.exports = router;

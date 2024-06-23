@@ -28,7 +28,7 @@ import BookDialog from './BookDialog';
 import BookForm from './BookForm';
 import Iconify from '../../../components/iconify';
 import { apiUrl, methods, routes } from '../../../constants';
-import BorrowalForm from '../borrowal/BorrowalForm';
+import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
 
 // ----------------------------------------------------------------------
 
@@ -69,6 +69,8 @@ const BookPage = () => {
     authorId: '',
     genreId: '',
     photoUrl: '',
+    pageUrls: [],
+    position: '',
   });
 
   const [borrowal, setBorrowal] = useState({
@@ -215,6 +217,8 @@ const BookPage = () => {
       authorId: '',
       genreId: '',
       photoUrl: '',
+      pageUrls: [],
+      position: '',
     });
   };
 
@@ -518,7 +522,7 @@ const BookPage = () => {
         )}
       </Popover>
 
-      <BorrowalForm
+      <BorrowalFormForUser
         isModalOpen={isBorrowalModalOpen}
         handleCloseModal={handleCloseBorrowalModal}
         id={selectedBookId}

@@ -5,7 +5,7 @@ import reportWebVitals from "./reportWebVitals.js";
 import * as serviceWorker from "./serviceWorker";
 import { AuthProvider } from "./hooks/useAuth";
 import App from "./App";
-import { AuthProvider } from "./hooks/useAuth";
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
