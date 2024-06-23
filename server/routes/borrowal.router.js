@@ -6,7 +6,7 @@ const borrowalRouter = express.Router();
 
 borrowalRouter.get('/getAll', borrowalController.getAllBorrowals)
 
-borrowalRouter.get('/get/:id', borrowalController.getBorrowalById)
+borrowalRouter.get('/get/:id', borrowalController.getBorrowal)
 
 borrowalRouter.post('/add' , borrowalController.addBorrowal)
 

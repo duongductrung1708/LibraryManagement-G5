@@ -30,8 +30,8 @@ Nav.propTypes = {
 };
 
 export default function Nav({ openNav, onCloseNav }) {
-  // const { user } = useAuth();
-  // console.log(user);
+  const { user } = useAuth();
+  console.log(user);
 
   const { pathname } = useLocation();
 
@@ -58,15 +58,15 @@ export default function Nav({ openNav, onCloseNav }) {
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none">
           <StyledAccount>
-            {/* <Avatar src={user.photoUrl} alt="photoURL" /> */}
+            <Avatar src={user.photoUrl} alt="photoURL" />
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {/* {user.name} */}
+                {user.name}
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {/* {user.isAdmin ? "Admin" : user.isLibrarian ? "Librarian" : "Member"} */}
+                {user.isAdmin ? "Admin" : user.isLibrarian ? "Librarian" : "Member"}
               </Typography>
             </Box>
           </StyledAccount>
@@ -74,14 +74,10 @@ export default function Nav({ openNav, onCloseNav }) {
       </Box>
 
       <NavSection
-        data={navConfig}
-      />
-
-{/* <NavSection
         data={navConfig.filter(
           (navLink) => user.isAdmin || !(navLink.title === 'Dashboard' || navLink.title === 'Users')
         )}
-      /> */}
+      />
 
       <Box sx={{ flexGrow: 1 }} />
     </Scrollbar>

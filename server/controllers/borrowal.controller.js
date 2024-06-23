@@ -3,109 +3,154 @@ const db = require('../models');
 const Borrowal = db.borrowal;
 const Book = db.book;
 
-async function getBorrowalById(req, res, next) {
-    try {
-        const borrowalId = req.params.id;
-        const borrowal = await Borrowal.findById(borrowalId);        
-        res.status(200).json({borrowal : borrowal})
-    } catch (error) {
-        next(error)
-    }
-}
+const getBorrowal = async (req, res) => {
+    const borrowalId = req.params.id;
 
-async function getAllBorrowals(req, res, next) {
-    try {
-        // Lấy danh sách tất cả các mượn sách
-        const borrowalsList = await Borrowal.find({})
-            .populate('memberId') 
-            .populate('bookId'); 
-        
-        res.status(200).json({
+    Borrowal.findById(borrowalId, (err, borrowal) => {
+        if (err) {
+            return res.status(400).json({ success: false, err });
+        }
+
+        return res.status(200).json({
             success: true,
-            borrowalsList: borrowalsList.map(borrowal => ({
-                borrowal: borrowal,
-                member: borrowal.memberId,
-                book: borrowal.bookId
-            }))
+            borrowal
         });
-    } catch (error) {
-        console.error('Error in getAllBorrowals:', error);
-        next(error);
-    }
+    });
 }
 
-async function addBorrowal(req, res, next) {
+const getAllBorrowals = async (req, res) => {
     try {
-        const newBorrowal = await Borrowal.create({
-            ...req.body,
-            memberId: mongoose.Types.ObjectId(req.body.memberId),
-            bookId: mongoose.Types.ObjectId(req.body.bookId)
-        });
+        const borrowals = await Borrowal.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "memberId",
+                    foreignField: "_id",
+                    as: "member"
+                }
+            },
+            {
+                $unwind: "$member"
+            },
+            {
+                $lookup: {
+                    from: "books",
+                    localField: "bookId",
+                    foreignField: "_id",
+                    as: "book"
+                }
+            },
+            {
+                $unwind: "$book"
+            }
+        ]);
 
-        await Book.findByIdAndUpdate(
-            mongoose.Types.ObjectId(req.body.bookId),
-            { isAvailable: false }
-        );
-
-        res.status(200).json({
-            success: true,
-            newBorrowal: newBorrowal
-        });
-    } catch (error) {
-        console.error('Error in addBorrowal:', error);
-        next(error);
-    }
-}
-
-async function updateBorrowal(req, res, next) {
-    try {
-        const borrowalId = req.params.id;
-
-        const updatedBorrowal = await Borrowal.findByIdAndUpdate(
-            borrowalId,
-            { ...req.body },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedBorrowal) {
-            return res.status(404).json({ success: false, error: 'Borrowal not found' });
+        // Cập nhật trường overdue
+        const currentDate = new Date();
+        for (const borrowal of borrowals) {
+            if (borrowal.dueDate < currentDate) {
+                await Borrowal.findByIdAndUpdate(borrowal._id, { overdue: true });
+                borrowal.overdue = true; // Cập nhật giá trị trong kết quả trả về
+            }
         }
 
         res.status(200).json({
             success: true,
-            updatedBorrowal: updatedBorrowal
+            borrowalsList: borrowals
         });
-    } catch (error) {
-        console.error('Error in updateBorrowal:', error);
-        next(error);
+    } catch (err) {
+        res.status(400).json({ success: false, err });
     }
 }
 
 
-async function deleteBorrowal(req, res, next) {
-    try {
-        const borrowalId = req.params.id;
+const addBorrowal = async (req, res) => {
+    const newBorrowal = {
+        ...req.body,
+        memberId: mongoose.Types.ObjectId(req.body.memberId),
+        bookId: mongoose.Types.ObjectId(req.body.bookId)
+    }
 
-        const deletedBorrowal = await Borrowal.findByIdAndDelete(borrowalId);
-
-        if (!deletedBorrowal) {
-            return res.status(404).json({ success: false, error: 'Borrowal not found' });
+    Borrowal.create(newBorrowal, (err, borrowal) => {
+        if (err) {
+            return res.status(400).json({success: false, err});
         }
 
-        await Book.findByIdAndUpdate(deletedBorrowal.bookId, { isAvailable: true });
+        Book.findByIdAndUpdate(newBorrowal.bookId, {isAvailable: false}, (err, book) => {
+            if (err) {
+                return res.status(400).json({success: false, err});
+            }
 
-        res.status(200).json({
-            success: true,
-            deletedBorrowal: deletedBorrowal
+            return res.status(200).json({
+                success: true,
+                newBorrowal: borrowal
+            });
         });
-    } catch (error) {
-        console.error('Error in deleteBorrowal:', error);
-        next(error);
-    }
+    })
 }
+
+const updateBorrowal = async (req, res) => {
+    const borrowalId = req.params.id;
+    const { borrowedDate, dueDate, status } = req.body;
+  
+  // Tạo một đối tượng rỗng để lưu các trường cập nhật
+  let updatedFields = {};
+  if (borrowedDate) {
+    updatedFields.borrowedDate = new Date(borrowedDate).toISOString();
+  }
+
+  if (dueDate) {
+    updatedFields.dueDate = new Date(dueDate).toISOString();
+  }
+  if (status) {
+    updatedFields.status = status;
+  }
+    console.log('Updating borrowal with ID:', borrowalId);
+    console.log('Fields to update:', updatedFields);
+  
+    Borrowal.findByIdAndUpdate(
+      borrowalId,
+      { $set: updatedFields },
+      { new: true }, // Option to return the updated document
+      (err, borrowal) => {
+        if (err) {
+          return res.status(400).json({ success: false, err });
+        }
+  
+        return res.status(200).json({
+          success: true,
+          updatedBorrowal: borrowal
+        });
+      }
+    );
+  };
+  
+  
+
+const deleteBorrowal = async (req, res) => {
+    const borrowalId = req.params.id
+
+    Borrowal.findByIdAndDelete(borrowalId, (err, borrowal) => {
+        if (err) {
+            return res.status(400).json({success: false, err});
+        }
+
+        Book.findByIdAndUpdate(borrowal.bookId, {isAvailable: true}, (err, book) => {
+            if (err) {
+                return res.status(400).json({success: false, err});
+            }
+
+            return res.status(200).json({
+                success: true,
+                deletedBorrowal: borrowal
+            });
+        });
+    })
+}
+
 
 const borrowalController ={
-    getBorrowalById,
+    getBorrowal,
     getAllBorrowals,
     addBorrowal,
     updateBorrowal,
