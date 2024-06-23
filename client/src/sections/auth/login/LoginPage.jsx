@@ -9,8 +9,6 @@ import { useAuth } from "../../../hooks/useAuth";
 import Logo from "../../../components/logo";
 import { LoginForm } from "./index";
 
-// ----------------------------------------------------------------------
-
 const StyledRoot = styled("div")(({ theme }) => ({
   [theme.breakpoints.up("md")]: {
     display: "flex"
@@ -26,8 +24,6 @@ const StyledContent = styled("div")(({ theme }) => ({
   flexDirection: "column",
   padding: theme.spacing(12, 0)
 }));
-
-// ----------------------------------------------------------------------
 
 export default function LoginPage() {
   const { login, user } = useAuth();
@@ -45,21 +41,24 @@ export default function LoginPage() {
     } else {
       axios.post(`http://localhost:8080/api/auth/login`, { email, password }, { withCredentials: false })
         .then((response) => {
-          // handle success
           if (response.status === 200) {
             console.log(response.data);
             toast.success(`Successfully logged in as ${response.data.user.name}`);
             login(response.data.user);
+            
+            if (response.data.user.firstLogin) {
+              window.location.href = '/change-password';
+            } else {
+              window.location.href = response.data.redirectUrl;
+            }
           }
         })
         .catch((error) => {
-          // handle error
           toast.error(error.response.data.message);
           console.log(error);
         });
     }
   };
-
 
   return (
     <>

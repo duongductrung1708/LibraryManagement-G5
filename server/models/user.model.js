@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: false,
+    required: true,
   },
   dob: {
     type: Date,
@@ -33,6 +33,10 @@ const UserSchema = new mongoose.Schema({
   photoUrl: {
     type: String,
     required: true,
+  },
+  firstLogin: {
+    type: Boolean,
+    default: true,
   },
   hash: String,
   salt: String,

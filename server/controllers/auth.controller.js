@@ -41,13 +41,14 @@ const loginUser = async (req, res, next) => {
         if (err) {
           throw err;
         }
+        const redirectUrl = user.firstLogin ? '/change-password' : user.isAdmin ? '/dashboard' : '/books';
         return res.status(200).json({
           success: true,
-          user
+          user,
+          redirectUrl
         });
       });
     },)(req, res, next);
-    
   })
 }
 
@@ -56,7 +57,6 @@ const logoutUser = async (req, res, next) => {
     if (err) {
       return next(err);
     }
-    // res.redirect('/login');
   });
   return res.status(200).json({success: true, message: "User logged out"});
 }
