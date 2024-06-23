@@ -3,6 +3,14 @@ const cors = require("cors");
 const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
+const mongoose = require("mongoose");
+const initializePassport = require("./middleware/passport-config");
+const MongoStore = require('connect-mongo');
+
+// Import routers
+const routes = require("./routes");
+// const initMiddleware = require("./middlewares/auth.middleware");
+
 const cookieParser = require("cookie-parser");
 const db = require("./models");
 const createError = require("http-errors"); // Import http-errors
@@ -34,23 +42,40 @@ app.use(
   })
 );
 
-app.use(cookieParser(process.env.SESSION_SECRET));
+// Parse cookies used for session management
+// app.use(cookieParser(process.env.SESSION_SECRET));
 
 app.use(express.json());
 
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
+    cookie:{
+      maxAge: 1000 * 64 * 10,
+      sameSite: 'strict',
+      // secure: true
+    },
+    store: new MongoStore({ 
+      mongooseConnection: mongoose.connection,
+      mongoUrl:process.env.MONGO_URI,
+      collectionName: 'session',
+      autoRemove: 'native', }),
+      // stringify: false,
   })
 );
 
 app.use(passport.initialize());
-app.use(passport.session());
 
-const initializePassport = require("./passport-config");
+app.use(passport.session());
+// Initialise passport as authentication middleware
 initializePassport(passport);
+// Initialise middleware
+// initMiddleware(app)
+// Implement routes for REST API
+
+
 
 app.use("/api/auth", AuthRouter);
 app.use("/api/book", BookRouter);
@@ -65,12 +90,9 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  res.status(err.status || 500);
-  res.send({
-    error: {
-      status: err.status || 500,
-      message: err.message,
-    },
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Internal Server Error'
   });
 });
 

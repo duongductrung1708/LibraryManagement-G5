@@ -17,6 +17,7 @@
   },
   "license": "ISC",
   "dependencies": {
+    "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -32,7 +33,7 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "mongodb": "^4.11.0",
+    "mongodb": "^5.1.0",
     "nodemon": "^2.0.22"
   }
 }

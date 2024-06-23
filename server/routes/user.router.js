@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const middle = require('../middleware/validateUser.middleware')
 const sendEmail = require('../middleware/mailer');
 
 const {
@@ -13,11 +14,12 @@ const {
   changePassword,
 } = require('../controllers/user.controller');
 
+
 router.get("/getAll", (req, res) => getAllUsers(req, res));
 
 router.get("/getAllMembers", (req, res) => getAllMembers(req, res));
 
-router.get("/get/:id", (req, res) => getUser(req, res));
+router.get("/get/:id", middle.adminMiddle, (req, res) => getUser(req, res))
 
 router.post("/add", addUser, sendEmail);
 
