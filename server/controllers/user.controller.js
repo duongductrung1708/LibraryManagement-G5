@@ -74,6 +74,9 @@ const deleteUser = async (req, res) => {
 const generateRandomPassword = () => {
   return crypto.randomBytes(8).toString('hex');
 };
+const generateRandomPasswordtest = (length) => {
+  return crypto.randomBytes(length / 2).toString('hex');
+};
 
 
 const addUser = async (req, res, next) => {
@@ -87,7 +90,7 @@ const addUser = async (req, res, next) => {
 
     const user = new User(newUser);
 
-    const password = newUser.password || generateRandomPassword();
+    const password = newUser.password || generateRandomPasswordtest(6);
     user.setPassword(password);
     await user.save();
 

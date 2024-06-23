@@ -29,7 +29,11 @@ const borrowalSchema = new mongoose.Schema({
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    notificationSent: {
+      type: Boolean,
+      default: false
+  }
 })
 
 const Borrowal = mongoose.model('Borrowal', borrowalSchema)
