@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const db = require('../models');
 const Borrowal = db.borrowal;
 const Book = db.book;
+const User = db.user; 
+const sendMail = require('../middleware/sendmaiil');
 
 const getBorrowal = async (req, res) => {
     const borrowalId = req.params.id;
@@ -108,40 +110,86 @@ const addBorrowal = async (req, res) => {
 const updateBorrowal = async (req, res) => {
     const borrowalId = req.params.id;
     const { borrowedDate, dueDate, status } = req.body;
-  
-  // Tạo một đối tượng rỗng để lưu các trường cập nhật
-  let updatedFields = {};
-  if (borrowedDate) {
-    updatedFields.borrowedDate = new Date(borrowedDate).toISOString();
-  }
 
-  if (dueDate) {
-    updatedFields.dueDate = new Date(dueDate).toISOString();
-  }
-  if (status) {
-    updatedFields.status = status;
-  }
-    console.log('Updating borrowal with ID:', borrowalId);
-    console.log('Fields to update:', updatedFields);
-  
-    Borrowal.findByIdAndUpdate(
-      borrowalId,
-      { $set: updatedFields },
-      { new: true }, // Option to return the updated document
-      (err, borrowal) => {
-        if (err) {
-          return res.status(400).json({ success: false, err });
+    try {
+        // Tạo một đối tượng rỗng để lưu các trường cập nhật
+        let updatedFields = {};
+        
+        if (borrowedDate) {
+            updatedFields.borrowedDate = new Date(borrowedDate);
         }
-  
+
+        if (dueDate) {
+            updatedFields.dueDate = new Date(dueDate);
+        }
+
+        if (status) {
+            updatedFields.status = status;
+        }
+
+        console.log('Updating borrowal with ID:', borrowalId);
+        console.log('Fields to update:', updatedFields);
+
+        // Sử dụng getEmailFromBorrowalId để lấy email của thành viên
+        const memberEmail = await getEmailFromBorrowalId(borrowalId);
+
+        if (!memberEmail) {
+            return res.status(404).json({ success: false, error: 'Email not found for the member associated with the borrowal' });
+        }
+
+        // Sử dụng findByIdAndUpdate để cập nhật borrowal và lấy borrowal đã cập nhật
+        const updatedBorrowal = await Borrowal.findByIdAndUpdate(
+            borrowalId,
+            { $set: updatedFields },
+            { new: true } // Option to return the updated document
+        );
+
+        if (!updatedBorrowal) {
+            return res.status(404).json({ success: false, error: 'Borrowal not found' });
+        }
+
+        // Gửi email thông báo khi cập nhật thành công
+        try {
+            await sendMail({
+                email: memberEmail,
+                subject: 'Thông báo cập nhật thông tin mượn sách',
+                html: `<p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>`
+            });
+        } catch (mailError) {
+            console.error('Error sending email:', mailError);
+            return res.status(500).json({ success: false, error: 'Failed to send email notification' });
+        }
+
+        // Trả về thông tin borrowal đã cập nhật
         return res.status(200).json({
-          success: true,
-          updatedBorrowal: borrowal
+            success: true,
+            updatedBorrowal
         });
-      }
-    );
-  };
-  
-  
+    } catch (err) {
+        console.error('Error updating borrowal:', err);
+        return res.status(400).json({ success: false, error: err.message });
+    }
+};
+
+const getEmailFromBorrowalId = async (borrowalId) => {
+    try {
+        const borrowal = await Borrowal.findById(borrowalId);
+        if (!borrowal) {
+            throw new Error('Borrowal not found');
+        }
+
+        const memberId = borrowal.memberId;
+        const member = await User.findById(memberId);
+        if (!member) {
+            throw new Error('Member not found');
+        }
+
+        return member.email;
+    } catch (err) {
+        throw new Error(err.message);
+    }
+};
+
 
 const deleteBorrowal = async (req, res) => {
     const borrowalId = req.params.id
@@ -170,7 +218,8 @@ const borrowalController ={
     getAllBorrowals,
     addBorrowal,
     updateBorrowal,
-    deleteBorrowal
+    deleteBorrowal,
+    getEmailFromBorrowalId
 }
 
 

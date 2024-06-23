@@ -2,15 +2,15 @@ import { Helmet } from 'react-helmet-async';
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField, Card } from '@mui/material';
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField, Card, Breadcrumbs, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import shuffle from 'lodash.shuffle';
 import { apiUrl, routes, methods } from '../../../constants';
 import Label from '../../../components/label';
 import BorrowalForm from '../borrowal/BorrowalForm';
-import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
-import { useAuth } from '../../../hooks/useAuth.js';
+
+// ----------------------------------------------------------------------
 
 const TruncatedTypography = styled(Typography)({
   color: 'black',
@@ -107,6 +107,33 @@ const BookDetails = () => {
       });
   };
 
+  if (isLoading) {
+    return (
+      <Container>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (!book || !author || !genre) {
+    return (
+      <Container>
+        <Typography variant="h5">Book not found</Typography>
+      </Container>
+    );
+  }
+
+  const images = [
+    {
+      original: book.photoUrl,
+      thumbnail: book.photoUrl,
+    },
+    ...book.pageUrls.map((url) => ({
+      original: url,
+      thumbnail: url,
+    })),
+  ];
+
   const backToBookPage = () => {
     navigate('/books');
   };
@@ -128,10 +155,6 @@ const BookDetails = () => {
       status: '',
     });
   };
-
-  useEffect(() => {
-    getBook();
-  }, [getBook]);
 
   if (isLoading) {
     return (
@@ -156,13 +179,27 @@ const BookDetails = () => {
         <title>{book.name} - Book Details</title>
       </Helmet>
 
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link component={RouterLink} to="/">
+          Dashboard
+        </Link>
+        <Link component={RouterLink} to="/books">
+          Books
+        </Link>
+        <Link component={RouterLink} to={`/books/genres/${genre.name}`}>
+          {genre.name}
+        </Link>
+        <Typography color="text.primary">{book.name}</Typography>
+      </Breadcrumbs>
+
       <Button variant="outlined" color="primary" onClick={backToBookPage} sx={{ mb: 2 }}>
         Back to Books
       </Button>
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
-          <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} />
+          {/* <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} /> */}
+          <ImageGallery items={images} />
         </Grid>
         <Grid item xs={12} sm={8} style={{ paddingLeft: '3rem' }}>
           <Box>
@@ -182,6 +219,9 @@ const BookDetails = () => {
             </Box>
             <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2 }}>
               ISBN: {book.isbn}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2 }}>
+              Position: {book.position}
             </Typography>
             <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2 }}>
               GENRE: {genre.name}
