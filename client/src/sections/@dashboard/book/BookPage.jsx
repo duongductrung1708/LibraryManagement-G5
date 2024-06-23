@@ -456,18 +456,7 @@ const BookPage = () => {
                     </Typography>
                     <TruncatedTypography variant="body2">{book.summary}</TruncatedTypography>
 
-                    {book.isAvailable && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={(e) => {
-                          setSelectedBookId(book._id);
-                          handleOpenBorrowalModal(e);
-                        }}
-                      >
-                        Borrow
-                      </Button>
-                    )}
+
                   </Stack>
                 </Card>
               </Grid>

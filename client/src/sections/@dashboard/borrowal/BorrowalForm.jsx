@@ -39,6 +39,8 @@ const BorrowalForm = ({
   const [books, setBooks] = useState([]);
   const [availableBooks, setAvailableBooks] = useState([]);
 
+  console.log(borrowal);
+
   const getAllMembers = useCallback(() => {
     axios
       .get('http://localhost:8080/api/user/getAllMembers')
