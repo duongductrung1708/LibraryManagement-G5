@@ -2,6 +2,7 @@ const db = require('../models');
 const crypto = require('crypto');
 const User = db.user;
 
+
 const getUser = async (req, res) => {
   const userId = req.params.id;
 
@@ -74,6 +75,7 @@ const generateRandomPassword = () => {
   return crypto.randomBytes(8).toString('hex');
 };
 
+
 const addUser = async (req, res, next) => {
   const newUser = req.body;
 
@@ -84,17 +86,21 @@ const addUser = async (req, res, next) => {
     }
 
     const user = new User(newUser);
+
     const password = newUser.password || generateRandomPassword();
     user.setPassword(password);
     await user.save();
-  
-    req.emailDetails = { user, password };
+
+     req.emailDetails = { user, password };
+
+
     next();
 
   } catch (err) {
     return res.status(400).json({ success: false, err });
   }
 };
+
 
 const importUsers = async (req, res, next) => {
   const { users } = req.body;
