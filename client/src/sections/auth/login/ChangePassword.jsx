@@ -30,20 +30,26 @@ const StyledContent = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function ChangePasswordPage() {
-  const { user } = useAuth();
-  const [password, setPassword] = useState('');
+  const { user, setUser } = useAuth();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
   const handleChangePassword = () => {
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
 
-    axios.post('http://localhost:8080/api/auth/change-password', { userId: user._id, newPassword: password }, { withCredentials: true })
+    axios.post('http://localhost:8080/api/user/change-password', {
+      userId: user._id,
+      currentPassword,
+      newPassword,
+    }, { withCredentials: true })
       .then(response => {
         toast.success('Password changed successfully');
+        setUser({ ...user, firstLogin: false });
         navigate('/books');
       })
       .catch(error => {
@@ -78,10 +84,16 @@ export default function ChangePasswordPage() {
 
             <Stack spacing={3} sx={{ mt: 3 }}>
               <TextField
+                label="Current Password"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+              <TextField
                 label="New Password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
               />
               <TextField
                 label="Confirm New Password"
