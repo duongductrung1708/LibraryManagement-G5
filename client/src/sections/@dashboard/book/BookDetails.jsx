@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Container, Typography, Box, Button, CircularProgress, Grid, Avatar, TextField, Card, Breadcrumbs, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import shuffle from 'lodash.shuffle';
@@ -11,14 +11,16 @@ import Label from '../../../components/label';
 import BorrowalForm from '../borrowal/BorrowalForm';
 import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
 import { useAuth } from '../../../hooks/useAuth';
+import ImageGallery from 'react-image-gallery';
+import 'react-image-gallery/styles/css/image-gallery.css';
 
 const TruncatedTypography = styled(Typography)({
   color: 'black',
 });
 
 const BookDetails = () => {
-  const { user } = useAuth(); // Correctly get the user from the Auth context
-  console.log(user); // This should log the user object or null if not logged in
+  const { user } = useAuth();
+  console.log(user);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -73,6 +75,10 @@ const BookDetails = () => {
       });
   }, [id]);
 
+  useEffect(() => {
+    getBook();
+  }, [getBook]);
+
   const addBorrowal = () => {
     axios
       .post(apiUrl(routes.BORROWAL, methods.POST), borrowal)
@@ -107,6 +113,33 @@ const BookDetails = () => {
       });
   };
 
+  if (isLoading) {
+    return (
+      <Container>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (!book || !author || !genre) {
+    return (
+      <Container>
+        <Typography variant="h5">Book not found</Typography>
+      </Container>
+    );
+  }
+
+  const images = [
+    {
+      original: book.photoUrl,
+      thumbnail: book.photoUrl,
+    },
+    ...book.pageUrls.map((url) => ({
+      original: url,
+      thumbnail: url,
+    })),
+  ];
+
   const backToBookPage = () => {
     navigate('/books');
   };
@@ -129,39 +162,32 @@ const BookDetails = () => {
     });
   };
 
-  useEffect(() => {
-    getBook();
-  }, [getBook]);
-
-  if (isLoading) {
-    return (
-      <Container>
-        <CircularProgress />
-      </Container>
-    );
-  }
-
-  if (!book || !author || !genre) {
-    return (
-      <Container>
-        <Typography variant="h5">Book not found</Typography>
-      </Container>
-    );
-  }
-
   return (
     <Container>
       <Helmet>
         <title>{book.name} - Book Details</title>
       </Helmet>
 
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <Link component={RouterLink} to="/">
+          Dashboard
+        </Link>
+        <Link component={RouterLink} to="/books">
+          Books
+        </Link>
+        <Link component={RouterLink} to={`/books/genres/${genre.name}`}>
+          {genre.name}
+        </Link>
+        <Typography color="text.primary">{book.name}</Typography>
+      </Breadcrumbs>
+
       <Button variant="outlined" color="primary" onClick={backToBookPage} sx={{ mb: 2 }}>
         Back to Books
       </Button>
 
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={4}>
-          <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} />
+      <Grid item xs={12} sm={4}>
+          <ImageGallery items={images} />
         </Grid>
         <Grid item xs={12} sm={8} style={{ paddingLeft: '3rem' }}>
           <Box>
