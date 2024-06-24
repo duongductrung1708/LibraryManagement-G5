@@ -175,7 +175,7 @@ const BookDetails = () => {
         <Link component={RouterLink} to="/books">
           Books
         </Link>
-        <Link component={RouterLink} to={`/books/genres/${genre.name}`}>
+        <Link component={RouterLink} to={`/genre/${genre._id}`}>
           {genre.name}
         </Link>
         <Typography color="text.primary">{book.name}</Typography>
