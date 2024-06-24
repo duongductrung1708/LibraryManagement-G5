@@ -7,10 +7,7 @@ import { useAuth } from "../../../hooks/useAuth";
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
-  // const { user } = useAuth();
-  const user = {
-    name: "minh",
-  }
+  const { user } = useAuth();
   const theme = useTheme();
 
   return (
