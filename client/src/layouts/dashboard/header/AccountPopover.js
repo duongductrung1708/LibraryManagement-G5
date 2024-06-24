@@ -6,38 +6,24 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 
 export default function AccountPopover() {
-
-  // const { user } = useAuth();
-  const user = {
-    name: "minh",
-    email: "lvhm114@gmail.com",
-    isAdmin: false,
-    isLibrarian: false,
-    photoUrl:"asd",
-    _id: "66706707332ac58fab7fe156",
-  }
-  // const { logout } = useAuth();
-  const  logout  = () =>  console.log("heelo");
-
+  const { user } = useAuth();
+  const { logout } = useAuth();
   const [open, setOpen] = useState(null);
 
   const logoutUser = () => {
     handleClose();
-
-    logout();
-    // axios
-    //   .get(`http://localhost:8080/api/auth/logout`, { withCredentials: true })
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       console.log(response.data);
-    //       logout();
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     alert(error);
-    //     console.log(error);
-    //   });
-
+    axios
+      .get(`http://localhost:8080/api/auth/logout`, { withCredentials: true })
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          logout();
+        }
+      })
+      .catch((error) => {
+        alert(error);
+        console.log(error);
+      });
   };
 
   const handleOpen = (event) => {

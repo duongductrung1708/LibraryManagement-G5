@@ -30,18 +30,8 @@ Nav.propTypes = {
 };
 
 export default function Nav({ openNav, onCloseNav }) {
-
-  // const { user } = useAuth();
-  // console.log(user);
-  const user = {
-    name: "minh",
-    email: "lvhm114@gmail.com",
-    isAdmin: true,
-    isLibrarian: false,
-    photoUrl:"asd",
-    _id: "66706707332ac58fab7fe156"
-}
-
+  const { user } = useAuth();
+  console.log(user);
 
   const { pathname } = useLocation();
 
