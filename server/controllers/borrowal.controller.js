@@ -53,6 +53,9 @@ const getAllBorrowals = async (req, res) => {
             if (borrowal.dueDate < currentDate) {
                 await Borrowal.findByIdAndUpdate(borrowal._id, { overdue: true });
                 borrowal.overdue = true; // Cập nhật giá trị trong kết quả trả về
+
+                 // Gửi email thông báo quá hạn
+                 await sendOverdueNotification(borrowal);
             }
         }
 
@@ -66,6 +69,7 @@ const getAllBorrowals = async (req, res) => {
 }
 
 
+
 async function addBorrowal(req, res, next) {
     try {
         const { memberId, bookId } = req.body;
@@ -77,12 +81,14 @@ async function addBorrowal(req, res, next) {
             return res.status(400).json({ success: false, error: 'This book has already been borrowed.' });
         }
 
+
         // Nếu không có Borrowal nào tồn tại với bookId này, thêm mới Borrowal
         const newBorrowal = {
             ...req.body,
             memberId: mongoose.Types.ObjectId(memberId),
             bookId: mongoose.Types.ObjectId(bookId)
         };
+
 
         const borrowal = await Borrowal.create(newBorrowal);
 
@@ -211,6 +217,27 @@ const deleteBorrowal = async (req, res) => {
         });
     })
 }
+
+
+const sendOverdueNotification = async (borrowal) => {
+    try {
+        await sendMail({
+            email: borrowal.member.email,
+            subject: 'Thông báo quá hạn trả sách',
+            html: `
+                <p>Xin chào, ${borrowal.member.name}</p>
+                <p>Bạn đang có sách quá hạn trả. Vui lòng trả sách sớm nhất có thể.</p>
+                <p>Trân trọng,</p>
+                <p>Đội của bạn</p>
+            `
+        });
+
+        // Đánh dấu rằng email thông báo đã được gửi
+        await Borrowal.findByIdAndUpdate(borrowal._id, { notificationSent: true });
+    } catch (error) {
+        console.error('Error sending overdue notification:', error);
+    }
+};
 
 
 const borrowalController ={
