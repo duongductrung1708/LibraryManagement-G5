@@ -13,6 +13,8 @@ import UserProfile from "./sections/@dashboard/user/UserProfile";
 import BorrowalHistory from "./sections/@dashboard/borrowal/BorrowalHistory";
 import BookDetails from "./sections/@dashboard/book/BookDetails";
 import AuthorProfile from "./sections/@dashboard/author/AuthorProfile";
+import ChangePassword from "./sections/auth/login/ChangePassword";
+import GenreDetails from "./sections/@dashboard/genre/GenreDetails";
 
 // ----------------------------------------------------------------------
 
@@ -28,6 +30,7 @@ export default function Router() {
     { path: "userprofile/history/:id", element: <BorrowalHistory /> },
     { path: "books/:id", element: <BookDetails /> },
     { path: "author/:id", element: <AuthorProfile /> },
+    { path: "genre/:id", element: <GenreDetails /> },
   ];
 
   const adminRoutes = useRoutes([
@@ -42,6 +45,7 @@ export default function Router() {
       ],
     },
     { path: "login", element: <LoginPage /> },
+    { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
   ]);
@@ -57,6 +61,7 @@ export default function Router() {
       ],
     },
     { path: "login", element: <LoginPage /> },
+    { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
   ]);
@@ -71,12 +76,14 @@ export default function Router() {
       ],
     },
     { path: "login", element: <LoginPage /> },
+    { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
   ]);
 
   const guestRoutes = useRoutes([
     { path: "login", element: <LoginPage /> },
+    { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/login" replace /> },
   ]);

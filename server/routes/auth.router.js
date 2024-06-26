@@ -1,6 +1,7 @@
 // Import required modules
 const express = require("express")
 const router = express.Router();
+const middle = require('../middleware/validateUser.middleware')
 
 // Import functions from controller
 const {
@@ -16,3 +17,5 @@ router.post("/register", (req, res) => registerUser(req, res))
 router.get("/logout", (req, res) => logoutUser(req, res))
 
 module.exports = router;
+
+

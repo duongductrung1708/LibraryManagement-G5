@@ -31,11 +31,15 @@ const BorrowalForm = ({
   handleCloseModal,
   borrowal,
   setBorrowal,
+  bookName,
+  id
 }) => {
   const { user } = useAuth();
   const [members, setMembers] = useState([]);
   const [books, setBooks] = useState([]);
   const [availableBooks, setAvailableBooks] = useState([]);
+
+  console.log(borrowal);
 
   const getAllMembers = useCallback(() => {
     axios
@@ -78,6 +82,17 @@ const BorrowalForm = ({
   }, [getAllMembers, getAllBooks]);
 
   useEffect(() => {
+    if (!isUpdateForm) {
+      setBorrowal((prev) => ({
+        ...prev,
+        requestDate: new Date().toISOString().split('T')[0], 
+        status: 'pending', 
+        bookId: id, 
+      }));
+    }
+  }, [setBorrowal, isUpdateForm, id]);
+
+  useEffect(() => {
     if (!user.isAdmin && !user.isLibrarian) {
       setBorrowal((prev) => ({
         ...prev,
@@ -91,6 +106,19 @@ const BorrowalForm = ({
   const handleDateChange = (field, value) => {
     const isoDate = new Date(value).toISOString();
     setBorrowal((prev) => ({ ...prev, [field]: isoDate }));
+  };
+
+  const handleSubmit = () => {
+    if (isUpdateForm) {
+      handleUpdateBorrowal();
+    } else {
+      // Check required fields before adding new borrowal
+      if (!borrowal.memberId || !borrowal.bookId || !borrowal.borrowedDate || !borrowal.dueDate || !borrowal.status) {
+        toast.error('Please fill in all required fields.');
+        return;
+      }
+      handleAddBorrowal();
+    }
   };
 
   const style = {
@@ -143,21 +171,12 @@ const BorrowalForm = ({
               </Grid>
               <Grid item xs={12} md={6} paddingLeft={1}>
                 <FormControl sx={{ m: 0 }} fullWidth>
-                  <InputLabel id="book-label">Book</InputLabel>
-                  <Select
-                    required
-                    labelId="book-label"
-                    id="book"
-                    value={borrowal.bookId}
-                    label="Book"
-                    onChange={(e) => setBorrowal({ ...borrowal, bookId: e.target.value })}
-                  >
-                    {availableBooks.map((book) => (
-                      <MenuItem key={book._id} value={book._id}>
-                        {book.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  <Typography variant="subtitle1" id="book-label" aria-describedby="book-label">
+                    Book
+                  </Typography>
+                  <Typography variant="body1" id="book-name">
+                    {bookName}
+                  </Typography>
                 </FormControl>
               </Grid>
             </Grid>
@@ -222,7 +241,7 @@ const BorrowalForm = ({
                 <Button
                   size="large"
                   variant="contained"
-                  onClick={isUpdateForm ? handleUpdateBorrowal : handleAddBorrowal}
+                  onClick={handleSubmit}
                   startIcon={<Iconify icon="bi:check-lg" />}
                   style={{ marginRight: '12px' }}
                 >
@@ -256,6 +275,8 @@ BorrowalForm.propTypes = {
   setBorrowal: PropTypes.func,
   handleAddBorrowal: PropTypes.func,
   handleUpdateBorrowal: PropTypes.func,
+  bookName: PropTypes.string,
+  id: PropTypes.string
 };
 
 export default BorrowalForm;

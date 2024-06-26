@@ -11,7 +11,6 @@ import {
   InputLabel,
   MenuItem,
   Modal,
-  Select,
   Stack,
   TextField,
   Typography,
@@ -27,6 +26,8 @@ const BorrowalFormForUser = ({
   handleCloseModal,
   borrowal,
   setBorrowal,
+  id,
+  bookName
 }) => {
   const { user } = useAuth();
   const [members, setMembers] = useState([]);
@@ -77,11 +78,12 @@ const BorrowalFormForUser = ({
     if (!isUpdateForm) {
       setBorrowal((prev) => ({
         ...prev,
-        requestDate: new Date().toISOString().split('T')[0], // Đặt giá trị mặc định cho requestDate
-        status: 'pending', // Đặt giá trị mặc định cho status
+        requestDate: new Date().toISOString().split('T')[0], 
+        status: 'pending', 
+        bookId: id, 
       }));
     }
-  }, [setBorrowal, isUpdateForm]);
+  }, [setBorrowal, isUpdateForm, id]);
 
   const style = {
     position: 'absolute',
@@ -105,6 +107,14 @@ const BorrowalFormForUser = ({
     }));
   };
 
+  const handleSubmit = () => {
+    if (isUpdateForm) {
+      handleUpdateBorrowal();
+    } else {
+      handleAddBorrowal();
+    }
+  };
+
   return (
     <Modal
       open={isModalOpen}
@@ -121,41 +131,22 @@ const BorrowalFormForUser = ({
             <Grid container spacing={0} sx={{ paddingBottom: '4px' }}>
               <Grid item xs={12} md={6} paddingRight={1}>
                 <FormControl sx={{ m: 0 }} fullWidth>
-                  <InputLabel id="member-label">Member</InputLabel>
-                  <Select
-                    required
-                    disabled={!isAdminOrLibrarian}
-                    labelId="member-label"
-                    id="member"
-                    value={borrowal.memberId}
-                    label="Member"
-                    onChange={(e) => setBorrowal({ ...borrowal, memberId: e.target.value })}
-                  >
-                    {members.map((member) => (
-                      <MenuItem key={member._id} value={member._id}>
-                        {member.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                <Typography variant="subtitle1" id="member-label" aria-describedby="member-label" paddingBottom={1}>
+                Member
+              </Typography>
+              <Typography variant="body1" id="member-name">
+                {user.name}
+              </Typography>
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={6} paddingLeft={1}>
                 <FormControl sx={{ m: 0 }} fullWidth>
-                  <InputLabel id="book-label">Book</InputLabel>
-                  <Select
-                    required
-                    labelId="book-label"
-                    id="book"
-                    value={borrowal.bookId}
-                    label="Book"
-                    onChange={(e) => setBorrowal({ ...borrowal, bookId: e.target.value })}
-                  >
-                    {availableBooks.map((book) => (
-                      <MenuItem key={book._id} value={book._id}>
-                        {book.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                <Typography variant="subtitle1" id="member-label" aria-describedby="member-label" paddingBottom={1}>
+                Member
+              </Typography>
+              <Typography variant="body1" id="member-name">
+                {bookName}
+              </Typography>
                 </FormControl>
               </Grid>
             </Grid>
@@ -182,7 +173,7 @@ const BorrowalFormForUser = ({
                 <Button
                   size="large"
                   variant="contained"
-                  onClick={isUpdateForm ? handleUpdateBorrowal : handleAddBorrowal}
+                  onClick={handleSubmit}
                   startIcon={<Iconify icon="bi:check-lg" />}
                   style={{ marginRight: '12px' }}
                 >
@@ -216,6 +207,8 @@ BorrowalFormForUser.propTypes = {
   setBorrowal: PropTypes.func,
   handleAddBorrowal: PropTypes.func,
   handleUpdateBorrowal: PropTypes.func,
+  id: PropTypes.string,
+  bookName: PropTypes.string,
 };
 
 export default BorrowalFormForUser;

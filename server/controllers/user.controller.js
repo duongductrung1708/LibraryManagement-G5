@@ -2,7 +2,6 @@ const db = require('../models');
 const crypto = require('crypto');
 const User = db.user;
 
-
 const getUser = async (req, res) => {
   const userId = req.params.id;
 
@@ -78,7 +77,6 @@ const generateRandomPasswordtest = (length) => {
   return crypto.randomBytes(length / 2).toString('hex');
 };
 
-
 const addUser = async (req, res, next) => {
   const newUser = req.body;
 
@@ -94,16 +92,13 @@ const addUser = async (req, res, next) => {
     user.setPassword(password);
     await user.save();
 
-     req.emailDetails = { user, password };
-
+    req.emailDetails = { user, password };
 
     next();
-
   } catch (err) {
     return res.status(400).json({ success: false, err });
   }
 };
-
 
 const importUsers = async (req, res, next) => {
   const { users } = req.body;
@@ -148,6 +143,30 @@ const importUsers = async (req, res, next) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const { userId, currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!user.isValidPassword(currentPassword)) {
+      return res.status(401).json({ success: false, message: 'Current password is incorrect' });
+    }
+
+    user.setPassword(newPassword);
+    user.firstLogin = false;
+    await user.save();
+
+    return res.status(200).json({ success: true, message: 'Password changed successfully' });
+  } catch (err) {
+    return res.status(400).json({ success: false, err });
+  }
+};
+
 const userController = {
   getUser,
   getAllUsers,
@@ -155,7 +174,8 @@ const userController = {
   addUser,
   updateUser,
   deleteUser,
-  importUsers
+  importUsers,
+  changePassword
 };
 
 module.exports = userController;
