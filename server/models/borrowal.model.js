@@ -34,7 +34,7 @@ const borrowalSchema = new mongoose.Schema({
     note : {
       type : String,
       required: false
-    }
+    },
 
     notificationSent: {
       type: Boolean,
