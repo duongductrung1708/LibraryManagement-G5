@@ -12,7 +12,7 @@ const {
 
 router.post("/login", (req, res) => loginUser(req, res))
 
-router.post("/register", (req, res) => registerUser(req, res))
+router.post("/add-user", (req, res) => addUser(req, res))
 
 router.get("/logout", (req, res) => logoutUser(req, res))
 

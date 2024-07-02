@@ -1,9 +1,10 @@
 
 const db = require('../models/index.js')
 const passport = require("passport");
+const sendEmail = require('../middleware/mailer');
 const User = db.user;
 
-const registerUser = async (req, res) => {
+const addUser = async (req, res) => {
   User.findOne({ email: req.body.email }, (err, user) => {
     //check user exists
     if (user) {
@@ -15,11 +16,14 @@ const registerUser = async (req, res) => {
     }
 
     const newUser = new User(req.body);
-    newUser.setPassword(req.body.password);
+    // newUser.setPassword(req.body.password);
+    const password = newUser.password || user.generateRandomPasswordtest(6);
+    user.setPassword(password);
     newUser.save((err, user) => {
       if (err) {
         return res.status(400).json({ success: false, err});
       }
+      sendEmail(user.email, password)
       return res.status(201).json({
         success: true,
         user
@@ -72,7 +76,7 @@ const logoutUser = async (req, res, next) => {
 }
 
 const authController ={
-  registerUser,
+  addUser,
   loginUser,
   logoutUser
 }

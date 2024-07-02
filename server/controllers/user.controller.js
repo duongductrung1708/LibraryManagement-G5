@@ -77,28 +77,28 @@ const generateRandomPasswordtest = (length) => {
   return crypto.randomBytes(length / 2).toString('hex');
 };
 
-const addUser = async (req, res, next) => {
-  const newUser = req.body;
+// const addUser = async (req, res, next) => {
+//   const newUser = req.body;
 
-  try {
-    const existingUser = await User.findOne({ email: newUser.email });
-    if (existingUser) {
-      return res.status(403).json({ success: false, message: 'User already exists' });
-    }
+//   try {
+//     const existingUser = await User.findOne({ email: newUser.email });
+//     if (existingUser) {
+//       return res.status(403).json({ success: false, message: 'User already exists' });
+//     }
 
-    const user = new User(newUser);
+//     const user = new User(newUser);
 
-    const password = newUser.password || generateRandomPasswordtest(6);
-    user.setPassword(password);
-    await user.save();
+//     const password = newUser.password || generateRandomPasswordtest(6);
+//     user.setPassword(password);
+//     await user.save();
 
-    req.emailDetails = { user, password };
+//     req.emailDetails = { user, password };
 
-    next();
-  } catch (err) {
-    return res.status(400).json({ success: false, err });
-  }
-};
+//     next();
+//   } catch (err) {
+//     return res.status(400).json({ success: false, err });
+//   }
+// };
 
 const importUsers = async (req, res, next) => {
   const { users } = req.body;
@@ -171,7 +171,7 @@ const userController = {
   getUser,
   getAllUsers,
   getAllMembers,
-  addUser,
+  // addUser,
   updateUser,
   deleteUser,
   importUsers,
