@@ -5,33 +5,78 @@ const sendEmail = require('../middleware/mailer');
 const User = db.user;
 
 const addUser = async (req, res) => {
-  User.findOne({ email: req.body.email }, (err, user) => {
-    //check user exists
-    if (user) {
-      return res.status(403).json({ success: false, message: "User already exists" });
+  const user = User.findOne({ email: req.body.email }, (err, user) => {
+    if (err) {
+      return res.status(400).json({ success: false, err});
     }
-    //check pass
-    if (!req.body.password && req.body.password.length < 6) {
-      return res.status(400).json({ success: false, message: "`password` is required and min 6 characters" });
-    }
-
-    const newUser = new User(req.body);
-    // newUser.setPassword(req.body.password);
-    const password = newUser.password || user.generateRandomPasswordtest(6);
-    user.setPassword(password);
-    newUser.save((err, user) => {
-      if (err) {
-        return res.status(400).json({ success: false, err});
-      }
-      sendEmail(user.email, password)
-      return res.status(201).json({
-        success: true,
-        user
-      });
-    })
-
   })
+
+  //check user exists
+  if (user) {
+    return res.status(403).json({ success: false, message: "User already exists" });
+  }
+  //check pass
+  if (!req.body.password && req.body.password.length < 6) {
+    return res.status(400).json({ success: false, message: "`password` is required and min 6 characters" });
+  }
+
+  const newUser = new User(req.body);
+  // newUser.setPassword(req.body.password);
+  const password = newUser.password || newUser.generateRandomPasswordtest(6);
+  newUser.setPassword(password);
+  await newUser.save((err, user) => {
+    if (err) {
+      return res.status(400).json({ success: false, err});
+    }
+  })
+
+  sendEmail(newUser.email, password)
+
+  res.status(201).json({ success: true, newUser });
 }
+
+const importUsers = async (req, res, next) => {
+  const { users } = req.body;
+
+  try {
+    const results = [];
+
+    for (const userData of users) {
+      const existingUser = await User.findOne({ email: userData.email });
+      if (existingUser) {
+        results.push({
+          email: userData.email,
+          success: false,
+          message: 'User already exists',
+        });
+        continue;
+      }
+
+      const newUser = new User({
+        name: userData.name,
+        email: userData.email,
+        password: userData.password || user.generateRandomPassword(),
+        dob: userData.dob || null,
+        phone: userData.phone || 'N/A',
+        photoUrl: userData.photoUrl || 'default-photo-url.png',
+        isAdmin: userData.isAdmin || false,
+        isLibrarian: userData.isLibrarian || false,
+      });
+
+      await newUser.save();
+
+      req.emailDetails = { user: newUser, password: newUser.password };
+      sendEmail(newUser, newUser.password);
+
+      results.push({ email: userData.email, success: true });
+    }
+
+    res.status(200).json({ results });
+  } catch (error) {
+    console.error('Error importing users:', error);
+    res.status(400).json({ success: false, error: 'Error importing users' });
+  }
+};
 
 const loginUser = async (req, res, next) => {
 
@@ -77,6 +122,7 @@ const logoutUser = async (req, res, next) => {
 
 const authController ={
   addUser,
+  importUsers,
   loginUser,
   logoutUser
 }

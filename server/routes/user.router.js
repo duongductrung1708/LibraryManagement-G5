@@ -28,7 +28,7 @@ router.put("/update/:id", (req, res) => updateUser(req, res));
 
 router.delete("/delete/:id", (req, res) => deleteUser(req, res));
 
-router.post("/import", importUsers, sendEmail);
+// router.post("/import", importUsers, sendEmail);
 
 router.post("/change-password", (req, res) => changePassword(req, res));
 

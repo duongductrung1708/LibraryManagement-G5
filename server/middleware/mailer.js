@@ -35,8 +35,7 @@ const createTransporter = async () => {
   });
 };
 
-const sendEmail = async (req, res, next) => {
-  const { user, password } = req.emailDetails;
+const sendEmail = async (user, password) => {
 
   const transporter = await createTransporter();
   const mailOptions = {
@@ -47,9 +46,8 @@ const sendEmail = async (req, res, next) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Email sent to ${user.email}`);
-    res.status(201).json({ success: true, user });
+    transporter.sendMail(mailOptions);
+    console.log(`Email already send to ${user.email}`);
   } catch (error) {
     console.error(`Error sending email to ${user.email}:`, error);
     res.status(500).json({ success: false, message: 'Error sending email', error });
