@@ -6,7 +6,7 @@ const middle = require('../middleware/validateUser.middleware')
 // Import functions from controller
 const {
   loginUser,
-  registerUser,
+  addUser,
   logoutUser,
 } = require('../controllers/auth.controller')
 
