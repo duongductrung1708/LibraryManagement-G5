@@ -86,6 +86,7 @@ app.use("/api/user", UserRouter);
 app.use("/api/review", ReviewRouter);
 
 app.use((req, res, next) => {
+  console.log("avx")
   next(createError(404));
 });
 

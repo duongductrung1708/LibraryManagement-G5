@@ -100,7 +100,8 @@ const loginUser = async (req, res, next) => {
 
   User.findOne({ email: req.body.email }, (err, user) => {
     if (err) {
-      return res.status(500).json({ success: false, err });
+      err.status(500)
+      next(err);
     }
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
