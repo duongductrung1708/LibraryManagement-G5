@@ -63,6 +63,14 @@ UserSchema.methods.isValidPassword = function (password) {
   return this.hash === newhash;
 };
 
+UserSchema.methods.generateRandomPassword = function (){
+  return crypto.randomBytes(8).toString('hex');
+};
+
+UserSchema.methods.generateRandomPasswordtest = (length) => {
+  return crypto.randomBytes(length / 2).toString('hex');
+};
+
 const User = mongoose.model("User", UserSchema);
 
 module.exports = User;
