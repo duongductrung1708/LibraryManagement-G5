@@ -8,6 +8,7 @@ const {
   loginUser,
   addUser,
   logoutUser,
+  importUsers
 } = require('../controllers/auth.controller')
 
 router.post("/login", (req, res) => loginUser(req, res))
