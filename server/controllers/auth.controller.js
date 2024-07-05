@@ -2,7 +2,6 @@
 const db = require('../models/index.js')
 const passport = require("passport");
 const sendMail = require('../middleware/sendmaiil');
-const sendEmail = require('../middleware/mailer.js');
 const User = db.user;
 
 const addUser = async (req, res) => {
@@ -14,12 +13,13 @@ const addUser = async (req, res) => {
       return res.status(403).json({ success: false, message: "User already exists" });
     }
 
-    //create user
+    //create user && add data
     const newUser = new User(req.body);
     //check pass
     if (!newUser.password && newUser.password.length < 6) {
       return res.status(400).json({ success: false, message: "`password` is required and min 6 characters" });
     }
+
     const password = newUser.password || newUser.generateRandomPasswordtest(6);
     newUser.setPassword(password);
     await newUser.save((err, user) => {
@@ -27,7 +27,7 @@ const addUser = async (req, res) => {
         return res.status(400).json({ success: false, err });
       }
     })
-    // await sendEmail(newUser, password)
+    //send mail
     sendMail({
       email: newUser.email,
       subject: 'Thông báo từ ethnic group library',

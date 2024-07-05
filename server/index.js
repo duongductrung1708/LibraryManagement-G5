@@ -6,6 +6,7 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const initializePassport = require("./middleware/passport-config");
 const MongoStore = require('connect-mongo');
+require('./cron');
 
 // Import routers
 const routes = require("./routes");

@@ -47,6 +47,11 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  totalOverDue: {
+    type: Number,
+    max:3,
+    default: 0,
+  }
 },{
   versionKey:false
 });

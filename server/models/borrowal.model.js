@@ -1,46 +1,44 @@
 const mongoose = require('mongoose')
 
 const borrowalSchema = new mongoose.Schema({
-    bookId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true
-    },
+  bookId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
   memberId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true
   },
-  requestDate :{
+  requestDate: {
     type: Date,
     required: false
   },
-    borrowedDate: {
-        type: Date,
-        required: false
-    },
-    dueDate: {
-        type: Date,
-        required: false
-    },
-    status: {
-        type: String,
-        required: false
-    },
-    overdue: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
+  borrowedDate: {
+    type: Date,
+    required: false
+  },
+  dueDate: {
+    type: Date,
+    required: false
+  },
+  status: {
+    type: String,
+    required: false
+  },
+  overdue: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  note: {
+    type: String,
+    required: false
+  },
 
-    note : {
-      type : String,
-      required: false
-    },
-
-    notificationSent: {
-      type: Boolean,
-      default: false
+  notificationSent: {
+    type: Boolean,
+    default: false
   }
-
 })
 
 const Borrowal = mongoose.model('Borrowal', borrowalSchema)
