@@ -13,7 +13,8 @@ servers:
     url: https://virtserver.swaggerhub.com/TRUNGKIEN2981412/sdn/1.0.0
   - url: http://localhost:3000
     description: Local development server
-
+  - url: https://app.swaggerhub.com/apis/TRUNGKIEN2981412/sdn/1.0.0
+    description: Local development server
 paths:
   /api/auth/login:
     post:
