@@ -4,14 +4,13 @@ const crypto = require("crypto");
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
+    maxLength:50,
     required: true,
   },
   email: {
     type: String,
-    required: true,
-  },
-  password: {
-    type: String,
+    maxLength:50,
+    unique:true,
     required: true,
   },
   dob: {
@@ -20,7 +19,8 @@ const UserSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: false,
+    maxLength:50,
+    required: true,
   },
   isAdmin: {
     type: Boolean,
@@ -32,6 +32,7 @@ const UserSchema = new mongoose.Schema({
   },
   photoUrl: {
     type: String,
+    default:'default-photo-url.png',
     required: false,
   },
   hash: {
@@ -46,6 +47,11 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  totalOverDue: {
+    type: Number,
+    max:3,
+    default: 0,
+  }
 },{
   versionKey:false
 });

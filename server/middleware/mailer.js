@@ -1,3 +1,4 @@
+//need maintain
 const nodemailer = require('nodemailer');
 const { OAuth2Client } = require('google-auth-library');
 
@@ -22,6 +23,7 @@ const getAccessToken = async () => {
 
 const createTransporter = async () => {
   const myAccessToken = await getAccessToken();
+  console.log('kjasdbbkafd++++++++++++++')
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -36,7 +38,9 @@ const createTransporter = async () => {
 };
 
 const sendEmail = async (user, password) => {
-
+  try {
+  console.log('kjasdbbkafd++++++++++++++')
+  console.log(user)
   const transporter = await createTransporter();
   const mailOptions = {
     from: ADMIN_EMAIL_ADDRESS,
@@ -44,13 +48,11 @@ const sendEmail = async (user, password) => {
     subject: 'Welcome to Our Service',
     text: `Hello ${user.name},\n\nYour account has been created. Here are your credentials:\n\nUsername: ${user.email}\nPassword: ${password}\n\nBest regards,\nYour Team`,
   };
-
-  try {
-    transporter.sendMail(mailOptions);
-    console.log(`Email already send to ${user.email}`);
+  transporter.sendMail(mailOptions);
+  console.log(`Email already send to ${user.email}`);
   } catch (error) {
     console.error(`Error sending email to ${user.email}:`, error);
-    res.status(500).json({ success: false, message: 'Error sending email', error });
+    // res.status(500).json({ success: false, message: 'Error sending email', error });
   }
 };
 

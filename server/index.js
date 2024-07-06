@@ -6,6 +6,7 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const initializePassport = require("./middleware/passport-config");
 const MongoStore = require('connect-mongo');
+require('./cron');
 
 // Import routers
 const routes = require("./routes");
@@ -86,10 +87,14 @@ app.use("/api/user", UserRouter);
 app.use("/api/review", ReviewRouter);
 
 app.use((req, res, next) => {
-  next(createError(404));
+  res.status(404).json({
+    success: false,
+    message: 'Bad method'
+  });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res , next) => {
+  console.log(err)
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal Server Error'

@@ -3,7 +3,6 @@ require('dotenv').config(); // Load environment variables from .env file
 const nodemailer = require('nodemailer');
 
 const  sendMail = async ({ email, subject, html }) => {
-  console.log(subject)
   try {
     // Create a transporter using the SMTP configuration
     const transporter = nodemailer.createTransport({

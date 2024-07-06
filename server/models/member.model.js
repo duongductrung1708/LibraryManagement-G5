@@ -32,6 +32,8 @@ const memberSchema = new mongoose.Schema({
         type: String,
         required: false
     }
+},{
+    versionKey:false
 })
 
 const Member = mongoose.model('Member', memberSchema)
