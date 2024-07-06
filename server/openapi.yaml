@@ -9,12 +9,14 @@ info:
     name: ISC
 servers:
   # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/TRUNGKIEN2981412/sdn/1.0.0
+  # - description: SwaggerHub API Auto Mocking
+  #   url: https://virtserver.swaggerhub.com/TRUNGKIEN2981412/sdn/1.0.0
   - url: http://localhost:3000
     description: Local development server
+
+    ## đường link web swagger
   - url: https://app.swaggerhub.com/apis/TRUNGKIEN2981412/sdn/1.0.0
-    description: Local development server
+    description: vào đường live swagger này 
 paths:
   /api/auth/login:
     post:
