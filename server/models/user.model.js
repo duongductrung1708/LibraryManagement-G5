@@ -1,17 +1,17 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
+const status = require("../models/enum")
 
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
+    maxLength:50,
     required: true,
   },
   email: {
     type: String,
-    required: true,
-  },
-  password: {
-    type: String,
+    maxLength:50,
+    unique:true,
     required: true,
   },
   dob: {
@@ -20,7 +20,8 @@ const UserSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: false,
+    maxLength:50,
+    required: true,
   },
   isAdmin: {
     type: Boolean,
@@ -32,6 +33,7 @@ const UserSchema = new mongoose.Schema({
   },
   photoUrl: {
     type: String,
+    default:'default-photo-url.png',
     required: false,
   },
   hash: {
@@ -46,6 +48,16 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  totalOverDue: {
+    type: Number,
+    max:3,
+    default: 0,
+  },
+  status: {
+    type: String,
+    default: status.UserType.ACTIVE,
+    require: true
+  }
 },{
   versionKey:false
 });
@@ -61,6 +73,14 @@ UserSchema.methods.isValidPassword = function (password) {
     .pbkdf2Sync(password, this.salt, 1000, 64, `sha512`)
     .toString(`hex`);
   return this.hash === newhash;
+};
+
+UserSchema.methods.generateRandomPassword = function (){
+  return crypto.randomBytes(8).toString('hex');
+};
+
+UserSchema.methods.generateRandomPasswordtest = (length) => {
+  return crypto.randomBytes(length / 2).toString('hex');
 };
 
 const User = mongoose.model("User", UserSchema);

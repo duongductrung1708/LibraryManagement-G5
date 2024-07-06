@@ -4,17 +4,23 @@ const router = express.Router();
 const middle = require('../middleware/validateUser.middleware')
 
 // Import functions from controller
-const {
-  loginUser,
-  registerUser,
-  logoutUser,
-} = require('../controllers/auth.controller')
+// const {
+//   loginUser,
+//   addUser,
+//   logoutUser,
+//   importUsers
+// } = require('../controllers/auth.controller');
+// const authController = require("../controllers/auth.controller");
+const { authController } = require('../controllers')
 
-router.post("/login", (req, res) => loginUser(req, res))
+router.post("/login", authController.loginUser)
 
-router.post("/register", (req, res) => registerUser(req, res))
+router.post("/add-user", authController.addUser)
+
+router.post("/import", authController.importUsers);
 
 router.get("/logout", (req, res) => logoutUser(req, res))
+
 
 module.exports = router;
 

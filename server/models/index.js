@@ -25,6 +25,7 @@ db.connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    mongoose.set('strictQuery', true);
     console.log("Connected to MongoDB successfully");
   } catch (err) {
     console.error("Error connecting to MongoDB:", err.message);

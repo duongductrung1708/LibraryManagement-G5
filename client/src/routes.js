@@ -15,8 +15,7 @@ import BookDetails from "./sections/@dashboard/book/BookDetails";
 import AuthorProfile from "./sections/@dashboard/author/AuthorProfile";
 import ChangePassword from "./sections/auth/login/ChangePassword";
 import GenreDetails from "./sections/@dashboard/genre/GenreDetails";
-
-// ----------------------------------------------------------------------
+import LibraryRulesPage from "./sections/@dashboard/app/LibraryRulesPage";
 
 export default function Router() {
   const { user } = useAuth();
@@ -31,6 +30,7 @@ export default function Router() {
     { path: "books/:id", element: <BookDetails /> },
     { path: "author/:id", element: <AuthorProfile /> },
     { path: "genre/:id", element: <GenreDetails /> },
+    { path: "rules", element: <LibraryRulesPage /> },
   ];
 
   const adminRoutes = useRoutes([

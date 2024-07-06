@@ -9,6 +9,8 @@ const genreSchema = new mongoose.Schema({
         type: String,
         required: true
     }
+},{
+    versionKey:false
 })
 
 const Genre = mongoose.model('Genre', genreSchema)
