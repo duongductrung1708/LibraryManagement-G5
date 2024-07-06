@@ -54,8 +54,8 @@ const getAllBorrowals = async (req, res) => {
                 await Borrowal.findByIdAndUpdate(borrowal._id, { overdue: true });
                 borrowal.overdue = true; // Cập nhật giá trị trong kết quả trả về
 
-                 // Gửi email thông báo quá hạn
-                 await sendOverdueNotification(borrowal);
+                //  // Gửi email thông báo quá hạn
+                //  await sendOverdueNotification(borrowal);
             }
         }
 

@@ -4,14 +4,14 @@ const router = express.Router();
 const middle = require('../middleware/validateUser.middleware')
 
 // Import functions from controller
-const {
-  loginUser,
-  addUser,
-  logoutUser,
-  importUsers
-} = require('../controllers/auth.controller');
-const authController = require("../controllers/auth.controller");
-// const { authController } = require('../controllers/auth.controller')
+// const {
+//   loginUser,
+//   addUser,
+//   logoutUser,
+//   importUsers
+// } = require('../controllers/auth.controller');
+// const authController = require("../controllers/auth.controller");
+const { authController } = require('../controllers')
 
 router.post("/login", authController.loginUser)
 
