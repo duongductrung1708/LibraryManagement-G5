@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
+const status = require("../models/enum")
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -51,6 +52,11 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     max:3,
     default: 0,
+  },
+  status: {
+    type: String,
+    default: status.UserType.ACTIVE,
+    require: true
   }
 },{
   versionKey:false

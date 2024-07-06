@@ -5,7 +5,6 @@ const sendMail = require('../middleware/sendmaiil');
 const User = db.user;
 
 const addUser = async (req, res) => {
-
   try {
     const user = await User.findOne({ email: req.body.email });
     //check user exists
@@ -16,10 +15,9 @@ const addUser = async (req, res) => {
     //create user && add data
     const newUser = new User(req.body);
     //check pass
-    if (!newUser.password && newUser.password.length < 6) {
-      return res.status(400).json({ success: false, message: "`password` is required and min 6 characters" });
+    if (newUser.password && newUser.password.length < 6) {
+      return res.status(400).json({ success: false, message: "password is required and min 6 characters" });
     }
-
     const password = newUser.password || newUser.generateRandomPasswordtest(6);
     newUser.setPassword(password);
     await newUser.save((err, user) => {
@@ -38,7 +36,8 @@ const addUser = async (req, res) => {
     });
     res.status(201).json({ success: true, newUser });
   } catch (err) {
-    return res.status(400).json({ success: false, err });
+    console.log("asdf")
+    return res.status(400).json({ success: false, message: err || "123" });
   }
 }
 
