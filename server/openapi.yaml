@@ -1,0 +1,965 @@
+openapi: 3.0.0
+info:
+  title: Library Management System API
+  version: 1.0.0
+  description: This is the API documentation for the Library Management System.
+  contact:
+    email: you@your-company.com
+  license:
+    name: ISC
+servers:
+  # Added by API Auto Mocking Plugin
+  # - description: SwaggerHub API Auto Mocking
+  #   url: https://virtserver.swaggerhub.com/TRUNGKIEN2981412/sdn/1.0.0
+  - url: http://localhost:3000
+    description: Local development server
+
+    ## đường link web swagger
+  - url: https://app.swaggerhub.com/apis/TRUNGKIEN2981412/sdn/1.0.0
+    description: vào đường live swagger này 
+paths:
+  /api/auth/login:
+    post:
+      summary: Login user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Access token for authentication
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+
+  /api/auth/add-user:
+    post:
+      summary: Add new user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                isAdmin:
+                  type: boolean
+                isLibrarian:
+                  type: boolean
+              required:
+                - name
+                - email
+                - password
+                - isAdmin
+                - isLibrarian
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+
+  /api/auth/import:
+    post:
+      summary: Import users
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Users imported successfully
+        '400':
+          description: Bad request
+
+  /api/auth/logout:
+    get:
+      summary: Logout user
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: Successfully logged out
+        '401':
+          description: Unauthorized
+
+  /api/books/getAll:
+    get:
+      summary: Get all books
+      tags:
+        - Books
+      responses:
+        '200':
+          description: List of books retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+
+  /api/books/get/{id}:
+    get:
+      summary: Get a book by ID
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the book to retrieve
+      responses:
+        '200':
+          description: Book retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Book not found
+
+  /api/books/add:
+    post:
+      summary: Add a new book
+      tags:
+        - Books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '201':
+          description: Book added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          description: Bad request
+
+  /api/books/update/{id}:
+    put:
+      summary: Update a book by ID
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the book to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '200':
+          description: Book updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Book not found
+
+  /api/books/delete/{id}:
+    delete:
+      summary: Delete a book by ID
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the book to delete
+      responses:
+        '200':
+          description: Book deleted successfully
+        '404':
+          description: Book not found
+
+  /api/books/genre/get/{genreId}:
+    get:
+      summary: Get books by genre
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: genreId
+          required: true
+          schema:
+            type: string
+          description: ID of the genre to filter books
+      responses:
+        '200':
+          description: Books retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+        '404':
+          description: Genre not found or no books in this genre
+
+  /api/books/author/get/{authorId}:
+    get:
+      summary: Get books by author
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: authorId
+          required: true
+          schema:
+            type: string
+          description: ID of the author to filter books
+      responses:
+        '200':
+          description: Books retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+        '404':
+          description: Author not found or no books by this author
+
+  /api/authors/getAll:
+    get:
+      summary: Get all authors
+      tags:
+        - Authors
+      responses:
+        '200':
+          description: List of authors retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Author'
+
+  /api/authors/get/{id}:
+    get:
+      summary: Get an author by ID
+      tags:
+        - Authors
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the author to retrieve
+      responses:
+        '200':
+          description: Author retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '404':
+          description: Author not found
+
+  /api/authors/add:
+    post:
+      summary: Add a new author
+      tags:
+        - Authors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Author'
+      responses:
+        '201':
+          description: Author added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '400':
+          description: Bad request
+
+  /api/authors/update/{id}:
+    put:
+      summary: Update an author by ID
+      tags:
+        - Authors
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the author to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Author'
+      responses:
+        '200':
+          description: Author updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '404':
+          description: Author not found
+
+  /api/authors/delete/{id}:
+    delete:
+      summary: Delete an author by ID
+      tags:
+        - Authors
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the author to delete
+      responses:
+        '200':
+          description: Author deleted successfully
+        '404':
+          description: Author not found
+
+  /api/borrowals/getAll:
+    get:
+      summary: Get all borrowals
+      tags:
+        - Borrowals
+      responses:
+        '200':
+          description: List of borrowals retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Borrowal'
+
+  /api/borrowals/get/{id}:
+    get:
+      summary: Get a borrowal by ID
+      tags:
+        - Borrowals
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the borrowal to retrieve
+      responses:
+        '200':
+          description: Borrowal retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Borrowal'
+        '404':
+          description: Borrowal not found
+
+  /api/borrowals/add:
+    post:
+      summary: Add a new borrowal
+      tags:
+        - Borrowals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Borrowal'
+      responses:
+        '201':
+          description: Borrowal added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Borrowal'
+        '400':
+          description: Bad request
+
+  /api/borrowals/update/{id}:
+    put:
+      summary: Update a borrowal by ID
+      tags:
+        - Borrowals
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the borrowal to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Borrowal'
+      responses:
+        '200':
+          description: Borrowal updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Borrowal'
+        '404':
+          description: Borrowal not found
+
+  /api/borrowals/delete/{id}:
+    delete:
+      summary: Delete a borrowal by ID
+      tags:
+        - Borrowals
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the borrowal to delete
+      responses:
+        '200':
+          description: Borrowal deleted successfully
+        '404':
+          description: Borrowal not found
+
+  /api/genres/getAll:
+    get:
+      summary: Get all genres
+      tags:
+        - Genres
+      responses:
+        '200':
+          description: List of genres retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Genre'
+
+  /api/genres/get/{id}:
+    get:
+      summary: Get a genre by ID
+      tags:
+        - Genres
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the genre to retrieve
+      responses:
+        '200':
+          description: Genre retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Genre'
+        '404':
+          description: Genre not found
+
+  /api/genres/add:
+    post:
+      summary: Add a new genre
+      tags:
+        - Genres
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Genre'
+      responses:
+        '201':
+          description: Genre added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Genre'
+        '400':
+          description: Bad request
+
+  /api/genres/update/{id}:
+    put:
+      summary: Update a genre by ID
+      tags:
+        - Genres
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the genre to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Genre'
+      responses:
+        '200':
+          description: Genre updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Genre'
+        '404':
+          description: Genre not found
+
+  /api/genres/delete/{id}:
+    delete:
+      summary: Delete a genre by ID
+      tags:
+        - Genres
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the genre to delete
+      responses:
+        '200':
+          description: Genre deleted successfully
+        '404':
+          description: Genre not found
+
+  /api/reviews/getAll:
+    get:
+      summary: Get all reviews
+      tags:
+        - Reviews
+      responses:
+        '200':
+          description: List of reviews retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+
+  /api/reviews/get/{id}:
+    get:
+      summary: Get a review by ID
+      tags:
+        - Reviews
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the review to retrieve
+      responses:
+        '200':
+          description: Review retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          description: Review not found
+
+  /api/reviews/getByBookId/{bid}:
+    get:
+      summary: Get reviews by book ID
+      tags:
+        - Reviews
+      parameters:
+        - in: path
+          name: bid
+          required: true
+          schema:
+            type: string
+          description: ID of the book to filter reviews
+      responses:
+        '200':
+          description: Reviews retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '404':
+          description: Book not found or no reviews for this book
+
+  /api/reviews/add/{id}:
+    post:
+      summary: Add a new review for a book
+      tags:
+        - Reviews
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the book to add review to
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+              required:
+                - rating
+                - comment
+      responses:
+        '201':
+          description: Review added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Bad request
+
+  /api/reviews/update/{id}:
+    put:
+      summary: Update a review by ID
+      tags:
+        - Reviews
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the review to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+              required:
+                - rating
+                - comment
+      responses:
+        '200':
+          description: Review updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          description: Review not found
+
+  /api/reviews/delete/{id}:
+    delete:
+      summary: Delete a review by ID
+      tags:
+        - Reviews
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the review to delete
+      responses:
+        '200':
+          description: Review deleted successfully
+        '404':
+          description: Review not found
+
+  /api/users/getAll:
+    get:
+      summary: Get all users
+      tags:
+        - Users
+      responses:
+        '200':
+          description: List of users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /api/users/getAllMembers:
+    get:
+      summary: Get all members
+      tags:
+        - Users
+      responses:
+        '200':
+          description: List of members retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /api/users/get/{id}:
+    get:
+      summary: Get a user by ID
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the user to retrieve
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+  /api/users/update/{id}:
+    put:
+      summary: Update a user by ID
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the user to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+  /api/users/delete/{id}:
+    delete:
+      summary: Delete a user by ID
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the user to delete
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        isAdmin:
+          type: boolean
+        isLibrarian:
+          type: boolean
+      required:
+        - name
+        - email
+        - password
+        - isAdmin
+        - isLibrarian
+
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        author:
+          type: string
+        genre:
+          type: string
+        publishedDate:
+          type: string
+          format: date
+        ISBN:
+          type: string
+      required:
+        - title
+        - author
+        - genre
+        - publishedDate
+        - ISBN
+
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        biography:
+          type: string
+        nationality:
+          type: string
+      required:
+        - name
+
+    Borrowal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        bookId:
+          type: string
+          format: uuid
+        borrowDate:
+          type: string
+          format: date
+        returnDate:
+          type: string
+          format: date
+
+    Genre:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+        - name
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        bookId:
+          type: string
+          format: uuid
+        rating:
+          type: number
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+      required:
+        - userId
+        - bookId
+        - rating
+        - comment
