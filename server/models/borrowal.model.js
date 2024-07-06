@@ -3,10 +3,12 @@ const mongoose = require('mongoose')
 const borrowalSchema = new mongoose.Schema({
   bookId: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'Book',
     required: true
   },
   memberId: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   requestDate: {
@@ -25,11 +27,6 @@ const borrowalSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  overdue: {
-    type: Boolean,
-    required: false,
-    default: false
-  },
   note: {
     type: String,
     required: false
@@ -39,6 +36,8 @@ const borrowalSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   }
+},{
+  versionKey:false
 })
 
 const Borrowal = mongoose.model('Borrowal', borrowalSchema)

@@ -87,15 +87,14 @@ app.use("/api/user", UserRouter);
 app.use("/api/review", ReviewRouter);
 
 app.use((req, res, next) => {
-  // console.log("avx")
-  // next(createError(404));
   res.status(404).json({
     success: false,
     message: 'Bad method'
   });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res , next) => {
+  console.log(err)
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal Server Error'
