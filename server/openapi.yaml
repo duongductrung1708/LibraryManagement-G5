@@ -14,7 +14,7 @@ servers:
   - url: http://localhost:3000
     description: Local development server
 
-    ## đường link web swagger
+    ## đường link web  wagger link trên web
   - url: https://app.swaggerhub.com/apis/TRUNGKIEN2981412/sdn/1.0.0
     description: vào đường live swagger này 
 paths:
