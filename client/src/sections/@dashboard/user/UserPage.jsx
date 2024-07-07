@@ -98,7 +98,7 @@ const UserPage = () => {
 
   const addUser = () => {
     axios
-      .post(apiUrl(routes.USER, methods.POST), user)
+      .post(apiUrl(routes.AUTH, methods.POST), user)
       .then((response) => {
         toast.success('User added');
         handleCloseModal();
