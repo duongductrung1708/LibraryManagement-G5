@@ -141,14 +141,7 @@ const UserForm = ({ isUpdateForm, isModalOpen, handleCloseModal, user, setUser, 
               </RadioGroup>
             </FormControl>
 
-            <TextField
-              name="password"
-              type="password"
-              label="Password"
-              value={user.password}
-              required
-              onChange={(e) => setUser({ ...user, password: e.target.value })}
-            />
+         
 
             <TextField
               name="photoUrl"

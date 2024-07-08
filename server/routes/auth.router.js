@@ -19,7 +19,7 @@ router.post("/add", authController.addUser)
 
 router.post("/import", authController.importUsers);
 
-router.get("/logout", (req, res) => logoutUser(req, res))
+router.get("/logout", (req, res) => authController.logoutUser(req, res))
 
 
 module.exports = router;
