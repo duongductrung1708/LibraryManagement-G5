@@ -6,7 +6,7 @@ const db = require('../models');
 const Borrowal = db.borrowal;
 const User = db.user;
 
-cron.schedule('*/5 * * * * *', async (next) => {
+cron.schedule('0 0 * * *', async (next) => {
     try {
         const warningWeekEmail = new Set();
         const warningDayEmail = new Set();
