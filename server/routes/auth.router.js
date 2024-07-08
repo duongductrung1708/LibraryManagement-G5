@@ -15,7 +15,7 @@ const { authController } = require('../controllers')
 
 router.post("/login", authController.loginUser)
 
-router.post("/add-user", authController.addUser)
+router.post("/add", authController.addUser)
 
 router.post("/import", authController.importUsers);
 

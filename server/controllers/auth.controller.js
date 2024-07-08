@@ -1,4 +1,3 @@
-
 const db = require('../models/index.js')
 const passport = require("passport");
 const sendMail = require('../middleware/sendmaiil');
@@ -41,17 +40,15 @@ const addUser = async (req, res) => {
   }
 }
 
-const importUsers = async (req, res, next) => {
-  //recive data
+const importUsers = async (req, res) => {
   const { users } = req.body;
+
   try {
-    //create new array
     const results = [];
-    // loop data contain users
+
     for (const userData of users) {
-      const existUser = await User.findOne({ email: userData.email });
-      //check user exist
-      if (existUser) {
+      const existingUser = await User.findOne({ email: userData.email });
+      if (existingUser) {
         results.push({
           email: userData.email,
           success: false,
@@ -59,7 +56,7 @@ const importUsers = async (req, res, next) => {
         });
         continue;
       }
-       //check phone exist
+
       const existPhone = await User.findOne({ phone: userData.phone });
       if (existPhone) {
         results.push({
@@ -69,31 +66,40 @@ const importUsers = async (req, res, next) => {
         });
         continue;
       }
+
       const newUser = new User({
         name: userData.name,
         email: userData.email,
         dob: userData.dob || null,
-        phone: userData.phone,
+        phone: userData.phone || 'N/A',
         photoUrl: userData.photoUrl || 'default-photo-url.png',
         isAdmin: userData.isAdmin || false,
         isLibrarian: userData.isLibrarian || false,
       });
-      const password = userData.password || newUser.generateRandomPassword()
-      newUser.setPassword(password)
+
+      const password = userData.password || newUser.generateRandomPassword();
+      newUser.setPassword(password);
+
       await newUser.save();
 
-      sendMail({
-        email: newUser.email,
-        subject: 'Thông báo từ ethnic group library',
-        html:`
-            <p>Hello,<strong>${newUser.name}</strong></p><br>
-            <p>Your account has been created.<br> Here are your credentials: Username: ${newUser.email} || Password: <span style="color: blue; font-weight: bold;">${password}</span> <br>Thanks for use our service <3 </p>
-        `
-      });
+      // Send email
+      try {
+        await sendMail({
+          email: newUser.email,
+          subject: 'Thông báo từ ethnic group library',
+          html: `
+            <p>Hello, <strong>${newUser.name}</strong></p><br>
+            <p>Your account has been created.<br> Here are your credentials: Username: ${newUser.email} || Password: <span style="color: blue; font-weight: bold;">${password}</span> <br>Thanks for using our service <3 </p>
+          `,
+        });
+        console.log(`Email sent to ${newUser.email}`);
+      } catch (emailError) {
+        console.error(`Failed to send email to ${newUser.email}:`, emailError);
+      }
 
       results.push({ email: userData.email, success: true });
     }
-    console.log('4')
+
     res.status(200).json({ results });
   } catch (error) {
     console.error('Error importing users:', error);

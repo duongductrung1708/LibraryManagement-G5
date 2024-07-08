@@ -38,7 +38,7 @@ const ImportUsersModal = ({ isOpen, onClose }) => {
           password: user.password || Math.random().toString(36).slice(-8),
         }));
 
-        axios.post(apiUrl(routes.USER, methods.IMPORT), { users: formattedUsers })
+        axios.post(apiUrl(routes.AUTH, methods.IMPORT), { users: formattedUsers })
           .then(response => {
             toast.success('Users imported successfully');
             onClose();
