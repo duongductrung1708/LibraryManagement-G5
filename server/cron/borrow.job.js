@@ -45,7 +45,7 @@ cron.schedule('*/5 * * * * *', async (next) => {
         })
 
         if(warningWeekEmail){
-            const sendWarningPromises = Array.from(warningWeekEmail).map(email => {
+            Array.from(warningWeekEmail).map(email => {
                 const userData = email.split(" ")
                 sendMail({
                     email: userData[0],
@@ -57,11 +57,11 @@ cron.schedule('*/5 * * * * *', async (next) => {
                     `
                 });
             })
-            Promise.all(sendWarningPromises)
+            // Promise.all(sendWarningPromises)
         }
 
         if(warningDayEmail){
-            const sendWarningPromises = Array.from(warningDayEmail).map(email => {
+            Array.from(warningDayEmail).map(email => {
                 const userData = email.split(" ")
                 sendMail({
                     email: userData[0],
@@ -73,11 +73,11 @@ cron.schedule('*/5 * * * * *', async (next) => {
                     `
                 });
             })
-            Promise.all(sendWarningPromises)
+            // Promise.all(sendWarningPromises)
         }
         
         if(dueEmail){
-            const sendDuePromises = Array.from(dueEmail).map(email => {
+            Array.from(dueEmail).map(email => {
                 const userData = email.split(" ")
                 sendMail({
                     email: userData[0],
@@ -89,11 +89,11 @@ cron.schedule('*/5 * * * * *', async (next) => {
                     `
                 });
             })
-            Promise.all(sendDuePromises)
+            // Promise.all(sendDuePromises)
         }
 
          if(banEmail){
-            const sendDuePromises = Array.from(banEmail).map(email => {
+            Array.from(banEmail).map(email => {
                 const userData = email.split(" ")
                 sendMail({
                     email: userData[0],
@@ -105,7 +105,7 @@ cron.schedule('*/5 * * * * *', async (next) => {
                     `
                 });
             })
-            Promise.all(sendDuePromises)
+            // Promise.all(sendDuePromises)
         }
 
     } catch (error) {
