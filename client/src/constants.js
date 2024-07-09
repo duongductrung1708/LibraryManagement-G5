@@ -20,6 +20,7 @@ const methods = {
   DELETE: "delete",
   UPLOAD: "upload",
   IMPORT: "import",
+  IMPORTBOOK: "importBooks",
 };
 
 const apiUrl = (route, method, id = "") => `${backendApiUrl}/${route}/${method}${id && `/${id}`}`;

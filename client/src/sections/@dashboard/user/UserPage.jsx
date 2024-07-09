@@ -250,7 +250,7 @@ const UserPage = () => {
               }}
               startIcon={<Iconify icon="eva:plus-fill" />}
             >
-              Import New User
+              Import New Users
             </Button>
           </Grid>
         </Stack>
