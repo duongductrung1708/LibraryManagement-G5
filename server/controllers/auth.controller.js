@@ -123,6 +123,9 @@ const loginUser = async (req, res, next) => {
     if (!user.isValidPassword(req.body.password)) {
       return res.status(401).json({ success: false, message: "Password incorrect" });
     }
+    if (!user.status) {
+      return res.status(401).json({ success: false, message: "User is not active" });
+    }
     passport.authenticate("local", (err, user, info) => {
       req.logIn(user, (err) => {
         if (err) {
