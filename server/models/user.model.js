@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
   },
   photoUrl: {
     type: String,
-    default:'default-photo-url.png',
+    // default:'default-photo-url.png',
     required: false,
   },
   hash: {

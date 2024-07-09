@@ -272,16 +272,7 @@ const BorrowalPage = () => {
           <Typography variant="h3" gutterBottom>
             Borrowals
           </Typography>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setIsUpdateForm(false);
-              handleOpenModal();
-            }}
-            startIcon={<Iconify icon="eva:plus-fill" />}
-          >
-            New Borrowal
-          </Button>
+
         </Stack>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <OutlinedInput
