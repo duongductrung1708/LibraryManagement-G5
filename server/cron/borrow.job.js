@@ -1,5 +1,5 @@
 var cron = require('node-cron');
-const sendMail = require('../middleware/sendmaiil');
+const sendMail = require('../helpers/sendmaiil');
 const status = require("../models/enum")
 
 const db = require('../models');

@@ -3,7 +3,7 @@ const db = require('../models');
 const Borrowal = db.borrowal;
 const Book = db.book;
 const User = db.user; 
-const sendMail = require('../middleware/sendmaiil');
+const sendMail = require('../helpers/sendmaiil');
 
 const getBorrowal = async (req, res) => {
     const borrowalId = req.params.id;
@@ -46,7 +46,7 @@ const getAllBorrowals = async (req, res) => {
                 $unwind: "$book"
             }
         ]);
-
+        console.log(borrowals)
         // Cập nhật trường overdue
         const currentDate = new Date();
         for (const borrowal of borrowals) {

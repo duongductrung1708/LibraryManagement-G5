@@ -32,7 +32,8 @@
     "nodemailer": "^6.9.14",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "split-file": "^2.3.0"
   },
   "devDependencies": {
     "mongodb": "^5.1.0",

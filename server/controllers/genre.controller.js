@@ -17,6 +17,7 @@ const getGenre = async (req, res) => {
 }
 
 const getAllGenres = async (req, res) => {
+    // const genre = {}
     Genre.find({}, (err, genres)=>{
         if (err) {
             return res.status(400).json({ success: false, err });
@@ -31,7 +32,7 @@ const getAllGenres = async (req, res) => {
 
 const addGenre = async (req, res) => {
     const newGenre = req.body
-
+    // console.log(req.session)
     Genre.create(newGenre, (err, genre) => {
         if (err) {
             return res.status(400).json({ success: false, err });

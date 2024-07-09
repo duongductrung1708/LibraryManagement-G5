@@ -11,10 +11,12 @@ const bookSchema = new mongoose.Schema({
   },
   authorId: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'Author',
     required: false
   },
   genreId: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'Genre',
     required: false
   },
   isAvailable: {

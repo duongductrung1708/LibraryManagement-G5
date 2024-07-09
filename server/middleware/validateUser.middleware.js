@@ -1,41 +1,12 @@
 const db = require('../models/index')
 const User = db.user
 
-// const initMiddleware = (app) => {
-//     const adminMiddle = function (req, res, next) {
-//         const user =  User.findById(req.session.passport.user._id)
-//         if(user.email !== req.session.passport.user.email){
-//             next(404)
-//         }
-//         if(req.isAuthenticated() && req.session.passport.user.isAdmin == false && req.session.passport.user.librian == false){
-//             next()
-//         }
-//     }
-
-//     const librianMiddle = function (req, res, next) {
-//         if(req.isAuthenticated() && req.session.passport.user.isAdmin == false && req.session.passport.user.librian == false){
-//             next()
-//         }
-//     }
-
-//     const memMiddle = function (req, res, next) {
-//         if(req.isAuthenticated() && req.session.passport.user.isAdmin == false && req.session.passport.user.librian == false){
-//             next()
-//         }
-//     }
-
-//     app.use('/api/auth/register', adminMiddle)
-//     app.use('/api/auth/register', librianMiddle)
-//     app.use('/api/auth/register', memMiddle)
-// }
-
 const initMiddleware = {
     adminMiddle: async function (req, res, next) {
         const error = new Error();
         try {
-            const user = await  User.findById(req.session.passport.user._id).exec()
             console.log(req.session)
-            if(req.session.passport.user.email === user.email){
+            if(req.session.passport.user.email ){
                 console.log("11111")
                 if(req.isAuthenticated()){
                     console.log("22222222")
@@ -104,3 +75,42 @@ const initMiddleware = {
     }
 }
 module.exports = initMiddleware
+
+
+
+
+
+
+
+
+
+
+
+
+// const initMiddleware = (app) => {
+//     const adminMiddle = function (req, res, next) {
+//         const user =  User.findById(req.session.passport.user._id)
+//         if(user.email !== req.session.passport.user.email){
+//             next(404)
+//         }
+//         if(req.isAuthenticated() && req.session.passport.user.isAdmin == false && req.session.passport.user.librian == false){
+//             next()
+//         }
+//     }
+
+//     const librianMiddle = function (req, res, next) {
+//         if(req.isAuthenticated() && req.session.passport.user.isAdmin == false && req.session.passport.user.librian == false){
+//             next()
+//         }
+//     }
+
+//     const memMiddle = function (req, res, next) {
+//         if(req.isAuthenticated() && req.session.passport.user.isAdmin == false && req.session.passport.user.librian == false){
+//             next()
+//         }
+//     }
+
+//     app.use('/api/auth/register', adminMiddle)
+//     app.use('/api/auth/register', librianMiddle)
+//     app.use('/api/auth/register', memMiddle)
+// }

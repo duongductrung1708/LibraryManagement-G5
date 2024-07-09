@@ -1,6 +1,6 @@
 const db = require('../models/index.js')
 const passport = require("passport");
-const sendMail = require('../middleware/sendmaiil');
+const sendMail = require('../helpers/sendmaiil.js');
 const User = db.user;
 
 const addUser = async (req, res) => {
@@ -112,7 +112,7 @@ const loginUser = async (req, res, next) => {
   const email = req.body.email
   const password = req.body.password
 
-  User.findOne({ email: req.body.email }, (err, user) => {
+  User.findOne({ email: email }, (err, user) => {
     if (err) {
       err.status(500)
       next(err);
@@ -131,7 +131,7 @@ const loginUser = async (req, res, next) => {
         const redirectUrl = user.firstLogin ? '/change-password' : user.isAdmin ? '/dashboard' : '/books';
         return res.status(200).json({
           success: true,
-          user,
+          // user,
           redirectUrl
         });
       });

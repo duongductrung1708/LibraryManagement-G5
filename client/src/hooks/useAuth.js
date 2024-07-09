@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (data) => {
     setUser(data);
+    console.log("12345678987654322345678765432345678765",)
     if (data.isAdmin) {
       navigate("/dashboard", { replace: true });
     } else {

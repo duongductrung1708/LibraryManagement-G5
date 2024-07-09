@@ -4,7 +4,7 @@ const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
 const mongoose = require("mongoose");
-const initializePassport = require("./middleware/passport-config");
+const initializePassport = require("./helpers/passport-config");
 const MongoStore = require('connect-mongo');
 require('./cron');
 
