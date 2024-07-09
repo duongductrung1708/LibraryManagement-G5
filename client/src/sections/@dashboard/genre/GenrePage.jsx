@@ -27,6 +27,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import Iconify from "../../../components/iconify";
 import Scrollbar from "../../../components/scrollbar";
+import { useNavigate } from 'react-router-dom';
 import GenreTableHead from "./GenreListHead";
 import GenreForm from "./GenreForm";
 import GenreDialog from "./GenreDialog";
@@ -61,6 +62,7 @@ const GenrePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUpdateForm, setIsUpdateForm] = useState(false);
+  const navigate = useNavigate();
 
   // Load data on initial page load
   useEffect(() => {
@@ -245,7 +247,9 @@ const GenrePage = () => {
                           return (
                             <TableRow hover key={_id} tabIndex={-1}>
                               <TableCell align="left">
-                                <Typography variant="subtitle2" noWrap>
+                                <Typography variant="subtitle2" noWrap
+                                onClick={() => navigate(`/genre/${_id}`)}
+                                >
                                   {name}
                                 </Typography>
                               </TableCell>

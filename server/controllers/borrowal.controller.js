@@ -5,6 +5,18 @@ const Book = db.book;
 const User = db.user; 
 const sendMail = require('../middleware/sendmaiil');
 
+function formatDate(date) {
+    const d = new Date(date);
+    let day = "" + d.getDate();
+    let month = "" + (d.getMonth() + 1);
+    const year = d.getFullYear();
+  
+    if (day.length < 2) day = "0" + day;
+    if (month.length < 2) month = "0" + month;
+  
+    return [day, month, year].join("/");
+  }
+
 const getBorrowal = async (req, res) => {
     const borrowalId = req.params.id;
 
@@ -128,9 +140,8 @@ async function updateBorrowal(req, res, next) {
 
         console.log('Updating borrowal with ID:', borrowalId);
         console.log('Fields to update:', updatedFields);
-
       
-        // Sử dụng findByIdAndUpdate để cập nhật borrowal
+        //Sử dụng findByIdAndUpdate để cập nhật borrowal
         const updatedBorrowal = await Borrowal.findByIdAndUpdate(
             borrowalId,
             { $set: updatedFields },
@@ -150,6 +161,8 @@ async function updateBorrowal(req, res, next) {
           }
 
         // Gửi email thông báo khi cập nhật thành công
+        const formatbrrDate = formatDate(borrowedDate)
+        const formatdueDate = formatDate(dueDate)
         if(status == "accepted"){
             try {
                 await sendMail({
@@ -158,7 +171,7 @@ async function updateBorrowal(req, res, next) {
                     html: `
                         <p>Hello, ${memberEmail.name}</p>
                         <p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>
-                        <p>Thời gian mượn sách của bạn bắt đầu từ ${borrowedDate} đến ngày ${dueDate} vui lòng chú ý hạn trả sách </p>
+                        <p>Thời gian mượn sách của bạn bắt đầu từ ${formatbrrDate} đến ngày ${formatdueDate} vui lòng chú ý hạn trả sách </p>
                         <p>Best regards,<br>Your Team</p>
                     `
                 });

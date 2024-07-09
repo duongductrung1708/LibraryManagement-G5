@@ -30,7 +30,7 @@ import { useAuth } from "../../../hooks/useAuth";
 
 import Iconify from "../../../components/iconify";
 import Scrollbar from "../../../components/scrollbar";
-
+import { useNavigate } from 'react-router-dom';
 import AuthorTableHead from "./AuthorListHead";
 import AuthorForm from "./AuthorForm";
 import AuthorDialog from "./AuthorDialog";
@@ -55,6 +55,7 @@ const AuthorPage = () => {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const navigate = useNavigate();
 
   const [author, setAuthor] = useState({
     id: "",
@@ -249,8 +250,11 @@ const AuthorPage = () => {
                                 <Avatar alt={name} src={photoUrl} />
                               </TableCell>
                               <TableCell align="left">
-                                <Typography variant="subtitle2" noWrap>
+                                <Typography variant="subtitle2" noWrap 
+                                onClick={() => navigate(`/author/${_id}`)}
+                                >
                                   {name}
+                                 
                                 </Typography>
                               </TableCell>
                               <TableCell align="left">{description}</TableCell>

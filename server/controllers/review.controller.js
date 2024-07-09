@@ -49,7 +49,6 @@ async function getAllReviews (req, res,next) {
 }
 
 async function addReview (req, res,next) {
-    console.log(req.body);
     try {       
         const bookId = req.params.id
         const userId = req.body.reviewedBy
