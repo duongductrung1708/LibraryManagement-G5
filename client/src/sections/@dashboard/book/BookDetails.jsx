@@ -101,7 +101,7 @@ const BookDetails = () => {
       reviewedAt: new Date(),
     };
     axios
-      .post(apiUrl(routes.REVIEW, methods.POST), reviewData)
+      .post(apiUrl(routes.REVIEW, methods.POST,id), reviewData)
       .then((response) => {
         toast.success('Review added successfully');
         setReview('');
@@ -112,6 +112,7 @@ const BookDetails = () => {
         toast.error('Failed to add review');
       });
   };
+  console.log(user?._id);
 
   if (isLoading) {
     return (

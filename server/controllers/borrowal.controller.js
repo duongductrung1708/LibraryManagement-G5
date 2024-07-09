@@ -150,21 +150,55 @@ async function updateBorrowal(req, res, next) {
           }
 
         // Gửi email thông báo khi cập nhật thành công
-        try {
-            await sendMail({
-                email: memberEmail.email,
-                subject: 'Thông báo cập nhật thông tin mượn sách',
-                html: `
-                    <p>Hello, ${memberEmail.name}</p>
-                    <p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>
-                    <p>Best regards,<br>Your Team</p>
-                `
-            });
-        } catch (mailError) {
-            console.error('Error sending email:', mailError);
-            return res.status(500).json({ success: false, error: 'Failed to send email notification' });
+        if(status == "accepted"){
+            try {
+                await sendMail({
+                    email: memberEmail.email,
+                    subject: 'Thông báo cập nhật thông tin mượn sách',
+                    html: `
+                        <p>Hello, ${memberEmail.name}</p>
+                        <p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>
+                        <p>Thời gian mượn sách của bạn bắt đầu từ ${borrowedDate} đến ngày ${dueDate} vui lòng chú ý hạn trả sách </p>
+                        <p>Best regards,<br>Your Team</p>
+                    `
+                });
+            } catch (mailError) {
+                console.error('Error sending email:', mailError);
+                return res.status(500).json({ success: false, error: 'Failed to send email notification' });
+            }
         }
-
+        if(status == "rejected"){
+            try {
+                await sendMail({
+                    email: memberEmail.email,
+                    subject: 'Thông báo cập nhật thông tin mượn sách',
+                    html: `
+                        <p>Hello, ${memberEmail.name}</p>
+                        <p>yêu cầu mượn sách của bạn đã bị từ chối</p>
+                        <p>Best regards,<br>Your Team</p>
+                    `
+                });
+            } catch (mailError) {
+                console.error('Error sending email:', mailError);
+                return res.status(500).json({ success: false, error: 'Failed to send email notification' });
+            }
+        }
+        if(status == "returned"){
+            try {
+                await sendMail({
+                    email: memberEmail.email,
+                    subject: 'Thông báo cập nhật thông tin mượn sách',
+                    html: `
+                        <p>Hello, ${memberEmail.name}</p>
+                        <p>Bạn đã trả sách thành công </p>
+                        <p>Best regards,<br>Your Team</p>
+                    `
+                });
+            } catch (mailError) {
+                console.error('Error sending email:', mailError);
+                return res.status(500).json({ success: false, error: 'Failed to send email notification' });
+            }
+        }
         // Trả về thông tin borrowal đã cập nhật
         res.status(200).json({ updatedBorrowal });
     } catch (err) {

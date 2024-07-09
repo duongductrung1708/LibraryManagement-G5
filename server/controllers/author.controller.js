@@ -1,8 +1,6 @@
 const db = require('../models');
 const Author = db.author;
 
-//[GET] get author by id 
-
 async function getAuthor(req, res,next) {
     try {
         const author = await Author.findById(req.params.id);
@@ -13,7 +11,6 @@ async function getAuthor(req, res,next) {
 }
 
 
-//[GET] get all authors
 async function getAllAuthors(req, res, next) {
     try {
         const authorsList = await Author.find({});
@@ -23,7 +20,6 @@ async function getAllAuthors(req, res, next) {
     }
 }
 
-//[POST] add a new author
 
 async function addAuthor(req,res,next) {
     try {
@@ -35,9 +31,6 @@ async function addAuthor(req,res,next) {
 
 }
 
-
-// [PUT] update author
-
 async function updateAuthor(req, res, next) {
     try {
         const updatedAuthor = await Author.findByIdAndUpdate(req.params.id, req.body);
@@ -47,7 +40,6 @@ async function updateAuthor(req, res, next) {
     }
 }
 
-//[DELETE] delete author
 async function deleteAuthor(req, res,next) {
     try {
         const id = req.params.id

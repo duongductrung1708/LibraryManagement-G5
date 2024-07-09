@@ -140,6 +140,42 @@ const UserForm = ({ isUpdateForm, isModalOpen, handleCloseModal, user, setUser, 
                 </Grid>
               </RadioGroup>
             </FormControl>
+          
+            <FormControl>
+            <FormLabel id="available-label" sx={{ textAlign: 'center' }}>
+              User Status
+            </FormLabel>
+            <RadioGroup
+              sx={{ paddingTop: '10px' }}
+              aria-labelledby="available-label"
+              defaultValue={user.staus ? 'Active' : user.staus ? 'Librarian' : 'Member'}
+              name="radio-buttons-group"
+              // onChange={(e) => {
+              //   const isAdmin = e.target.value === 'Admin';
+              //   const isLibrarian = e.target.value === 'Librarian';
+              //   setUser({ ...user, isAdmin, isLibrarian});
+              // }}
+            >
+              <Grid container spacing={0}>
+                <Grid item xs={12} md={6} paddingRight={1}>
+                  <FormControlLabel
+                    value="ACTIVE"
+                    control={<Radio />}
+                    label="Active"
+                    sx={{ textAlign: 'center', justifyContent: 'center', width: '100%' }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6} paddingRight={1}>
+                  <FormControlLabel
+                    value="DEACTIVE"
+                    control={<Radio />}
+                    label="Deactive"
+                    sx={{ textAlign: 'center', justifyContent: 'center', width: '100%' }}
+                  />
+                </Grid>
+              </Grid>
+            </RadioGroup>
+          </FormControl>
 
          
 

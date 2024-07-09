@@ -42,6 +42,7 @@ const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
   { id: 'dob', label: 'DOB', alignRight: false },
   { id: 'email', label: 'Email', alignRight: false },
+  { id: 'status', label: 'Status', alignRight: false },
   { id: 'phone', label: 'Phone', alignRight: false },
   { id: 'role', label: 'Role', alignRight: false },
   { id: '', label: '', alignRight: false },
@@ -63,6 +64,7 @@ const UserPage = () => {
     dob: '',
     email: '',
     password: '',
+    status: '',
     phone: '',
     isAdmin: false,
     isLibrarian: false,
@@ -158,6 +160,7 @@ const UserPage = () => {
       email: '',
       password: '',
       phone: '',
+      status: '',
       isAdmin: false,
       isLibrarian: false,
       photoUrl: '',
@@ -295,6 +298,7 @@ const UserPage = () => {
                           <TableCell align="left">{new Date(user.dob).toLocaleDateString('en-US')}</TableCell>
 
                           <TableCell align="left">{user.email}</TableCell>
+                          <TableCell align="left">{user.status}</TableCell>
 
                           <TableCell align="left">{user.phone}</TableCell>
 

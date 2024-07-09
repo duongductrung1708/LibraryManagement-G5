@@ -19,7 +19,7 @@ router.get("/get/:id",getReviewById)
 
 router.get("/getByBookId/:bid",getReviewByBookId)
 
-router.post("/add/:id",loginUser,addReview)
+router.post("/add/:id",addReview)
 
 router.put("/update/:id",updateReview)
 
