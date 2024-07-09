@@ -64,7 +64,7 @@ const UserPage = () => {
     dob: '',
     email: '',
     password: '',
-    status: '',
+    status: true,
     phone: '',
     isAdmin: false,
     isLibrarian: false,
@@ -160,7 +160,7 @@ const UserPage = () => {
       email: '',
       password: '',
       phone: '',
-      status: '',
+      status: true,
       isAdmin: false,
       isLibrarian: false,
       photoUrl: '',
@@ -231,27 +231,27 @@ const UserPage = () => {
           <Typography variant="h3" gutterBottom>
             Users
           </Typography>
-          <Grid style={{display: "flex", flexDirection: "column"}}>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setIsUpdateForm(false);
-              handleOpenModal();
-            }}
-            startIcon={<Iconify icon="eva:plus-fill" />}
-          >
-            New User
-          </Button>
-          <Button
-          style={{ marginTop: "5px"}}
-            variant="contained"
-            onClick={() => {
-              handleOpenImportModal();
-            }}
-            startIcon={<Iconify icon="eva:plus-fill" />}
-          >
-            Import New User
-          </Button>
+          <Grid style={{ display: 'flex', flexDirection: 'column' }}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setIsUpdateForm(false);
+                handleOpenModal();
+              }}
+              startIcon={<Iconify icon="eva:plus-fill" />}
+            >
+              New User
+            </Button>
+            <Button
+              style={{ marginTop: '5px' }}
+              variant="contained"
+              onClick={() => {
+                handleOpenImportModal();
+              }}
+              startIcon={<Iconify icon="eva:plus-fill" />}
+            >
+              Import New User
+            </Button>
           </Grid>
         </Stack>
 
@@ -298,7 +298,14 @@ const UserPage = () => {
                           <TableCell align="left">{new Date(user.dob).toLocaleDateString('en-US')}</TableCell>
 
                           <TableCell align="left">{user.email}</TableCell>
-                          <TableCell align="left">{user.status}</TableCell>
+
+                          <TableCell align="left">
+                            {user.status ? (
+                              <Label color="success">ACTIVE</Label>
+                            ) : (
+                              <Label color="error">DEACTIVE</Label>
+                            )}
+                          </TableCell>
 
                           <TableCell align="left">{user.phone}</TableCell>
 
