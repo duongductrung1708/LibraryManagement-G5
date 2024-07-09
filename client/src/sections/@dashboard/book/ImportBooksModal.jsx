@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Button, Modal, Typography } from '@mui/material';
-import { parse } from 'papaparse';
+import * as XLSX from 'xlsx';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { apiUrl, methods, routes } from '../../../constants';
@@ -30,33 +30,45 @@ const ImportBooksModal = ({ isOpen, onClose }) => {
       return;
     }
 
-    parse(file, {
-      complete: (results) => {
-        const books = results.data;
-        const formattedBooks = books.map(book => ({
-          ...book,
-        }));
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
 
-        axios.post(apiUrl(routes.AUTH, methods.IMPORTBOOK), { books: formattedBooks })
-          .then(response => {
-            toast.success('Books imported successfully');
-            onClose();
-          })
-          .catch(error => {
-            console.error('Error importing books:', error);
-            toast.error('Error importing books');
-          });
-          console.log('Formatted Books:', formattedBooks);
-      },
-      header: true,
-    });
+      // Extract the headers and data
+      const headers = worksheet[0];
+      const booksData = worksheet.slice(1);
+
+      // Format the data
+      const books = booksData.map(row => {
+        const book = {};
+        headers.forEach((header, index) => {
+          book[header] = row[index];
+        });
+        return book;
+      });
+
+      axios.post(apiUrl(routes.AUTH, methods.IMPORTBOOK), { books })
+        .then(response => {
+          toast.success('Books imported successfully');
+          onClose();
+        })
+        .catch(error => {
+          console.error('Error importing books:', error);
+          toast.error('Error importing books');
+        });
+    };
+
+    reader.readAsArrayBuffer(file);
   };
 
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={{ ...style }}>
         <Typography variant="h6" textAlign="center">Import Books</Typography>
-        <input type="file" accept=".csv" onChange={handleFileChange} />
+        <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
         <Button variant="contained" onClick={handleImport} sx={{ mt: 2 }}>Import</Button>
       </Box>
     </Modal>
