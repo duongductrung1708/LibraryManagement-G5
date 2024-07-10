@@ -1,8 +1,3 @@
-import { Helmet } from 'react-helmet-async';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-
 import {
   Box,
   Button,
@@ -10,26 +5,26 @@ import {
   CircularProgress,
   Container,
   Grid,
-  IconButton,
   MenuItem,
   OutlinedInput,
+  Pagination,
   Popover,
-  Stack,
-  Typography,
   Select,
+  Stack,
+  Typography
 } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { Alert } from '@mui/lab';
 import { styled } from '@mui/material/styles';
-import { useAuth } from '../../../hooks/useAuth';
-
-import Label from '../../../components/label';
-import BookDialog from './BookDialog';
-import BookForm from './BookForm';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import Iconify from '../../../components/iconify';
 import { apiUrl, methods, routes } from '../../../constants';
-import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
+import { useAuth } from '../../../hooks/useAuth';
 import BorrowalForm from '../borrowal/BorrowalForm';
+import BookDialog from './BookDialog';
+import BookForm from './BookForm';
 import ImportBooksModal from './ImportBooksModal';
 
 // ----------------------------------------------------------------------
@@ -100,8 +95,11 @@ const BookPage = () => {
   const [authors, setAuthors] = useState([]);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  // API operations
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
+  // API operations
   const getAllBooks = () => {
     axios
       .get(apiUrl(routes.BOOK, methods.GET_ALL))
@@ -304,271 +302,232 @@ const BookPage = () => {
     }
   }, [filterName, filterGenre, filterAuthor, filterIsAvailable, books]);
 
-  console.log(user.isAdmin);
+  // Pagination logic
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentBooks = filteredBooks.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <>
       <Helmet>
-        <title>Books</title>
+        <title>Book Management</title>
       </Helmet>
 
-      <Container>
+      <Container maxWidth="lg">
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h3" sx={{ mb: 5 }}>
+          <Typography variant="h4" gutterBottom>
             Books
           </Typography>
-          {(user.isAdmin || user.isLibrarian) && (
-            <Grid style={{ display: 'flex', flexDirection: 'column' }}>
-              <Button
-              variant="contained"
-              onClick={() => {
-                setIsUpdateForm(false);
-                handleOpenModal();
-              }}
-              startIcon={<Iconify icon="eva:plus-fill" />}
-            >
+          {user?.role === 'Admin' && (
+            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenModal}>
               New Book
             </Button>
-              <Button
-              style={{ marginTop: '5px' }}
-              variant="contained"
-              onClick={() => {
-                handleOpenImportModal();
-              }}
-              startIcon={<Iconify icon="eva:plus-fill" />}
-            >
-              Import New Books
-            </Button>
-            </Grid>  
           )}
         </Stack>
 
-        <Box mb={3}>
-          <OutlinedInput
-            value={filterName}
-            onChange={(e) => setFilterName(e.target.value)}
-            placeholder="Search books..."
-            fullWidth
-            startAdornment={<Iconify icon="eva:search-outline" color="action" />}
-          />
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-          <Select
-            value={filterGenre}
-            onChange={(e) => setFilterGenre(e.target.value)}
-            fullWidth
-            displayEmpty
-            input={<OutlinedInput />}
-            placeholder="Filter by Genre"
-          >
-            <MenuItem value="">All Genres</MenuItem>
-            {/* Populate genres dynamically */}
-            {genres.map((genre) => (
-              <MenuItem key={genre._id} value={genre._id}>
-                {genre.name}
-              </MenuItem>
-            ))}
-          </Select>
-
-          <Select
-            value={filterAuthor}
-            onChange={(e) => setFilterAuthor(e.target.value)}
-            fullWidth
-            displayEmpty
-            input={<OutlinedInput />}
-            placeholder="Filter by Author"
-          >
-            <MenuItem value="">All Authors</MenuItem>
-            {authors.map((author) => (
-              <MenuItem key={author._id} value={author._id}>
-                {author.name}
-              </MenuItem>
-            ))}
-          </Select>
-
-          <Select
-            value={filterIsAvailable}
-            onChange={(e) => setFilterIsAvailable(e.target.value)}
-            fullWidth
-            displayEmpty
-            input={<OutlinedInput />}
-            placeholder="Filter by Availability"
-          >
-            <MenuItem value="">All Status</MenuItem>
-            <MenuItem value="true">Available</MenuItem>
-            <MenuItem value="false">Not Available</MenuItem>
-          </Select>
-        </Box>
+        <Card>
+          <Box sx={{ p: 2 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={3}>
+                <OutlinedInput
+                  fullWidth
+                  value={filterName}
+                  onChange={(e) => setFilterName(e.target.value)}
+                  placeholder="Search by name"
+                  startAdornment={<Iconify icon="eva:search-fill" />}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <Select
+                  fullWidth
+                  value={filterGenre}
+                  onChange={(e) => setFilterGenre(e.target.value)}
+                  displayEmpty
+                  inputProps={{ 'aria-label': 'Without label' }}
+                >
+                  <MenuItem value="">
+                    <em>All Genres</em>
+                  </MenuItem>
+                  {genres.map((genre) => (
+                    <MenuItem key={genre.id} value={genre.id}>
+                      {genre.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <Select
+                  fullWidth
+                  value={filterAuthor}
+                  onChange={(e) => setFilterAuthor(e.target.value)}
+                  displayEmpty
+                  inputProps={{ 'aria-label': 'Without label' }}
+                >
+                  <MenuItem value="">
+                    <em>All Authors</em>
+                  </MenuItem>
+                  {authors.map((author) => (
+                    <MenuItem key={author.id} value={author.id}>
+                      {author.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <Select
+                  fullWidth
+                  value={filterIsAvailable}
+                  onChange={(e) => setFilterIsAvailable(e.target.value)}
+                  displayEmpty
+                  inputProps={{ 'aria-label': 'Without label' }}
+                >
+                  <MenuItem value="">
+                    <em>All Availability</em>
+                  </MenuItem>
+                  <MenuItem value="true">Available</MenuItem>
+                  <MenuItem value="false">Not Available</MenuItem>
+                </Select>
+              </Grid>
+            </Grid>
+          </Box>
+        </Card>
 
         {isTableLoading ? (
-          <Grid padding={2} style={{ textAlign: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
             <CircularProgress />
-          </Grid>
-        ) : filteredBooks.length > 0 ? (
-          <Grid container spacing={4}>
-            {filteredBooks.map((book) => (
-              <Grid key={book._id} item xs={12} sm={6} md={4}>
+          </Box>
+        ) : (
+          <Grid container spacing={3} mt={2}>
+            {currentBooks.map((book) => (
+              <Grid key={book.id} item xs={12} sm={6} md={4}>
                 <Card>
-                  <Box sx={{ pt: '80%', position: 'relative' }}>
-                    <Label
-                      variant="filled"
-                      sx={{
-                        zIndex: 9,
-                        top: 16,
-                        left: 16,
-                        position: 'absolute',
-                        textTransform: 'uppercase',
-                        color: 'primary.main',
-                      }}
-                    >
-                      {book.genre.name}
-                    </Label>
-                    {(user.isAdmin || user.isLibrarian) && (
-                      <Label
-                        variant="filled"
-                        sx={{
-                          zIndex: 9,
-                          top: 12,
-                          right: 16,
-                          position: 'absolute',
-                          borderRadius: '100%',
-                          width: '30px',
-                          height: '30px',
-                          color: 'white',
-                          backgroundColor: 'white',
-                        }}
-                      >
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={(e) => {
-                            setSelectedBookId(book._id);
-                            handleOpenMenu(e);
-                          }}
-                        >
-                          <Iconify icon={'eva:more-vertical-fill'} />
-                        </IconButton>
-                      </Label>
-                    )}
-
+                  <Box sx={{ pt: '100%', position: 'relative' }}>
                     <StyledBookImage alt={book.name} src={book.photoUrl} />
                   </Box>
-
-                  <Stack spacing={1} sx={{ p: 2 }}>
-                    <Link to={`/books/${book._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <Typography textAlign="center" variant="h5" noWrap>
-                        {book.name}
-                      </Typography>
-                    </Link>
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ color: '#888888' }}
-                      paddingBottom={1}
-                      noWrap
-                      textAlign="center"
+                  <Stack spacing={2} sx={{ p: 3 }}>
+                    <Typography variant="subtitle2" noWrap>
+                      {book.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {book.isAvailable ? 'Available' : 'Not Available'}
+                    </Typography>
+                    <TruncatedTypography variant="body2">
+                      {book.summary}
+                    </TruncatedTypography>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      component={Link}
+                      to={`/books/${book.id}`}
+                      endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
                     >
-                      {book.author.name}
-                    </Typography>
-                    <Label color={book.isAvailable ? 'success' : 'error'} sx={{ padding: 2 }}>
-                      {book.isAvailable ? 'Available' : 'Not available'}
-                    </Label>
-
-                    <Typography variant="subtitle2" textAlign="center" paddingTop={1}>
-                      ISBN: {book.isbn}
-                    </Typography>
-                    <TruncatedTypography variant="body2">{book.summary}</TruncatedTypography>
-
-
+                      View Details
+                    </Button>
+                    {user?.role === 'Admin' && (
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Button
+                          variant="outlined"
+                          color="warning"
+                          onClick={() => {
+                            setSelectedBookId(book.id);
+                            handleOpenMenu();
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => {
+                            setSelectedBookId(book.id);
+                            handleOpenDialog();
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
+                    )}
                   </Stack>
                 </Card>
               </Grid>
             ))}
           </Grid>
-        ) : (
-          <Alert severity="warning" color="warning">
-            No books found
-          </Alert>
         )}
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+          <Pagination
+            count={Math.ceil(filteredBooks.length / itemsPerPage)}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Box>
       </Container>
 
       <Popover
         open={Boolean(isMenuOpen)}
         anchorEl={isMenuOpen}
         onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
       >
-        {(user.isAdmin || user.isLibrarian) && (
-          <MenuItem
-            onClick={() => {
-              setIsUpdateForm(true);
-              getSelectedBookDetails();
-              handleCloseMenu();
-              handleOpenModal();
-            }}
-          >
-            <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-            Edit
-          </MenuItem>
-        )}
-
-        {(user.isAdmin || user.isLibrarian) && (
-          <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
-            <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-            Delete
-          </MenuItem>
-        )}
+        <MenuItem
+          onClick={() => {
+            getSelectedBookDetails();
+            setIsUpdateForm(true);
+            handleOpenModal();
+          }}
+        >
+          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+          Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setSelectedBookId(null);
+            setIsUpdateForm(false);
+            clearForm();
+            handleOpenModal();
+          }}
+        >
+          <Iconify icon="eva:plus-fill" sx={{ mr: 2 }} />
+          Add
+        </MenuItem>
       </Popover>
-      
-      {user && (user.isAdmin || user.isLibrarian) ? (
-        <BorrowalForm
-          isModalOpen={isBorrowalModalOpen}
-          handleCloseModal={handleCloseBorrowalModal}
-          id={selectedBookId}
-          borrowal={borrowal}
-          setBorrowal={setBorrowal}
-          handleAddBorrowal={addBorrowal}
-        />
-      ) : (
-        <BorrowalFormForUser
-          isModalOpen={isBorrowalModalOpen}
-          handleCloseModal={handleCloseBorrowalModal}
-          id={selectedBookId}
-          borrowal={borrowal}
-          setBorrowal={setBorrowal}
-          handleAddBorrowal={addBorrowal}
-        />
-      )}
 
       <BookDialog
-        isDialogOpen={isDialogOpen}
-        bookId={selectedBookId}
-        handleDeleteBook={deleteBook}
-        handleCloseDialog={handleCloseDialog}
+        open={isDialogOpen}
+        onClose={handleCloseDialog}
+        onDelete={() => deleteBook(selectedBookId)}
       />
 
       <BookForm
-        isUpdateForm={isUpdateForm}
-        isModalOpen={isModalOpen}
-        handleCloseModal={handleCloseModal}
-        id={selectedBookId}
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={isUpdateForm ? updateBook : addBook}
         book={book}
         setBook={setBook}
-        handleAddBook={addBook}
-        handleUpdateBook={updateBook}
+        isUpdateForm={isUpdateForm}
+        genres={genres}
+        authors={authors}
       />
-      <ImportBooksModal isOpen={isImportModalOpen} onClose={handleCloseImportModal} />
+
+      <BorrowalForm
+        open={isBorrowalModalOpen}
+        onClose={handleCloseBorrowalModal}
+        onSubmit={addBorrowal}
+        borrowal={borrowal}
+        setBorrowal={setBorrowal}
+      />
+
+      <ImportBooksModal
+        open={isImportModalOpen}
+        onClose={handleCloseImportModal}
+        onImported={getAllBooks}
+      />
     </>
   );
 };
