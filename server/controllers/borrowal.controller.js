@@ -141,7 +141,7 @@ async function updateBorrowal(req, res, next) {
         console.log('Updating borrowal with ID:', borrowalId);
         console.log('Fields to update:', updatedFields);
       
-        //Sử dụng findByIdAndUpdate để cập nhật borrowal
+        //update borrowal
         const updatedBorrowal = await Borrowal.findByIdAndUpdate(
             borrowalId,
             { $set: updatedFields },
