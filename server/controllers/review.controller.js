@@ -49,14 +49,14 @@ async function getAllReviews (req, res,next) {
 }
 
 async function addReview (req, res,next) {
-    try {
-        const userId = req.logIn.user._id
+    try {       
         const bookId = req.params.id
+        const userId = req.body.reviewedBy
         if (!userId) return res.status(401).send('Unauthorized');
         const existingReview = await Review.findOne({ user: userId, book: req.params.id });
         if (existingReview) return res.status(400).send({ message: 'User already submitted a review for this book' });
         const newReview = new Review({
-            user: userId,
+            reviewedBy: req.body.reviewedBy,
             book: bookId,
             rating: req.body.rating,
             review: req.body.review

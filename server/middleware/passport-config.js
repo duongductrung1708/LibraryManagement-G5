@@ -11,7 +11,9 @@ const initializePassport = (passport) => {
         return cb(err, false);
       }
       if (!user) {
+        console.log("acv");
         return cb(null, false, { message: "User not found" });
+
       }
       else {
         return cb(null, user);

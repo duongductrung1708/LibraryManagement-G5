@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Helmet } from 'react-helmet-async';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Typography, CircularProgress, Stack, Container, Grid, Card, Button } from '@mui/material';
 import { apiUrl, methods, routes } from '../../../constants';
 
@@ -99,7 +99,7 @@ export default function GenreDetails() {
                   <Typography
                     variant="subtitle2"
                     sx={{ mt: 2, textAlign: 'center', cursor: 'pointer' }}
-                    onClick={() => Navigate(`/books/${book._id}`)}
+                    onClick={() => navigate(`/books/${book._id}`)}
                   >
                     {book.name}
                   </Typography>

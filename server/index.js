@@ -95,6 +95,7 @@ app.use((req, res, next) => {
 
 app.use((err, req, res , next) => {
   console.log(err)
+  console.log("acb");
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal Server Error'

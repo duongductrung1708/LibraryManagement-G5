@@ -30,6 +30,7 @@ import Iconify from '../../../components/iconify';
 import { apiUrl, methods, routes } from '../../../constants';
 import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
 import BorrowalForm from '../borrowal/BorrowalForm';
+import ImportBooksModal from './ImportBooksModal';
 
 // ----------------------------------------------------------------------
 
@@ -97,6 +98,7 @@ const BookPage = () => {
   const [filterIsAvailable, setFilterIsAvailable] = useState('');
   const [genres, setGenres] = useState([]);
   const [authors, setAuthors] = useState([]);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // API operations
 
@@ -247,8 +249,12 @@ const BookPage = () => {
     setIsModalOpen(false);
   };
 
-  const handleOpenBorrowalModal = () => {
-    setIsBorrowalModalOpen(true);
+  const handleOpenImportModal = () => {
+    setIsImportModalOpen(true);
+  };
+
+  const handleCloseImportModal = () => {
+    setIsImportModalOpen(false);
   };
 
   const handleCloseBorrowalModal = () => {
@@ -311,7 +317,8 @@ const BookPage = () => {
             Books
           </Typography>
           {(user.isAdmin || user.isLibrarian) && (
-            <Button
+            <Grid style={{ display: 'flex', flexDirection: 'column' }}>
+              <Button
               variant="contained"
               onClick={() => {
                 setIsUpdateForm(false);
@@ -321,6 +328,17 @@ const BookPage = () => {
             >
               New Book
             </Button>
+              <Button
+              style={{ marginTop: '5px' }}
+              variant="contained"
+              onClick={() => {
+                handleOpenImportModal();
+              }}
+              startIcon={<Iconify icon="eva:plus-fill" />}
+            >
+              Import New Books
+            </Button>
+            </Grid>  
           )}
         </Stack>
 
@@ -550,6 +568,7 @@ const BookPage = () => {
         handleAddBook={addBook}
         handleUpdateBook={updateBook}
       />
+      <ImportBooksModal isOpen={isImportModalOpen} onClose={handleCloseImportModal} />
     </>
   );
 };

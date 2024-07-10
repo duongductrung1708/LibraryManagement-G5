@@ -2,6 +2,7 @@ const db = require('../models/index.js')
 const passport = require("passport");
 const sendMail = require('../middleware/sendmaiil');
 const User = db.user;
+const Book = db.book;
 
 const addUser = async (req, res) => {
   try {
@@ -107,6 +108,46 @@ const importUsers = async (req, res) => {
   }
 };
 
+const importBooks = async (req, res) => {
+  const { books } = req.body;
+
+  try {
+    const results = [];
+
+    for (const bookData of books) {
+      const existingBook = await Book.findOne({ isbn: bookData.isbn });
+      if (existingBook) {
+        results.push({
+          isbn: bookData.isbn,
+          success: false,
+          message: 'Book with this ISBN already exists',
+        });
+        continue;
+      }
+
+      const newBook = new Book({
+        name: bookData.name,
+        isbn: bookData.isbn,
+        authorId: bookData.authorId || null,
+        genreId: bookData.genreId || null,
+        isAvailable: bookData.isAvailable || true,
+        summary: bookData.summary || '',
+        photoUrl: bookData.photoUrl || 'default-photo-url.png',
+        pageUrls: bookData.pageUrls || [],
+        position: bookData.position || '',
+      });
+
+      await newBook.save();
+      results.push({ isbn: bookData.isbn, success: true });
+    }
+
+    res.status(200).json({ results });
+  } catch (error) {
+    console.error('Error importing books:', error);
+    res.status(400).json({ success: false, error: 'Error importing books' });
+  }
+};
+
 const loginUser = async (req, res, next) => {
 
   const email = req.body.email
@@ -122,6 +163,9 @@ const loginUser = async (req, res, next) => {
     }
     if (!user.isValidPassword(req.body.password)) {
       return res.status(401).json({ success: false, message: "Password incorrect" });
+    }
+    if (!user.status) {
+      return res.status(401).json({ success: false, message: "User is not active" });
     }
     passport.authenticate("local", (err, user, info) => {
       req.logIn(user, (err) => {
@@ -151,6 +195,7 @@ const logoutUser = async (req, res, next) => {
 const authController = {
   addUser,
   importUsers,
+  importBooks,
   loginUser,
   logoutUser
 }
