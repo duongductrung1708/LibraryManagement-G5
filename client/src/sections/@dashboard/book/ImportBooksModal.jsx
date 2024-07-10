@@ -6,6 +6,14 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { apiUrl, methods, routes } from '../../../constants';
 
+const parsePageUrls = (pageUrlsString) => {
+  // Check if the string is valid before splitting
+  if (typeof pageUrlsString === 'string') {
+    return pageUrlsString.split(';').map(url => url.trim());
+  }
+  return [];
+};
+
 const ImportBooksModal = ({ isOpen, onClose }) => {
   const style = {
     position: 'absolute',
@@ -47,6 +55,9 @@ const ImportBooksModal = ({ isOpen, onClose }) => {
         headers.forEach((header, index) => {
           book[header] = row[index];
         });
+        if (book.pageUrls) {
+          book.pageUrls = parsePageUrls(book.pageUrls);
+        }
         return book;
       });
 
