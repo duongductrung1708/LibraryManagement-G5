@@ -17,7 +17,7 @@ router.get("/getAll",getAllReviews)
 
 router.get("/get/:id",getReviewById)
 
-router.get("/getByBookId/:bid",getReviewByBookId)
+router.get("/getAll/:bid",getReviewByBookId)
 
 router.post("/add/:id",addReview)
 

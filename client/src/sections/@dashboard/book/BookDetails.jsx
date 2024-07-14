@@ -100,6 +100,7 @@ const BookDetails = () => {
       review,
       reviewedAt: new Date(),
     };
+    console.log(reviewData);
     axios
       .post(apiUrl(routes.REVIEW, methods.POST,id), reviewData)
       .then((response) => {
