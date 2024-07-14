@@ -26,7 +26,7 @@ const BookDetails = () => {
     dueDate: '',
     status: '',
   });
-
+  
   const { id } = useParams();
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
