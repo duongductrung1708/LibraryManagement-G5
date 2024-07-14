@@ -1,14 +1,44 @@
-import { Helmet } from "react-helmet-async";
-import { useTheme } from "@mui/material/styles";
-import { Container, Grid, Typography } from "@mui/material";
-import { AppCurrentVisits, AppWebsiteVisits, AppWidgetSummary } from "./index";
-import { useAuth } from "../../../hooks/useAuth";
-
-// ----------------------------------------------------------------------
+import { Helmet } from 'react-helmet-async';
+import { useEffect, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { Container, Grid, Typography } from '@mui/material';
+import axios from 'axios';
+import { AppCurrentVisits, AppWebsiteVisits, AppWidgetSummary } from './index';
+import { useAuth } from '../../../hooks/useAuth';
 
 export default function DashboardAppPage() {
   const { user } = useAuth();
   const theme = useTheme();
+  const [totalBooks, setTotalBooks] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [returnedBooks, setReturnedToday] = useState(0);
+  const [totalBorrowedBooks, setBorrowedToday] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch total books count
+        const totalBooksResponse = await axios.get('http://localhost:8080/api/auth/totalBooks');
+        setTotalBooks(totalBooksResponse.data.totalBooks);
+
+        // Fetch total users count
+        const totalUsersResponse = await axios.get('http://localhost:8080/api/auth/totalUsers');
+        setTotalUsers(totalUsersResponse.data.totalUsers);
+
+        // Fetch returned books count for today
+        const returnedBooksResponse = await axios.get('http://localhost:8080/api/auth/returnedBooks');
+        setReturnedToday(returnedBooksResponse.data.returnedBooks);
+
+        // Fetch borrowed books count for today
+        const borrowedTodayResponse = await axios.get('http://localhost:8080/api/auth/totalBorrowedBooks');
+        setBorrowedToday(borrowedTodayResponse.data.totalBorrowedBooks);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -17,25 +47,25 @@ export default function DashboardAppPage() {
       </Helmet>
 
       <Container maxWidth="xl">
-        <Typography variant="h4" sx={{mb: 5}}>
+        <Typography variant="h4" sx={{ mb: 5 }}>
           Hi {user.name.split(' ')[0]}, Welcome back
         </Typography>
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Total Books" total={22} icon={'solar:book-bold'}/>
+            <AppWidgetSummary title="Total Books" total={totalBooks} icon={'solar:book-bold'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Total Users" total={4} color="info" icon={'mdi:user'}/>
+            <AppWidgetSummary title="Total Users" total={totalUsers} color="info" icon={'mdi:user'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Returned Today" total={10} color="warning" icon={'carbon:return'} />
+            <AppWidgetSummary title="Book Returned" total={returnedBooks} color="warning" icon={'carbon:return'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Borrowed Today" total={30} color="error" icon={'ph:hand-fill'} />
+            <AppWidgetSummary title="Borrowed" total={totalBorrowedBooks} color="error" icon={'ph:hand-fill'} />
           </Grid>
 
           <Grid item xs={12} md={6} lg={8}>
@@ -97,7 +127,6 @@ export default function DashboardAppPage() {
               ]}
             />
           </Grid>
-
         </Grid>
       </Container>
     </>

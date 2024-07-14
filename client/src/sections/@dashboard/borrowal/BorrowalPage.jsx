@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 
 import { Alert } from '@mui/lab';
 import {
-  Button,
   Card,
   CircularProgress,
   Container,
@@ -36,7 +35,7 @@ import Scrollbar from '../../../components/scrollbar';
 
 import BorrowalListHead from './BorrowalListHead';
 import BorrowalForm from './BorrowalForm';
-import BorrowalFormForUser from "./BorowalFormForUser"
+import BorrowalFormForUser from './BorowalFormForUser';
 import BorrowalsDialog from './BorrowalDialog';
 import { applySortFilter, getComparator } from '../../../utils/tableOperations';
 import { apiUrl, methods, routes } from '../../../constants';
@@ -217,8 +216,8 @@ const BorrowalPage = () => {
 
   // Table functions
   const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
@@ -255,9 +254,7 @@ const BorrowalPage = () => {
   };
 
   const filteredBorrowals = applySortFilter(
-    borrowals.filter((borrowal) =>
-      borrowal.member.name.toLowerCase().includes(memberNameFilter.toLowerCase())
-    ),
+    borrowals.filter((borrowal) => borrowal.member.name.toLowerCase().includes(memberNameFilter.toLowerCase())),
     getComparator(order, orderBy)
   );
 
@@ -272,7 +269,6 @@ const BorrowalPage = () => {
           <Typography variant="h3" gutterBottom>
             Borrowals
           </Typography>
-
         </Stack>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <OutlinedInput
@@ -294,82 +290,79 @@ const BorrowalPage = () => {
         ) : (
           <Card>
             <Scrollbar>
-            {filteredBorrowals.length > 0 ? (
-              <TableContainer sx={{ minWidth: 800 }}>
-                <Table>
-                  <BorrowalListHead
-                    order={order}
-                    orderBy={orderBy}
-                    headLabel={TABLE_HEAD}
-                    rowCount={filteredBorrowals.length}
-                    onRequestSort={handleRequestSort}
-                  />
-                  <TableBody>
-  {filteredBorrowals
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    .map((borrowal) => {
-      // Kiểm tra và đặt thuộc tính overdue
-      const isOverdue = borrowal.dueDate && new Date(borrowal.dueDate) < new Date();
-      borrowal.overdue = isOverdue ? true : borrowal.dueDate ? false : 'no data';
-      
-      return (
-        <TableRow hover key={borrowal._id} tabIndex={-1}>
-          <TableCell align="left">{borrowal.member.name}</TableCell>
-          <TableCell align="left">{borrowal.book.name}</TableCell>
-          <TableCell align="left">
-            {new Date(borrowal.requestDate).toLocaleDateString('en-US')}
-          </TableCell>
-          <TableCell align="left">
-            {borrowal.status === 'pending' || borrowal.status === 'rejected'
-              ? 'none'
-              : new Date(borrowal.borrowedDate).toLocaleDateString('en-US')}
-          </TableCell>
-          <TableCell align="left">
-            {borrowal.status === 'pending' || borrowal.status === 'rejected'
-              ? 'none'
-              : borrowal.dueDate
-              ? new Date(borrowal.dueDate).toLocaleDateString('en-US')
-              : 'No Data'}
-          </TableCell>
-          <TableCell align="left" style={{ textTransform: 'uppercase' }}>
-            {getStatusIcon(borrowal.status)} {borrowal.status}
-          </TableCell>
-          <TableCell align="left">
-            {borrowal.overdue === true && (
-              <Label color="error" sx={{ padding: 2 }}>
-                Overdue
-              </Label>
-            )}
-            {borrowal.overdue === 'no data' && (
-              <Label color="warning" sx={{ padding: 2 }}>
-                No Data
-              </Label>
-            )}
-          </TableCell>
-          <TableCell align="right">
-            <IconButton
-              size="large"
-              color="inherit"
-              onClick={(e) => {
-                setSelectedBorrowalId(borrowal._id);
-                handleOpenMenu(e);
-              }}
-            >
-              <Iconify icon={'eva:more-vertical-fill'} />
-            </IconButton>
-          </TableCell>
-        </TableRow>
-      );
-    })}
-</TableBody>
+              {filteredBorrowals.length > 0 ? (
+                <TableContainer sx={{ minWidth: 800 }}>
+                  <Table>
+                    <BorrowalListHead
+                      order={order}
+                      orderBy={orderBy}
+                      headLabel={TABLE_HEAD}
+                      rowCount={filteredBorrowals.length}
+                      onRequestSort={handleRequestSort}
+                    />
+                    <TableBody>
+                      {filteredBorrowals.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((borrowal) => {
+                        // Kiểm tra và đặt thuộc tính overdue
+                        const isOverdue = borrowal.dueDate && new Date(borrowal.dueDate) < new Date();
+                        borrowal.overdue = isOverdue ? true : borrowal.dueDate ? false : 'no data';
 
-                </Table>
-              </TableContainer>
-            ) : (
-              <Alert severity="warning" color="warning">
-                No borrowals found
-              </Alert>
-            )}
+                        return (
+                          <TableRow hover key={borrowal._id} tabIndex={-1}>
+                            <TableCell align="left">{borrowal.member.name}</TableCell>
+                            <TableCell align="left">{borrowal.book.name}</TableCell>
+                            <TableCell align="left">
+                              {new Date(borrowal.requestDate).toLocaleDateString('en-US')}
+                            </TableCell>
+                            <TableCell align="left">
+                              {borrowal.status === 'pending' || borrowal.status === 'rejected'
+                                ? 'none'
+                                : new Date(borrowal.borrowedDate).toLocaleDateString('en-US')}
+                            </TableCell>
+                            <TableCell align="left">
+                              {borrowal.status === 'pending' || borrowal.status === 'rejected'
+                                ? 'none'
+                                : borrowal.dueDate
+                                ? new Date(borrowal.dueDate).toLocaleDateString('en-US')
+                                : 'No Data'}
+                            </TableCell>
+                            <TableCell align="left" style={{ textTransform: 'uppercase' }}>
+                              {getStatusIcon(borrowal.status)} {borrowal.status}
+                            </TableCell>
+                            <TableCell align="left">
+                              {borrowal.overdue === true && (
+                                <Label color="error" sx={{ padding: 2 }}>
+                                  Overdue
+                                </Label>
+                              )}
+                              {borrowal.overdue === 'no data' && (
+                                <Label color="warning" sx={{ padding: 2 }}>
+                                  No Data
+                                </Label>
+                              )}
+                            </TableCell>
+                            <TableCell align="right">
+                              <IconButton
+                                size="large"
+                                color="inherit"
+                                onClick={(e) => {
+                                  setSelectedBorrowalId(borrowal._id);
+                                  handleOpenMenu(e);
+                                }}
+                              >
+                                <Iconify icon={'eva:more-vertical-fill'} />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Alert severity="warning" color="warning">
+                  No borrowals found
+                </Alert>
+              )}
             </Scrollbar>
             {filteredBorrowals.length > 0 && (
               <TablePagination
@@ -445,7 +438,6 @@ const BorrowalPage = () => {
           handleUpdateBorrowal={updateBorrowal}
         />
       )}
-      
 
       <BorrowalsDialog
         isDialogOpen={isDialogOpen}
