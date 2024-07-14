@@ -6,7 +6,15 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { apiUrl, methods, routes } from '../../../constants';
 
-const ImportUsersModal = ({ isOpen, onClose }) => {
+const parsePageUrls = (pageUrlsString) => {
+  // Check if the string is valid before splitting
+  if (typeof pageUrlsString === 'string') {
+    return pageUrlsString.split(';').map(url => url.trim());
+  }
+  return [];
+};
+
+const ImportBooksModal = ({ isOpen, onClose }) => {
   const style = {
     position: 'absolute',
     top: '50%',
@@ -39,28 +47,28 @@ const ImportUsersModal = ({ isOpen, onClose }) => {
 
       // Extract the headers and data
       const headers = worksheet[0];
-      const usersData = worksheet.slice(1);
+      const booksData = worksheet.slice(1);
 
       // Format the data
-      const users = usersData.map(row => {
-        const user = {};
+      const books = booksData.map(row => {
+        const book = {};
         headers.forEach((header, index) => {
-          user[header] = row[index];
+          book[header] = row[index];
         });
-        return {
-          ...user,
-          password: user.password || Math.random().toString(36).slice(-8),
-        };
+        if (book.pageUrls) {
+          book.pageUrls = parsePageUrls(book.pageUrls);
+        }
+        return book;
       });
 
-      axios.post(apiUrl(routes.AUTH, methods.IMPORT), { users })
+      axios.post(apiUrl(routes.AUTH, methods.IMPORTBOOK), { books })
         .then(response => {
-          toast.success('Users imported successfully');
+          toast.success('Books imported successfully');
           onClose();
         })
         .catch(error => {
-          console.error('Error importing users:', error);
-          toast.error('Error importing users');
+          console.error('Error importing books:', error);
+          toast.error('Error importing books');
         });
     };
 
@@ -70,7 +78,7 @@ const ImportUsersModal = ({ isOpen, onClose }) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={{ ...style }}>
-        <Typography variant="h6" textAlign="center">Import Users</Typography>
+        <Typography variant="h6" textAlign="center">Import Books</Typography>
         <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
         <Button variant="contained" onClick={handleImport} sx={{ mt: 2 }}>Import</Button>
       </Box>
@@ -78,9 +86,9 @@ const ImportUsersModal = ({ isOpen, onClose }) => {
   );
 };
 
-ImportUsersModal.propTypes = {
+ImportBooksModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
-export default ImportUsersModal;
+export default ImportBooksModal;

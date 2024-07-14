@@ -1,4 +1,4 @@
-import {FiBookOpen, FiCheckCircle, FiHome, FiList, FiLock, FiUsers} from "react-icons/fi";
+import {FiBookOpen, FiCheckCircle, FiHome, FiList, FiLock, FiUsers, FiFile } from "react-icons/fi";
 
 const navConfig = [
   {
@@ -30,6 +30,11 @@ const navConfig = [
     title: 'Users',
     path: '/users',
     icon: <FiLock/>,
+  },
+  {
+    title: 'Rules',
+    path: '/rules',
+    icon: <FiFile/>,
   },
 ];
 
