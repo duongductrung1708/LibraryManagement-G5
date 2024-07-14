@@ -27,7 +27,9 @@ import BookDialog from './BookDialog';
 import BookForm from './BookForm';
 import Iconify from '../../../components/iconify';
 import { apiUrl, methods, routes } from '../../../constants';
+import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
 import BorrowalForm from '../borrowal/BorrowalForm';
+import ImportBooksModal from './ImportBooksModal';
 
 // ----------------------------------------------------------------------
 
@@ -247,8 +249,12 @@ const BookPage = () => {
     setIsModalOpen(false);
   };
 
-  const handleOpenBorrowalModal = () => {
-    setIsBorrowalModalOpen(true);
+  const handleOpenImportModal = () => {
+    setIsImportModalOpen(true);
+  };
+
+  const handleCloseImportModal = () => {
+    setIsImportModalOpen(false);
   };
 
   const handleCloseBorrowalModal = () => {

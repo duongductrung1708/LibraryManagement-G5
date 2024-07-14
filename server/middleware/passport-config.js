@@ -1,27 +1,32 @@
 const LocalStrategy = require("passport-local");
-const User = require("./models/user.model");
+const User = require("../models/user.model");
 
 const initializePassport = (passport) => {
   const authenticateUser = (email, password, cb) => {
-    User.findOne({ email: email }, (err, user) => {
+
+    User.findOne({ email: email })
+    .select(' _id name email firstLogin isAdmin isLibrarian')
+    .exec((err, user) => {
       if (err) {
-        return cb(err);
+        return cb(err, false);
       }
       if (!user) {
+        console.log("acv");
         return cb(null, false, { message: "User not found" });
+
       }
-      if (!user.isValidPassword(password)) {
-        return cb(null, false, { message: "Password incorrect" });
-      } else {
+      else {
         return cb(null, user);
       }
     });
   };
   passport.use(new LocalStrategy({ usernameField: "email" }, authenticateUser));
-  passport.serializeUser((user, done) => done(null, user));
+  passport.serializeUser((user, done) => {
+    done(null, user)
+  });
   passport.deserializeUser((user, done) => {
     User.findById(user._id, (err, user) => {
-      done(err, user);
+      done(err, user);//ham done() nhan 2 tham so 
     });
   });
 };

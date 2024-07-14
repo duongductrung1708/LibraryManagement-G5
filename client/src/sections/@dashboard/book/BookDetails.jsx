@@ -9,10 +9,10 @@ import shuffle from 'lodash.shuffle';
 import { apiUrl, routes, methods } from '../../../constants';
 import Label from '../../../components/label';
 import BorrowalForm from '../borrowal/BorrowalForm';
+import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
+import { useAuth } from '../../../hooks/useAuth';
 import ImageGallery from 'react-image-gallery';
 import 'react-image-gallery/styles/css/image-gallery.css';
-
-// ----------------------------------------------------------------------
 
 const TruncatedTypography = styled(Typography)({
   color: 'black',
@@ -32,14 +32,20 @@ const BookDetails = () => {
   const [book, setBook] = useState(null);
   const [author, setAuthor] = useState(null);
   const [genre, setGenre] = useState(null);
-  const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [relatedBooks, setRelatedBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState(null);
-
   const [review, setReview] = useState('');
+
+  const [borrowal, setBorrowal] = useState({
+    bookId: '',
+    memberId: '',
+    borrowedDate: '',
+    dueDate: '',
+    status: '',
+  });
 
   const getBook = useCallback(() => {
     setIsLoading(true);
@@ -74,22 +80,9 @@ const BookDetails = () => {
       });
   }, [id]);
 
-  const getUser = useCallback(() => {
-    axios
-      .get(apiUrl(routes.USER, methods.GET, id), { withCredentials: true })
-      .then((response) => {
-        setUser(response.data.user);
-      })
-      .catch((error) => {
-        console.error('Error fetching user details:', error);
-        toast.error('Failed to fetch user details');
-      });
-  }, [id]);
-
   useEffect(() => {
     getBook();
-    getUser();
-  }, [getBook, getUser]);
+  }, [getBook]);
 
   const addBorrowal = () => {
     axios
@@ -108,12 +101,13 @@ const BookDetails = () => {
   const addReview = () => {
     const reviewData = {
       book: id,
-      reviewedBy: user._id,
+      reviewedBy: user?._id,
       review,
       reviewedAt: new Date(),
     };
+    console.log(reviewData);
     axios
-      .post(apiUrl(routes.REVIEW, methods.POST), reviewData)
+      .post(apiUrl(routes.REVIEW, methods.POST,id), reviewData)
       .then((response) => {
         toast.success('Review added successfully');
         setReview('');
@@ -124,6 +118,7 @@ const BookDetails = () => {
         toast.error('Failed to add review');
       });
   };
+  console.log(user?._id);
 
   if (isLoading) {
     return (
@@ -187,7 +182,7 @@ const BookDetails = () => {
         <Link component={RouterLink} to="/books">
           Books
         </Link>
-        <Link component={RouterLink} to={`/books/genres/${genre.name}`}>
+        <Link component={RouterLink} to={`/genre/${genre._id}`}>
           {genre.name}
         </Link>
         <Typography color="text.primary">{book.name}</Typography>
@@ -198,8 +193,7 @@ const BookDetails = () => {
       </Button>
 
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={4}>
-          {/* <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} /> */}
+      <Grid item xs={12} sm={4}>
           <ImageGallery items={images} />
         </Grid>
         <Grid item xs={12} sm={8} style={{ paddingLeft: '3rem' }}>
@@ -220,9 +214,6 @@ const BookDetails = () => {
             </Box>
             <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2 }}>
               ISBN: {book.isbn}
-            </Typography>
-            <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2 }}>
-              Position: {book.position}
             </Typography>
             <Typography variant="subtitle1" sx={{ color: '#888888', mt: 2 }}>
               GENRE: {genre.name}
@@ -267,43 +258,58 @@ const BookDetails = () => {
             value={review}
             onChange={(e) => setReview(e.target.value)}
             sx={{ mt: 2 }}
-          />
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={addReview}>
-            Submit Review
-          </Button>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} sx={{ mt: 4 }}>
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          Related Books
-        </Typography>
-        {relatedBooks.map((relatedBook) => (
-          <Grid item xs={12} sm={2} key={relatedBook._id} style={{ paddingLeft: '3rem' }}>
-            <Card>
-              <Box sx={{ position: 'relative' }}>
-                <img alt={relatedBook.name} src={relatedBook.photoUrl} style={{ width: '100%', height: 'auto' }} />
-                <Typography
-                  variant="subtitle2"
-                  sx={{ mt: 2, textAlign: 'center', cursor: 'pointer' }}
-                  onClick={() => navigate(`/books/${relatedBook._id}`)}
-                >
-                  {relatedBook.name}
-                </Typography>
-              </Box>
-            </Card>
+            />
+            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={addReview}>
+              Submit Review
+            </Button>
           </Grid>
-        ))}
-      </Grid>
-      <BorrowalForm
-        isModalOpen={isBorrowalModalOpen}
-        handleCloseModal={handleCloseBorrowalModal}
-        id={selectedBookId}
-        borrowal={borrowal}
-        setBorrowal={setBorrowal}
-        handleAddBorrowal={addBorrowal}
-      />
-    </Container>
-  );
-};
+        </Grid>
+        <Grid container spacing={2} sx={{ mt: 4 }}>
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Related Books
+          </Typography>
+          {relatedBooks.map((relatedBook) => (
+            <Grid item xs={12} sm={2} key={relatedBook._id} style={{ paddingLeft: '3rem' }}>
+              <Card>
+                <Box sx={{ position: 'relative' }}>
+                  <img alt={relatedBook.name} src={relatedBook.photoUrl} style={{ width: '100%', height: 'auto' }} />
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ mt: 2, textAlign: 'center', cursor: 'pointer' }}
+                    onClick={() => navigate(`/books/${relatedBook._id}`)}
+                  >
+                    {relatedBook.name}
+                  </Typography>
+                </Box>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
-export default BookDetails;
+        {user && (user.isAdmin || user.isLibrarian) ? (
+          <BorrowalForm
+          isModalOpen={isBorrowalModalOpen}
+          handleCloseModal={handleCloseBorrowalModal}
+          id={selectedBookId}
+          borrowal={borrowal}
+          setBorrowal={setBorrowal}
+          handleAddBorrowal={addBorrowal}
+          bookName = {book.name}
+          />
+        ) : (
+          <BorrowalFormForUser
+          isModalOpen={isBorrowalModalOpen}
+          handleCloseModal={handleCloseBorrowalModal}
+          id={selectedBookId}
+          borrowal={borrowal}
+          setBorrowal={setBorrowal}
+          handleAddBorrowal={addBorrowal}
+          bookName = {book.name}
+          />
+        )}
+      </Container>
+    );
+  };
+
+  export default BookDetails;
+

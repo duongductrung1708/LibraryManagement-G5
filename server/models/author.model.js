@@ -14,6 +14,8 @@ const authorSchema = new mongoose.Schema({
         type: String,
         required: false
     }
+},{
+    versionKey:false
 })
 
 const Author = mongoose.model('Author', authorSchema)
