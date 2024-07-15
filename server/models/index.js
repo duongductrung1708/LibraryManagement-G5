@@ -6,6 +6,7 @@ const Genre = require("./genre.model");
 const Review = require("./review.model");
 const Member = require("./member.model");
 const User = require("./user.model");
+const Fine = require("./fine.model")
 
 mongoose.Promise = global.Promise;
 

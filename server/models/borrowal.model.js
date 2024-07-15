@@ -23,6 +23,10 @@ const borrowalSchema = new mongoose.Schema({
     type: Date,
     required: false
   },
+  returnDate: {
+    type: Date,
+    required: false
+  },  
   status: {
     type: String,
     required: false
