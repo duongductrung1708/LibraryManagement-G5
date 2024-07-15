@@ -1,6 +1,7 @@
 const db = require("../models/index.js");
 const passport = require("passport");
 const sendMail = require("../middleware/sendmaiil");
+const crypto = require('crypto');
 const User = db.user;
 const Book = db.book;
 const Borrowal = db.borrowal;
@@ -308,6 +309,36 @@ const generateBorrowedChartData = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const newPassword = crypto.randomBytes(6).toString('hex');
+    user.setPassword(newPassword);
+    await user.save();
+
+    await sendMail({
+      email: user.email,
+      subject: "Password Reset",
+      html: `
+        <p>Hello, <strong>${user.name}</strong></p><br>
+        <p>Your password has been reset. Here are your new credentials:<br>
+        Username: ${user.email} || Password: <span style="color: blue; font-weight: bold;">${newPassword}</span><br>
+        Please change your password after logging in.<br>Thanks for using our service <3</p>
+      `,
+    });
+
+    res.status(200).json({ success: true, message: "New password has been sent to your email" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 const authController = {
   addUser,
   importUsers,
@@ -320,6 +351,7 @@ const authController = {
   countTotalBorrowedBooks,
   generateReturnChartData,
   generateBorrowedChartData,
+  forgotPassword,
 };
 
 module.exports = authController;
