@@ -138,6 +138,10 @@ async function updateBorrowal(req, res, next) {
             updatedFields.status = status;
         }
 
+        if (status === "returned") {
+            updatedFields.returnDate = new Date();
+        }
+
         console.log('Updating borrowal with ID:', borrowalId);
         console.log('Fields to update:', updatedFields);
       
@@ -152,18 +156,17 @@ async function updateBorrowal(req, res, next) {
             return res.status(404).json({ success: false, error: 'Borrowal not found' });
         }
 
+        // Sử dụng getEmailFromBorrowalId để lấy email của thành viên
+        const memberEmail = await getEmailFromBorrowalId(borrowalId);
 
-          // Sử dụng getEmailFromBorrowalId để lấy email của thành viên
-          const memberEmail = await getEmailFromBorrowalId(borrowalId);
-
-          if (!memberEmail) {
-              return res.status(404).json({ success: false, error: 'Email not found for the member associated with the borrowal' });
-          }
+        if (!memberEmail) {
+            return res.status(404).json({ success: false, error: 'Email not found for the member associated with the borrowal' });
+        }
 
         // Gửi email thông báo khi cập nhật thành công
-        const formatbrrDate = formatDate(borrowedDate)
-        const formatdueDate = formatDate(dueDate)
-        if(status == "accepted"){
+        const formatbrrDate = formatDate(borrowedDate);
+        const formatdueDate = formatDate(dueDate);
+        if(status === "accepted"){
             try {
                 await sendMail({
                     email: memberEmail.email,
@@ -180,14 +183,14 @@ async function updateBorrowal(req, res, next) {
                 return res.status(500).json({ success: false, error: 'Failed to send email notification' });
             }
         }
-        if(status == "rejected"){
+        if(status === "rejected"){
             try {
                 await sendMail({
                     email: memberEmail.email,
                     subject: 'Thông báo cập nhật thông tin mượn sách',
                     html: `
                         <p>Hello, ${memberEmail.name}</p>
-                        <p>yêu cầu mượn sách của bạn đã bị từ chối</p>
+                        <p>Yêu cầu mượn sách của bạn đã bị từ chối</p>
                         <p>Best regards,<br>Your Team</p>
                     `
                 });
@@ -196,14 +199,14 @@ async function updateBorrowal(req, res, next) {
                 return res.status(500).json({ success: false, error: 'Failed to send email notification' });
             }
         }
-        if(status == "returned"){
+        if(status === "returned"){
             try {
                 await sendMail({
                     email: memberEmail.email,
                     subject: 'Thông báo cập nhật thông tin mượn sách',
                     html: `
                         <p>Hello, ${memberEmail.name}</p>
-                        <p>Bạn đã trả sách thành công </p>
+                        <p>Bạn đã trả sách thành công</p>
                         <p>Best regards,<br>Your Team</p>
                     `
                 });
@@ -219,6 +222,7 @@ async function updateBorrowal(req, res, next) {
         next(err);
     }
 }
+
 
 
 const getEmailFromBorrowalId = async (borrowalId) => {
