@@ -195,19 +195,39 @@ async function updateBorrowal(req, res, next) {
         }
 
         // Gửi email thông báo khi cập nhật thành công
-        const formatbrrDate = formatDate(updatedBorrowal.borrowedDate);
-        const formatdueDate = formatDate(updatedBorrowal.dueDate);
         if (status === "accepted") {
+            let emailSubject = 'Thông báo cập nhật thông tin mượn sách';
+            let emailContent = `
+                <p>Hello, ${memberEmail.name}</p>
+                <p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>
+                <p>Best regards,<br>Your Team</p>
+            `;
+            
+            // Nếu không có borrowedDate và dueDate được cung cấp
+            if (!borrowedDate && !dueDate) {
+                emailSubject = 'Xác nhận đặt lịch mượn sách thành công';
+                emailContent = `
+                    <p>Hello, ${memberEmail.name}</p>
+                    <p>Yêu cầu mượn sách của bạn đã được chấp nhận và đã được đặt lịch thành công!</p>
+                    <p>Best regards,<br>Your Team</p>
+                `;
+            } else {
+                // Nếu có borrowedDate và dueDate được cung cấp
+                const formatbrrDate = formatDate(updatedBorrowal.borrowedDate);
+                const formatdueDate = formatDate(updatedBorrowal.dueDate);
+                emailContent = `
+                    <p>Hello, ${memberEmail.name}</p>
+                    <p>Bạn đã mượn sách thành công!</p>
+                    <p>Thời gian mượn sách của bạn bắt đầu từ ${formatbrrDate} đến ngày ${formatdueDate}. Vui lòng chú ý hạn trả sách.</p>
+                    <p>Best regards,<br>Your Team</p>
+                `;
+            }
+
             try {
                 await sendMail({
                     email: memberEmail.email,
-                    subject: 'Thông báo cập nhật thông tin mượn sách',
-                    html: `
-                        <p>Hello, ${memberEmail.name}</p>
-                        <p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>
-                        <p>Thời gian mượn sách của bạn bắt đầu từ ${formatbrrDate} đến ngày ${formatdueDate}. Vui lòng chú ý hạn trả sách.</p>
-                        <p>Best regards,<br>Your Team</p>
-                    `
+                    subject: emailSubject,
+                    html: emailContent
                 });
             } catch (mailError) {
                 console.error('Error sending email:', mailError);
@@ -236,16 +256,18 @@ async function updateBorrowal(req, res, next) {
             // Tạo tiền phạt nếu có
             const fine = await createFine(borrowalId, returnDate);
 
+            let emailContent = `
+                <p>Hello, ${memberEmail.name}</p>
+                <p>Bạn đã trả sách thành công.</p>
+                ${fine ? `<p>Bạn có tiền phạt quá hạn là ${fine.fineAmount} đồng cho ${fine.daysOverdue} ngày quá hạn.</p>` : ''}
+                <p>Best regards,<br>Your Team</p>
+            `;
+
             try {
                 await sendMail({
                     email: memberEmail.email,
                     subject: 'Thông báo cập nhật thông tin mượn sách',
-                    html: `
-                        <p>Hello, ${memberEmail.name}</p>
-                        <p>Bạn đã trả sách thành công.</p>
-                        ${fine ? `<p>Bạn có tiền phạt quá hạn là ${fine.fineAmount} đồng cho ${fine.daysOverdue} ngày quá hạn.</p>` : ''}
-                        <p>Best regards,<br>Your Team</p>
-                    `
+                    html: emailContent
                 });
             } catch (mailError) {
                 console.error('Error sending email:', mailError);
@@ -254,12 +276,13 @@ async function updateBorrowal(req, res, next) {
         }
 
         // Trả về thông tin borrowal đã cập nhật
-        res.status(200).json({ updatedBorrowal });
+        res.status(200).json({ success: true, updatedBorrowal });
     } catch (err) {
         console.error('Error updating borrowal:', err);
         next(err);
     }
 }
+
 
 
 const getEmailFromBorrowalId = async (borrowalId) => {
