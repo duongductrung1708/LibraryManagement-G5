@@ -35,4 +35,6 @@ router.get('/returnChartData', authController.generateReturnChartData);
 
 router.get('/borrowedChartData', authController.generateBorrowedChartData);
 
+router.post('/forgot-password', authController.forgotPassword);
+
 module.exports = router;

@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Container, Typography } from "@mui/material";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
 
 import Logo from "../../../components/logo";
@@ -86,6 +86,12 @@ export default function LoginPage() {
             </Typography>
 
             <LoginForm loginUser={loginUser} />
+
+            <Typography variant="body2" textAlign="center" sx={{ mt: 3 }}>
+              <Link to="/forget-password">
+                Forgot password?
+              </Link>
+            </Typography>
 
           </StyledContent>
         </Container>

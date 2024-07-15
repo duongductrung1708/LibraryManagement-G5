@@ -16,6 +16,7 @@ import AuthorProfile from "./sections/@dashboard/author/AuthorProfile";
 import ChangePassword from "./sections/auth/login/ChangePassword";
 import GenreDetails from "./sections/@dashboard/genre/GenreDetails";
 import LibraryRulesPage from "./sections/@dashboard/app/LibraryRulesPage";
+import ForgetPassword from "./sections/auth/login/ForgetPassword";
 
 export default function Router() {
   const { user } = useAuth();
@@ -48,6 +49,7 @@ export default function Router() {
     { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
+    { path: "forget-password", element: <ForgetPassword /> },
   ]);
 
   const librarianRoutes = useRoutes([
@@ -64,6 +66,7 @@ export default function Router() {
     { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
+    { path: "forget-password", element: <ForgetPassword /> },
   ]);
 
   const memberRoutes = useRoutes([
@@ -79,6 +82,7 @@ export default function Router() {
     { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
+    { path: "forget-password", element: <ForgetPassword /> },
   ]);
 
   const guestRoutes = useRoutes([
@@ -86,6 +90,7 @@ export default function Router() {
     { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/login" replace /> },
+    { path: "forget-password", element: <ForgetPassword /> },
   ]);
 
   if (user) {
