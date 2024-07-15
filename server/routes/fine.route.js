@@ -10,9 +10,13 @@ Finerouter.put('/update/:id', fineController.updateFineStatus);
 Finerouter.get('/fines/:id', fineController.getFinesByBorrowalId);
 
 // Route để lấy danh sách tiền phạt theo userId
-Finerouter.get('/fines/:id', fineController.getFinesByUserId);
+Finerouter.get('/getByUserId/:id', fineController.getFinesByUserId);
+
 Finerouter.get('/getAll', fineController.getAll);
+
+Finerouter.get('/get/:id', fineController.getFines);
+
 // Route để xóa tiền phạt
-Finerouter.delete('/fines/:id', fineController.deleteFine);
+Finerouter.delete('/delete/:id', fineController.deleteFine);
 
 module.exports = Finerouter;

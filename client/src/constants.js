@@ -10,6 +10,7 @@ const routes = {
   USER: "user",
   BOOKS_BY_GENRE: 'book/genre',
   BOOKS_BY_AUTHOR: 'book/author',
+  FINE: 'fines',
 };
 
 const methods = {
