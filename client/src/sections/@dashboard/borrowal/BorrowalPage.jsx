@@ -397,6 +397,7 @@ const BorrowalPage = () => {
           },
         }}
       >
+        {user.isAdmin || user.isLibrarian ? (
         <MenuItem
           onClick={() => {
             setIsUpdateForm(true);
@@ -408,6 +409,7 @@ const BorrowalPage = () => {
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
+        ) : null}
 
         <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />

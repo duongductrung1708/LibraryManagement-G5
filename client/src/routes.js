@@ -17,6 +17,7 @@ import ChangePassword from "./sections/auth/login/ChangePassword";
 import GenreDetails from "./sections/@dashboard/genre/GenreDetails";
 import LibraryRulesPage from "./sections/@dashboard/app/LibraryRulesPage";
 import ForgetPassword from "./sections/auth/login/ForgetPassword";
+import ManageFines from "./sections/@dashboard/fine/ManageFines";
 
 export default function Router() {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ export default function Router() {
     { path: "authors", element: <AuthorPage /> },
     { path: "genres", element: <GenrePage /> },
     { path: "borrowals", element: <BorrowalPage /> },
+    { path: "manage-fines", element: <ManageFines />},
     { path: "userprofile/:id", element: <UserProfile /> },
     { path: "userprofile/history/:id", element: <BorrowalHistory /> },
     { path: "books/:id", element: <BookDetails /> },
@@ -43,6 +45,7 @@ export default function Router() {
         { path: "dashboard", element: <DashboardAppPage /> },
         ...commonRoutes,
         { path: "users", element: <UsersPage /> },
+        
       ],
     },
     { path: "login", element: <LoginPage /> },
