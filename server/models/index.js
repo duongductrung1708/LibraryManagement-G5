@@ -19,6 +19,7 @@ db.genre = Genre;
 db.review = Review;
 db.member = Member;
 db.user = User;
+db.fine = Fine
 
 db.connectDB = async () => {
   try {

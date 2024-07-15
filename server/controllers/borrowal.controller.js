@@ -3,6 +3,7 @@ const db = require('../models');
 const Borrowal = db.borrowal;
 const Book = db.book;
 const User = db.user; 
+const Fines = db.fine;
 const sendMail = require('../middleware/sendmaiil');
 
 function formatDate(date) {
@@ -16,6 +17,40 @@ function formatDate(date) {
   
     return [day, month, year].join("/");
   }
+
+  const createFine = async (borrowalId, returnDate) => {
+    const borrowal = await Borrowal.findById(borrowalId);
+
+    if (!borrowal) {
+        throw new Error('Borrowal record not found');
+    }
+
+    const { daysOverdue, fineAmount } = calculateFine(borrowal.borrowedDate, borrowal.dueDate, returnDate);
+
+    if (daysOverdue > 0) {
+        const fine = new Fines({
+            borrowalId: borrowal._id,
+            fineAmount,
+            daysOverdue
+        });
+        await fine.save();
+        return fine;
+    } else {
+        return null; // Không có tiền phạt nếu không có ngày quá hạn
+    }
+};
+
+const calculateFine = (borrowedDate, dueDate, returnDate) => {
+    const oneDay = 24 * 60 * 60 * 1000; // milliseconds in a day
+    const daysOverdue = Math.round((returnDate - dueDate) / oneDay);
+
+    if (daysOverdue > 0) {
+        const fineAmount = daysOverdue * 1000; // Giả sử mỗi ngày quá hạn phạt 1000 đồng
+        return { daysOverdue, fineAmount };
+    } else {
+        return { daysOverdue: 0, fineAmount: 0 };
+    }
+};
 
 const getBorrowal = async (req, res) => {
     const borrowalId = req.params.id;
@@ -125,7 +160,7 @@ async function updateBorrowal(req, res, next) {
 
         // Tạo một đối tượng rỗng để lưu các trường cập nhật
         let updatedFields = {};
-        
+
         if (borrowedDate) {
             updatedFields.borrowedDate = new Date(borrowedDate);
         }
@@ -138,18 +173,14 @@ async function updateBorrowal(req, res, next) {
             updatedFields.status = status;
         }
 
-        if (status === "returned") {
-            updatedFields.returnDate = new Date();
-        }
-
         console.log('Updating borrowal with ID:', borrowalId);
         console.log('Fields to update:', updatedFields);
-      
-        //update borrowal
+
+        // Cập nhật borrowal
         const updatedBorrowal = await Borrowal.findByIdAndUpdate(
             borrowalId,
             { $set: updatedFields },
-            { new: true } // Option to return the updated document
+            { new: true } // Tùy chọn để trả về tài liệu đã cập nhật
         );
 
         if (!updatedBorrowal) {
@@ -164,9 +195,9 @@ async function updateBorrowal(req, res, next) {
         }
 
         // Gửi email thông báo khi cập nhật thành công
-        const formatbrrDate = formatDate(borrowedDate);
-        const formatdueDate = formatDate(dueDate);
-        if(status === "accepted"){
+        const formatbrrDate = formatDate(updatedBorrowal.borrowedDate);
+        const formatdueDate = formatDate(updatedBorrowal.dueDate);
+        if (status === "accepted") {
             try {
                 await sendMail({
                     email: memberEmail.email,
@@ -174,7 +205,7 @@ async function updateBorrowal(req, res, next) {
                     html: `
                         <p>Hello, ${memberEmail.name}</p>
                         <p>Thông tin mượn sách của bạn đã được cập nhật thành công!</p>
-                        <p>Thời gian mượn sách của bạn bắt đầu từ ${formatbrrDate} đến ngày ${formatdueDate} vui lòng chú ý hạn trả sách </p>
+                        <p>Thời gian mượn sách của bạn bắt đầu từ ${formatbrrDate} đến ngày ${formatdueDate}. Vui lòng chú ý hạn trả sách.</p>
                         <p>Best regards,<br>Your Team</p>
                     `
                 });
@@ -182,15 +213,14 @@ async function updateBorrowal(req, res, next) {
                 console.error('Error sending email:', mailError);
                 return res.status(500).json({ success: false, error: 'Failed to send email notification' });
             }
-        }
-        if(status === "rejected"){
+        } else if (status === "rejected") {
             try {
                 await sendMail({
                     email: memberEmail.email,
                     subject: 'Thông báo cập nhật thông tin mượn sách',
                     html: `
                         <p>Hello, ${memberEmail.name}</p>
-                        <p>Yêu cầu mượn sách của bạn đã bị từ chối</p>
+                        <p>Yêu cầu mượn sách của bạn đã bị từ chối.</p>
                         <p>Best regards,<br>Your Team</p>
                     `
                 });
@@ -198,15 +228,22 @@ async function updateBorrowal(req, res, next) {
                 console.error('Error sending email:', mailError);
                 return res.status(500).json({ success: false, error: 'Failed to send email notification' });
             }
-        }
-        if(status === "returned"){
+        } else if (status === "returned") {
+            const returnDate = new Date();
+            updatedBorrowal.returnDate = returnDate;
+            await updatedBorrowal.save();
+
+            // Tạo tiền phạt nếu có
+            const fine = await createFine(borrowalId, returnDate);
+
             try {
                 await sendMail({
                     email: memberEmail.email,
                     subject: 'Thông báo cập nhật thông tin mượn sách',
                     html: `
                         <p>Hello, ${memberEmail.name}</p>
-                        <p>Bạn đã trả sách thành công</p>
+                        <p>Bạn đã trả sách thành công.</p>
+                        ${fine ? `<p>Bạn có tiền phạt quá hạn là ${fine.fineAmount} đồng cho ${fine.daysOverdue} ngày quá hạn.</p>` : ''}
                         <p>Best regards,<br>Your Team</p>
                     `
                 });
@@ -215,6 +252,7 @@ async function updateBorrowal(req, res, next) {
                 return res.status(500).json({ success: false, error: 'Failed to send email notification' });
             }
         }
+
         // Trả về thông tin borrowal đã cập nhật
         res.status(200).json({ updatedBorrowal });
     } catch (err) {
@@ -222,7 +260,6 @@ async function updateBorrowal(req, res, next) {
         next(err);
     }
 }
-
 
 
 const getEmailFromBorrowalId = async (borrowalId) => {
