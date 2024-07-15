@@ -17,42 +17,44 @@ function formatDate(date) {
     return [day, month, year].join("/");
 }
 
-const calculateFine = (borrowedDate, dueDate, returnDate) => {
-    const oneDay = 24 * 60 * 60 * 1000; // milliseconds in a day
-    const daysOverdue = Math.round((returnDate - dueDate) / oneDay);
 
-    if (daysOverdue > 0) {
-        const fineAmount = daysOverdue * 5000; // Giả sử mỗi ngày quá hạn phạt 5000 đồng
-        return { daysOverdue, fineAmount };
-    } else {
-        return { daysOverdue: 0, fineAmount: 0 };
-    }
-};
 
-const createFine = async (req, res, next) => {
+const getAll = async (req, res, next) => {
     try {
-        const borrowalId = req.params.id;
-        const borrowal = await Borrowal.findById(borrowalId);
+        const fines = await Fine.find()
+        .populate({
+            path: 'borrowalId',
+            populate: [
+                {
+                    path: 'bookId',
+                    model: 'Book',
+                    select: 'name' // Chọn các trường cần thiết của Book
+                },
+                {
+                    path: 'memberId',
+                    model: 'User',
+                    select: 'name' // Chọn các trường cần thiết của User
+                }
+            ]
+        });
 
-        if (!borrowal) {
-            return res.status(404).json({ success: false, error: 'Borrowal record not found' });
-        }
+        const formatfines = fines.map(f => {
+            return {
+                username : f.borrowalId.memberId.name,
+                book : f.borrowalId.bookId.name,
+                requestDate : f.borrowalId.requestDate,
+                borrowedDate : f.borrowalId.borrowedDate,
+                dueDate : f.borrowalId.dueDate,
+                status : f.borrowalId.status,
+                fineAmount : f.fineAmount,
+                daysOverdue :f.daysOverdue,
+                status :f.status
+            }
+        })
 
-        const { daysOverdue, fineAmount } = calculateFine(borrowal.borrowedDate, borrowal.dueDate, borrowal.returnDate);
-
-        if (daysOverdue > 0) {
-            const fine = new Fine({
-                borrowalId: borrowal._id,
-                fineAmount,
-                daysOverdue
-            });
-            await fine.save();
-            return res.status(200).json({ success: true, fine });
-        } else {
-            return res.status(200).json({ success: true, fine: null }); // Không có tiền phạt nếu không có ngày quá hạn
-        }
+        return res.status(200).json({ success: true, formatfines });
     } catch (err) {
-        console.error('Error creating fine:', err);
+        console.error('Error getting fines by borrowal ID:', err);
         next(err);
     }
 };
@@ -60,6 +62,7 @@ const createFine = async (req, res, next) => {
 const updateFineStatus = async (req, res, next) => {
     try {
         const fineId = req.params.id;
+        console.log(fineId);
         const { status } = req.body;
         const fine = await Fine.findById(fineId);
 
@@ -85,7 +88,20 @@ const getFinesByBorrowalId = async (req, res, next) => {
     try {
         const borrowalId = req.params.id;
         const fines = await Fine.find({ borrowalId: borrowalId });
-        return res.status(200).json({ success: true, fines });
+        const formatfines = fines.map(f => {
+            return {
+                username : f.borrowalId.memberId.name,
+                book : f.borrowalId.bookId.name,
+                requestDate : f.borrowalId.requestDate,
+                borrowedDate : f.borrowalId.borrowedDate,
+                dueDate : f.borrowalId.dueDate,
+                status : f.borrowalId.status,
+                fineAmount : f.fineAmount,
+                daysOverdue :f.daysOverdue,
+                status :f.status
+            }
+        })
+        return res.status(200).json({ success: true, formatfines });
     } catch (err) {
         console.error('Error getting fines by borrowal ID:', err);
         next(err);
@@ -98,6 +114,19 @@ const getFinesByUserId = async (req, res, next) => {
         const borrowals = await Borrowal.find({ memberId: userId });
         const borrowalIds = borrowals.map(b => b._id);
         const fines = await Fine.find({ borrowalId: { $in: borrowalIds } });
+        const formatfines = fines.map(f => {
+            return {
+                username : f.borrowalId.memberId.name,
+                book : f.borrowalId.bookId.name,
+                requestDate : f.borrowalId.requestDate,
+                borrowedDate : f.borrowalId.borrowedDate,
+                dueDate : f.borrowalId.dueDate,
+                status : f.borrowalId.status,
+                fineAmount : f.fineAmount,
+                daysOverdue :f.daysOverdue,
+                status :f.status
+            }
+        })
         return res.status(200).json({ success: true, fines });
     } catch (err) {
         console.error('Error getting fines by user ID:', err);
@@ -121,36 +150,14 @@ const deleteFine = async (req, res, next) => {
     }
 };
 
-const returnBook = async (req, res, next) => {
-    try {
-        const borrowalId = req.params.id;
-        const borrowal = await Borrowal.findById(borrowalId);
 
-        if (!borrowal) {
-            return res.status(404).json({ success: false, error: 'Borrowal record not found' });
-        }
-
-        const fine = await createFine(req, res, next);
-
-        // Cập nhật trạng thái mượn sách và lưu thông tin ngày trả sách
-        borrowal.status = 'returned';
-        borrowal.returnDate = new Date();
-        await borrowal.save();
-
-        return res.status(200).json({ success: true, borrowal, fine });
-    } catch (err) {
-        console.error('Error returning book:', err);
-        next(err);
-    }
-};
 
 const fineController = {
-    returnBook,
-    createFine,
     updateFineStatus,
     getFinesByBorrowalId,
     getFinesByUserId,
-    deleteFine
+    deleteFine,
+    getAll
 };
 
 module.exports = fineController;
