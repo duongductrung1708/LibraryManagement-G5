@@ -231,7 +231,7 @@ const UserPage = () => {
           <Typography variant="h3" gutterBottom>
             Users
           </Typography>
-          <Grid style={{ display: 'flex', flexDirection: 'column' }}>
+          <Stack direction="row" spacing={2}>
             <Button
               variant="contained"
               onClick={() => {
@@ -243,16 +243,15 @@ const UserPage = () => {
               New User
             </Button>
             <Button
-              style={{ marginTop: '5px' }}
               variant="contained"
               onClick={() => {
                 handleOpenImportModal();
               }}
-              startIcon={<Iconify icon="eva:plus-fill" />}
+              startIcon={<Iconify icon="eva:cloud-upload-outline" />}
             >
               Import New Users
             </Button>
-          </Grid>
+          </Stack>
         </Stack>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
