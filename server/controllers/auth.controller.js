@@ -250,6 +250,64 @@ const countTotalBorrowedBooks = async (req, res) => {
   }
 };
 
+const generateReturnChartData = async (req, res) => {
+  try {
+    const returnData = await Borrowal.aggregate([
+      {
+        $match: { status: "returned" }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$returnedAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    const chartData = returnData.map(entry => ({
+      date: entry._id,
+      count: entry.count
+    }));
+
+    res.status(200).json({ chartData });
+  } catch (error) {
+    console.error("Error generating return chart data:", error);
+    res.status(500).json({ success: false, error: "Error generating return chart data" });
+  }
+};
+
+const generateBorrowedChartData = async (req, res) => {
+  try {
+    const borrowData = await Borrowal.aggregate([
+      {
+        $match: { status: { $ne: "returned" } }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$borrowedAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    const chartData = borrowData.map(entry => ({
+      date: entry._id,
+      count: entry.count
+    }));
+
+    res.status(200).json({ chartData });
+  } catch (error) {
+    console.error("Error generating borrowed chart data:", error);
+    res.status(500).json({ success: false, error: "Error generating borrowed chart data" });
+  }
+};
+
 const authController = {
   addUser,
   importUsers,
@@ -260,6 +318,8 @@ const authController = {
   countTotalUsers,
   countReturnedBooks,
   countTotalBorrowedBooks,
+  generateReturnChartData,
+  generateBorrowedChartData,
 };
 
 module.exports = authController;

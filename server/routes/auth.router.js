@@ -31,4 +31,8 @@ router.get("/returnedBooks", authController.countReturnedBooks);
 
 router.get("/totalBorrowedBooks", authController.countTotalBorrowedBooks);
 
+router.get('/returnChartData', authController.generateReturnChartData);
+
+router.get('/borrowedChartData', authController.generateBorrowedChartData);
+
 module.exports = router;

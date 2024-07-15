@@ -93,11 +93,11 @@ const BookPage = () => {
   const [genres, setGenres] = useState([]);
   const [authors, setAuthors] = useState([]);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(6);
 
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const getAllBooks = () => {
     axios
@@ -272,12 +272,6 @@ const BookPage = () => {
     }
   }, [filterName, filterGenre, filterAuthor, filterIsAvailable, books]);
 
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -391,7 +385,7 @@ const BookPage = () => {
           <Typography variant="h4" gutterBottom>
             Books
           </Typography>
-          {user.isAdmin && (
+          {user.isAdmin === true || user.isLibrarian === true ? (
             <Stack direction="row" spacing={2}>
               <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenModal}>
                 New Book
@@ -406,7 +400,7 @@ const BookPage = () => {
                 Import Books
               </Button>
             </Stack>
-          )}
+          ): null}
         </Stack>
 
         <Stack direction="row" spacing={2} mb={5}>
@@ -493,9 +487,22 @@ const BookPage = () => {
             />
           </Card>
         ) : filteredBooks.length > 0 ? (
-          <Grid container spacing={4}>
-            {filteredBooks.map((book) => (
-              <Grid key={book._id} item xs={12} sm={6} md={4}>
+          <div>
+          <TablePagination
+              component="div"
+              count={filteredBooks.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[6, 12, 24]}
+            />
+
+            <Grid container spacing={3}>
+              {filteredBooks
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((book) => (
+                  <Grid key={book._id} item xs={12} sm={6} md={4}>
                 <Card>
                   <Box sx={{ pt: '80%', position: 'relative' }}>
                     <Label
@@ -568,8 +575,9 @@ const BookPage = () => {
                   </Stack>
                 </Card>
               </Grid>
-            ))}
-          </Grid>
+                ))}
+            </Grid>
+            </div>
         ) : (
           <Alert severity="warning" color="warning">
             No books found
