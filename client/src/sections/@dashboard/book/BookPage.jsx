@@ -2,7 +2,6 @@ import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-
 import {
   Box,
   Button,
@@ -17,22 +16,27 @@ import {
   Stack,
   Typography,
   Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Alert,
+  InputAdornment,
+  TextField,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { Alert } from '@mui/lab';
 import { styled } from '@mui/material/styles';
 import { useAuth } from '../../../hooks/useAuth';
-
+import Scrollbar from '../../../components/scrollbar';
 import Label from '../../../components/label';
 import BookDialog from './BookDialog';
 import BookForm from './BookForm';
 import Iconify from '../../../components/iconify';
 import { apiUrl, methods, routes } from '../../../constants';
-import BorrowalFormForUser from '../borrowal/BorowalFormForUser';
-import BorrowalForm from '../borrowal/BorrowalForm';
 import ImportBooksModal from './ImportBooksModal';
-
-// ----------------------------------------------------------------------
 
 const StyledBookImage = styled('img')({
   top: 0,
@@ -61,7 +65,6 @@ const TruncatedTypography = styled(Typography)({
 const BookPage = () => {
   const { user } = useAuth();
 
-  // State variables
   const [book, setBook] = useState({
     id: '',
     name: '',
@@ -75,14 +78,6 @@ const BookPage = () => {
     position: '',
   });
 
-  const [borrowal, setBorrowal] = useState({
-    bookId: '',
-    memberId: '',
-    borrowedDate: '',
-    dueDate: '',
-    status: '',
-  });
-
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [selectedBookId, setSelectedBookId] = useState(null);
@@ -91,7 +86,6 @@ const BookPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUpdateForm, setIsUpdateForm] = useState(false);
-  const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [filterName, setFilterName] = useState('');
   const [filterGenre, setFilterGenre] = useState('');
   const [filterAuthor, setFilterAuthor] = useState('');
@@ -100,7 +94,10 @@ const BookPage = () => {
   const [authors, setAuthors] = useState([]);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  // API operations
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('name');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const getAllBooks = () => {
     axios
@@ -159,20 +156,6 @@ const BookPage = () => {
       .catch((error) => {
         console.error('Error deleting book:', error);
         toast.error('Failed to delete book');
-      });
-  };
-
-  const addBorrowal = () => {
-    axios
-      .post(apiUrl(routes.BORROWAL, methods.POST), borrowal)
-      .then((response) => {
-        toast.success('Borrowal added successfully');
-        handleCloseBorrowalModal();
-        clearBorrowForm();
-      })
-      .catch((error) => {
-        console.error('Error adding borrowal:', error);
-        toast.error('Failed to add borrowal');
       });
   };
 
@@ -257,20 +240,6 @@ const BookPage = () => {
     setIsImportModalOpen(false);
   };
 
-  const handleCloseBorrowalModal = () => {
-    setIsBorrowalModalOpen(false);
-  };
-
-  const clearBorrowForm = () => {
-    setBorrowal({
-      bookId: '',
-      memberId: '',
-      borrowedDate: '',
-      dueDate: '',
-      status: '',
-    });
-  };
-
   useEffect(() => {
     getAllBooks();
   }, []);
@@ -296,114 +265,233 @@ const BookPage = () => {
       }
 
       if (filterIsAvailable !== '') {
-        const isAvailableValue = filterIsAvailable === 'true';
-        filteredResults = filteredResults.filter((book) => book.isAvailable === isAvailableValue);
+        filteredResults = filteredResults.filter((book) => book.isAvailable.toString() === filterIsAvailable);
       }
 
       setFilteredBooks(filteredResults);
     }
   }, [filterName, filterGenre, filterAuthor, filterIsAvailable, books]);
 
-  console.log(user.isAdmin);
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  function formatDate(date) {
+    const d = new Date(date);
+    let day = '' + d.getDate();
+    let month = '' + (d.getMonth() + 1);
+    const year = d.getFullYear();
+
+    if (day.length < 2) day = '0' + day;
+    if (month.length < 2) month = '0' + month;
+
+    return [day, month, year].join('/');
+  }
+
+  const tableHeadCells = [
+    { id: 'photo', label: 'Photo', alignRight: false },
+    { id: 'name', label: 'Name', alignRight: false },
+    { id: 'position', label: 'Position', alignRight: false },
+    { id: 'author', label: 'Author', alignRight: false },
+    { id: 'genre', label: 'Genre', alignRight: false },
+    { id: 'isAvailable', label: 'Availability', alignRight: false },
+    { id: 'createdAt', label: 'Created At', alignRight: false },
+    { id: 'actions', label: 'Actions', alignRight: true },
+  ];
+
+  const renderTableHead = () => (
+    <TableHead>
+      <TableRow>
+        {tableHeadCells.map((headCell) => (
+          <TableCell
+            key={headCell.id}
+            align={headCell.alignRight ? 'right' : 'left'}
+            sortDirection={orderBy === headCell.id ? order : false}
+          >
+            {headCell.label}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
+
+  const renderTableBody = () => (
+    <TableBody>
+      {filteredBooks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((book) => {
+        const { _id, photoUrl, name, position, authorId, genreId, isAvailable, createdAt } = book;
+        const author = authors.find((author) => author._id === authorId);
+        const genre = genres.find((genre) => genre._id === genreId);
+
+        return (
+          <TableRow key={_id}>
+            <TableCell>
+              <img src={photoUrl} alt={name} width="100" height="100" />
+            </TableCell>
+            <TableCell>
+              <Link to={`/books/${_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                {name}
+              </Link>
+            </TableCell>
+            <TableCell>{position}</TableCell>
+            <TableCell>{author ? author.name : 'N/A'}</TableCell>
+            <TableCell>
+              <Label
+                variant="filled"
+                sx={{
+                  textTransform: 'uppercase',
+                  color: 'primary.main',
+                }}
+              >
+                {genre.name}
+              </Label>
+            </TableCell>
+            <TableCell>
+              <Label color={isAvailable ? 'success' : 'error'} sx={{ padding: 2 }}>
+                {isAvailable ? 'Available' : 'Not available'}
+              </Label>
+            </TableCell>
+            <TableCell>{formatDate(createdAt)}</TableCell>
+            <TableCell align="right">
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={(e) => {
+                  setSelectedBookId(book._id);
+                  handleOpenMenu(e);
+                }}
+              >
+                <Iconify icon={'eva:more-vertical-fill'} />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        );
+      })}
+    </TableBody>
+  );
+
   return (
     <>
       <Helmet>
-        <title>Books</title>
+        <title>Books | Book Management</title>
       </Helmet>
 
-      <Container>
+      <Container maxWidth="lg">
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h3" sx={{ mb: 5 }}>
+          <Typography variant="h4" gutterBottom>
             Books
           </Typography>
-          {(user.isAdmin || user.isLibrarian) && (
-            <Grid style={{ display: 'flex', flexDirection: 'column' }}>
+          {user.isAdmin && (
+            <Stack direction="row" spacing={2}>
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenModal}>
+                New Book
+              </Button>
               <Button
-              variant="contained"
-              onClick={() => {
-                setIsUpdateForm(false);
-                handleOpenModal();
-              }}
-              startIcon={<Iconify icon="eva:plus-fill" />}
-            >
-              New Book
-            </Button>
-              <Button
-              style={{ marginTop: '5px' }}
-              variant="contained"
-              onClick={() => {
-                handleOpenImportModal();
-              }}
-              startIcon={<Iconify icon="eva:plus-fill" />}
-            >
-              Import New Books
-            </Button>
-            </Grid>  
+                variant="contained"
+                startIcon={<Iconify icon="eva:cloud-upload-outline" />}
+                onClick={() => {
+                  handleOpenImportModal();
+                }}
+              >
+                Import Books
+              </Button>
+            </Stack>
           )}
         </Stack>
 
-        <Box mb={3}>
-          <OutlinedInput
+        <Stack direction="row" spacing={2} mb={5}>
+          <TextField
+            variant="outlined"
             value={filterName}
             onChange={(e) => setFilterName(e.target.value)}
-            placeholder="Search books..."
-            fullWidth
-            startAdornment={<Iconify icon="eva:search-outline" color="action" />}
+            placeholder="Search by name"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Iconify icon="eva:search-outline" />
+                </InputAdornment>
+              ),
+            }}
           />
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
           <Select
+            displayEmpty
             value={filterGenre}
             onChange={(e) => setFilterGenre(e.target.value)}
-            fullWidth
-            displayEmpty
             input={<OutlinedInput />}
-            placeholder="Filter by Genre"
           >
-            <MenuItem value="">All Genres</MenuItem>
-            {/* Populate genres dynamically */}
+            <MenuItem value="">
+              <em>All Genres</em>
+            </MenuItem>
             {genres.map((genre) => (
               <MenuItem key={genre._id} value={genre._id}>
                 {genre.name}
               </MenuItem>
             ))}
           </Select>
-
           <Select
+            displayEmpty
             value={filterAuthor}
             onChange={(e) => setFilterAuthor(e.target.value)}
-            fullWidth
-            displayEmpty
             input={<OutlinedInput />}
-            placeholder="Filter by Author"
           >
-            <MenuItem value="">All Authors</MenuItem>
+            <MenuItem value="">
+              <em>All Authors</em>
+            </MenuItem>
             {authors.map((author) => (
               <MenuItem key={author._id} value={author._id}>
                 {author.name}
               </MenuItem>
             ))}
           </Select>
-
           <Select
+            displayEmpty
             value={filterIsAvailable}
             onChange={(e) => setFilterIsAvailable(e.target.value)}
-            fullWidth
-            displayEmpty
             input={<OutlinedInput />}
-            placeholder="Filter by Availability"
           >
-            <MenuItem value="">All Status</MenuItem>
+            <MenuItem value="">
+              <em>All Availability</em>
+            </MenuItem>
             <MenuItem value="true">Available</MenuItem>
             <MenuItem value="false">Not Available</MenuItem>
           </Select>
-        </Box>
+        </Stack>
 
         {isTableLoading ? (
           <Grid padding={2} style={{ textAlign: 'center' }}>
             <CircularProgress />
           </Grid>
+        ) : user.isAdmin || user.isLibrarian ? (
+          <Card>
+            <Scrollbar>
+              <TableContainer sx={{ minWidth: 800 }}>
+                <Table>
+                  {renderTableHead()}
+                  {renderTableBody()}
+                </Table>
+              </TableContainer>
+            </Scrollbar>
+
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={filteredBooks.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Card>
         ) : filteredBooks.length > 0 ? (
           <Grid container spacing={4}>
             {filteredBooks.map((book) => (
@@ -477,8 +565,6 @@ const BookPage = () => {
                       ISBN: {book.isbn}
                     </Typography>
                     <TruncatedTypography variant="body2">{book.summary}</TruncatedTypography>
-
-
                   </Stack>
                 </Card>
               </Grid>
@@ -489,86 +575,69 @@ const BookPage = () => {
             No books found
           </Alert>
         )}
-      </Container>
 
-      <Popover
-        open={Boolean(isMenuOpen)}
-        anchorEl={isMenuOpen}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
+        <BookDialog
+          isDialogOpen={isDialogOpen}
+          bookId={selectedBookId}
+          handleDeleteBook={deleteBook}
+          handleCloseDialog={handleCloseDialog}
+        />
+
+        <BookForm
+          isUpdateForm={isUpdateForm}
+          isModalOpen={isModalOpen}
+          handleCloseModal={handleCloseModal}
+          id={selectedBookId}
+          book={book}
+          setBook={setBook}
+          handleAddBook={addBook}
+          handleUpdateBook={updateBook}
+        />
+
+        <ImportBooksModal isOpen={isImportModalOpen} onClose={handleCloseImportModal} />
+
+        <Popover
+          open={Boolean(isMenuOpen)}
+          anchorEl={isMenuOpen}
+          onClose={handleCloseMenu}
+          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          PaperProps={{
+            sx: {
+              p: 1,
+              width: 140,
+              '& .MuiMenuItem-root': {
+                px: 1,
+                typography: 'body2',
+                borderRadius: 0.75,
+              },
             },
-          },
-        }}
-      >
-        {(user.isAdmin || user.isLibrarian) && (
+          }}
+        >
           <MenuItem
             onClick={() => {
               setIsUpdateForm(true);
               getSelectedBookDetails();
-              handleCloseMenu();
               handleOpenModal();
+              handleCloseMenu();
             }}
           >
-            <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+            <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
             Edit
           </MenuItem>
-        )}
 
-        {(user.isAdmin || user.isLibrarian) && (
-          <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
-            <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
+          <MenuItem
+            sx={{ color: 'error.main' }}
+            onClick={() => {
+              handleOpenDialog();
+              handleCloseMenu();
+            }}
+          >
+            <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
             Delete
           </MenuItem>
-        )}
-      </Popover>
-      
-      {user && (user.isAdmin || user.isLibrarian) ? (
-        <BorrowalForm
-          isModalOpen={isBorrowalModalOpen}
-          handleCloseModal={handleCloseBorrowalModal}
-          id={selectedBookId}
-          borrowal={borrowal}
-          setBorrowal={setBorrowal}
-          handleAddBorrowal={addBorrowal}
-        />
-      ) : (
-        <BorrowalFormForUser
-          isModalOpen={isBorrowalModalOpen}
-          handleCloseModal={handleCloseBorrowalModal}
-          id={selectedBookId}
-          borrowal={borrowal}
-          setBorrowal={setBorrowal}
-          handleAddBorrowal={addBorrowal}
-        />
-      )}
-
-      <BookDialog
-        isDialogOpen={isDialogOpen}
-        bookId={selectedBookId}
-        handleDeleteBook={deleteBook}
-        handleCloseDialog={handleCloseDialog}
-      />
-
-      <BookForm
-        isUpdateForm={isUpdateForm}
-        isModalOpen={isModalOpen}
-        handleCloseModal={handleCloseModal}
-        id={selectedBookId}
-        book={book}
-        setBook={setBook}
-        handleAddBook={addBook}
-        handleUpdateBook={updateBook}
-      />
-      <ImportBooksModal isOpen={isImportModalOpen} onClose={handleCloseImportModal} />
+        </Popover>
+      </Container>
     </>
   );
 };
