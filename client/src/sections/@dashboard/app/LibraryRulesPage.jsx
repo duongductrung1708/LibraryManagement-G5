@@ -60,7 +60,7 @@ export default function LibraryRulesPage() {
           <Typography paragraph>
             - Books should be returned on or before the due date.
             <br />
-            - Overdue books will attract a fine of $1 per day.
+            - Overdue books will attract a fine of 1.000đ per day.
             <br />
             - Damaged or lost books must be replaced or paid for.
             <br />

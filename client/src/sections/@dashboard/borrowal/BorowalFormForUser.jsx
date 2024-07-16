@@ -102,13 +102,47 @@ const BorrowalFormForUser = ({
     return userBorrowals.filter((borrowal) => borrowal.status === 'pending').length;
   };
 
-  const handleAddBorrowalWithCheck = () => {
-    if (countPendingBorrowals() >= 3) {
-      toast.error('You cannot borrow a new book because you have 3 or more pending borrowals.');
-      return;
-    }
+  const countAcceptBorrowals = () => {
+    return userBorrowals.filter((borrowal) => borrowal.status === 'accepted').length;
+  };
 
-    handleAddBorrowal();
+  const hasAcceptedOverdueBorrowal = (borrowals, userId) => {
+    console.log('Checking for accepted overdue borrowals...');
+    const result = borrowals.some(
+      (borrowal) => {
+        return borrowal.memberId === userId && borrowal.status === 'accepted' && borrowal.dueDate && new Date(borrowal.dueDate) < new Date();
+      }
+    );
+    return result;
+  };
+
+  const handleAddBorrowalWithCheck = () => {
+    axios
+      .get('http://localhost:8080/api/borrowal/getAll')
+      .then((response) => {
+        const borrowals = response.data.borrowalsList;
+        
+        if (hasAcceptedOverdueBorrowal(borrowals, user._id)) {
+          toast.error('You cannot borrow a new book because you have an overdue borrowal.');
+          return;
+        }
+
+        if (countPendingBorrowals() >= 3) {
+          toast.error('You cannot borrow a new book because you have 3 or more pending borrowals.');
+          return;
+        }
+
+        if (countAcceptBorrowals() >= 5) {
+          toast.error('You cannot borrow a new book because you have 5 or more accepted borrowals.');
+          return;
+        }
+
+        handleAddBorrowal();
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Error fetching borrowals');
+      });
   };
 
   const style = {
