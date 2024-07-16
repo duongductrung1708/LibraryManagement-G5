@@ -19,9 +19,14 @@ const TruncatedTypography = styled(Typography)({
 });
 
 const BookDetails = () => {
-  const { user } = useAuth();
-  console.log(user);
-
+  const [borrowal, setBorrowal] = useState({
+    bookId: '',
+    memberId: '',
+    borrowedDate: '',
+    dueDate: '',
+    status: '',
+  });
+  
   const { id } = useParams();
   const navigate = useNavigate();
   const [book, setBook] = useState(null);

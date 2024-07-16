@@ -92,10 +92,10 @@ const BookPage = () => {
   const [filterIsAvailable, setFilterIsAvailable] = useState('');
   const [genres, setGenres] = useState([]);
   const [authors, setAuthors] = useState([]);
+
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(6);
-
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
 
@@ -579,9 +579,149 @@ const BookPage = () => {
             </Grid>
             </div>
         ) : (
-          <Alert severity="warning" color="warning">
-            No books found
-          </Alert>
+          <>
+          
+            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={0}>
+              <Button
+                variant="contained"
+                component={Link}
+                to="#"
+                onClick={() => {
+                  handleOpenModal();
+                  setIsUpdateForm(false);
+                }}
+                startIcon={<Iconify icon="eva:plus-fill" />}
+              >
+                New Book
+              </Button>
+
+              <Stack direction="row" spacing={2}>
+                <OutlinedInput
+                  value={filterName}
+                  onChange={(e) => setFilterName(e.target.value)}
+                  placeholder="Search by name"
+                />
+                <Select
+                  value={filterGenre}
+                  onChange={(e) => setFilterGenre(e.target.value)}
+                  displayEmpty
+                >
+                  <MenuItem value="">
+                    <em>All Genres</em>
+                  </MenuItem>
+                  {genres.map((genre) => (
+                    <MenuItem key={genre._id} value={genre._id}>
+                      {genre.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <Select
+                  value={filterAuthor}
+                  onChange={(e) => setFilterAuthor(e.target.value)}
+                  displayEmpty
+                >
+                  <MenuItem value="">
+                    <em>All Authors</em>
+                  </MenuItem>
+                  {authors.map((author) => (
+                    <MenuItem key={author._id} value={author._id}>
+                      {author.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <Select
+                  value={filterIsAvailable}
+                  onChange={(e) => setFilterIsAvailable(e.target.value)}
+                  displayEmpty
+                >
+                  <MenuItem value="">
+                    <em>All</em>
+                  </MenuItem>
+                  <MenuItem value="true">Available</MenuItem>
+                  <MenuItem value="false">Not Available</MenuItem>
+                </Select>
+              </Stack>
+            </Stack>
+
+            <TablePagination
+              component="div"
+              count={filteredBooks.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[3, 6, 9]} // Pagination options
+            />
+
+            <Grid container spacing={3}>
+              {filteredBooks
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((book) => (
+                  <Grid key={book._id} item xs={12} sm={6} md={4}>
+                    <Card>
+                      <Box sx={{ pt: '100%', position: 'relative' }}>
+                        {book.isAvailable && (
+                          <Label
+                            variant="filled"
+                            color="info"
+                            sx={{
+                              zIndex: 9,
+                              top: 16,
+                              right: 16,
+                              position: 'absolute',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            Available
+                          </Label>
+                        )}
+                        <StyledBookImage alt={book.name} src={book.photoUrl} />
+                      </Box>
+
+                      <Stack spacing={2} sx={{ p: 3 }}>
+                        <Stack direction="row" alignItems="center" justifyContent="space-between">
+                          <Typography variant="subtitle1" noWrap>
+                            {book.name}
+                          </Typography>
+                          <IconButton
+                            size="large"
+                            color="inherit"
+                            onClick={(event) => {
+                              handleOpenMenu(event);
+                              setSelectedBookId(book._id);
+                            }}
+                          >
+                            <Iconify icon="eva:more-vertical-fill" />
+                          </IconButton>
+                        </Stack>
+
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          ISBN: {book.isbn}
+                        </Typography>
+
+                        <TruncatedTypography variant="body2" color="text.secondary">
+                          Summary: {book.summary}
+                        </TruncatedTypography>
+
+                        <Typography variant="body2" color="text.secondary">
+                          Position: {book.position}
+                        </Typography>
+                      </Stack>
+                    </Card>
+                  </Grid>
+                ))}
+            </Grid>
+
+            {/* <TablePagination
+              component="div"
+              count={filteredBooks.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[3, 6, 9]} // Pagination options
+            /> */}
+          </>
         )}
 
         <BookDialog
@@ -623,6 +763,7 @@ const BookPage = () => {
           }}
         >
           <MenuItem
+            sx={{ color: 'success.main' }}
             onClick={() => {
               setIsUpdateForm(true);
               getSelectedBookDetails();
