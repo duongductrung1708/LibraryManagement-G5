@@ -5,6 +5,7 @@ const BorrowalRouter = require("./borrowal.router");
 const GenreRouter = require("./genre.router");
 const UserRouter = require("./user.router");
 const ReviewRouter = require("./review.router");
+const Finerouter = require("./fine.route")
 
 module.exports = {
   AuthRouter,
@@ -14,4 +15,5 @@ module.exports = {
   GenreRouter,
   UserRouter,
   ReviewRouter,
+  Finerouter
 };

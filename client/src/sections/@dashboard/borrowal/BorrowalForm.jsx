@@ -109,6 +109,12 @@ const BorrowalForm = ({
   };
 
   const handleSubmit = () => {
+    // Check if borrowed date is greater than due date
+    if (new Date(borrowal.borrowedDate) > new Date(borrowal.dueDate)) {
+      toast.error('Borrowed date cannot be later than due date.');
+      return;
+    }
+  
     if (isUpdateForm) {
       handleUpdateBorrowal();
     } else {
@@ -119,7 +125,7 @@ const BorrowalForm = ({
       }
       handleAddBorrowal();
     }
-  };
+  };  
 
   const style = {
     position: 'absolute',

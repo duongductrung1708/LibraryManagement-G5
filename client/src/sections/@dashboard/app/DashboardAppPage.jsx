@@ -1,14 +1,53 @@
-import { Helmet } from "react-helmet-async";
-import { useTheme } from "@mui/material/styles";
-import { Container, Grid, Typography } from "@mui/material";
-import { AppCurrentVisits, AppWebsiteVisits, AppWidgetSummary } from "./index";
-import { useAuth } from "../../../hooks/useAuth";
-
-// ----------------------------------------------------------------------
+import { Helmet } from 'react-helmet-async';
+import { useEffect, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { Container, Grid, Typography } from '@mui/material';
+import axios from 'axios';
+import { AppCurrentVisits, AppWebsiteVisits, AppWidgetSummary } from './index';
+import { useAuth } from '../../../hooks/useAuth';
+import CountUp from 'react-countup';
 
 export default function DashboardAppPage() {
   const { user } = useAuth();
   const theme = useTheme();
+  const [totalBooks, setTotalBooks] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [returnedBooks, setReturnedBooks] = useState(0);
+  const [totalBorrowedBooks, setTotalBorrowedBooks] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch total books count
+        const totalBooksResponse = await axios.get('http://localhost:8080/api/auth/totalBooks');
+        if (totalBooksResponse.data.totalBooks !== undefined) {
+          setTotalBooks(totalBooksResponse.data.totalBooks);
+        }
+
+        // Fetch total users count
+        const totalUsersResponse = await axios.get('http://localhost:8080/api/auth/totalUsers');
+        if (totalUsersResponse.data.totalUsers !== undefined) {
+          setTotalUsers(totalUsersResponse.data.totalUsers);
+        }
+
+        // Fetch returned books count for today
+        const returnedBooksResponse = await axios.get('http://localhost:8080/api/auth/returnedBooks');
+        if (returnedBooksResponse.data.returnedBooks !== undefined) {
+          setReturnedBooks(returnedBooksResponse.data.returnedBooks);
+        }
+
+        // Fetch borrowed books count for today
+        const totalBorrowedBooksResponse = await axios.get('http://localhost:8080/api/auth/totalBorrowedBooks');
+        if (totalBorrowedBooksResponse.data.totalBorrowedBooks !== undefined) {
+          setTotalBorrowedBooks(totalBorrowedBooksResponse.data.totalBorrowedBooks);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -17,25 +56,44 @@ export default function DashboardAppPage() {
       </Helmet>
 
       <Container maxWidth="xl">
-        <Typography variant="h4" sx={{mb: 5}}>
+        <Typography variant="h4" sx={{ mb: 5 }}>
           Hi {user.name.split(' ')[0]}, Welcome back
         </Typography>
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Total Books" total={22} icon={'solar:book-bold'}/>
+            <AppWidgetSummary
+              title="Total Books"
+              total={<CountUp start={0} end={totalBooks} duration={2.5} />}
+              icon={'solar:book-bold'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Total Users" total={4} color="info" icon={'mdi:user'}/>
+            <AppWidgetSummary
+              title="Total Users"
+              total={<CountUp start={0} end={totalUsers} duration={2.5} />}
+              color="info"
+              icon={'mdi:user'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Returned Today" total={10} color="warning" icon={'carbon:return'} />
+            <AppWidgetSummary
+              title="Book Returned"
+              total={<CountUp start={0} end={returnedBooks} duration={2.5} />}
+              color="warning"
+              icon={'carbon:return'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Borrowed Today" total={30} color="error" icon={'ph:hand-fill'} />
+            <AppWidgetSummary
+              title="Borrowed"
+              total={<CountUp start={0} end={totalBorrowedBooks} duration={2.5} />}
+              color="error"
+              icon={'ph:hand-fill'}
+            />
           </Grid>
 
           <Grid item xs={12} md={6} lg={8}>
@@ -43,17 +101,17 @@ export default function DashboardAppPage() {
               title="Website Visits"
               subheader="(+43%) than last year"
               chartLabels={[
-                '01/01/2023',
-                '02/02/2023',
-                '03/03/2023',
-                '04/04/2023',
-                '05/05/2023',
-                '06/06/2023',
-                '07/07/2023',
-                '08/08/2023',
-                '09/09/2023',
-                '10/10/2023',
-                '11/11/2023',
+                '01/01/2024',
+                '02/02/2024',
+                '03/03/2024',
+                '04/04/2024',
+                '05/05/2024',
+                '06/06/2024',
+                '07/07/2024',
+                '08/08/2024',
+                '09/09/2024',
+                '10/10/2024',
+                '11/11/2024',
               ]}
               chartData={[
                 {
@@ -97,7 +155,6 @@ export default function DashboardAppPage() {
               ]}
             />
           </Grid>
-
         </Grid>
       </Container>
     </>
