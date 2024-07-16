@@ -132,6 +132,14 @@ const ManageFines = () => {
   };
 
   const deleteFine = () => {
+    const selectedFine = fines.find((fine) => fine._id === selectedFineId);
+  
+    if (!user.isAdmin && !user.isLibrarian && selectedFine.status === 'unpaid') {
+      toast.error('Cannot delete fines with status "unpaid".');
+      handleCloseDialog();
+      return;
+    }
+  
     axios
       .delete(apiUrl(routes.FINE, methods.DELETE, selectedFineId))
       .then((response) => {
@@ -145,7 +153,7 @@ const ManageFines = () => {
         console.log(error);
         toast.error('Something went wrong, please try again');
       });
-  };
+  };  
 
   const getSelectedFineDetails = () => {
     const selectedFine = fines.find((element) => element._id === selectedFineId);

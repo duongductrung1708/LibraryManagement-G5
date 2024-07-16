@@ -31,6 +31,7 @@ const BorrowalFormForUser = ({
   const [members, setMembers] = useState([]);
   const [books, setBooks] = useState([]);
   const [availableBooks, setAvailableBooks] = useState([]);
+  const [userBorrowals, setUserBorrowals] = useState([]);
 
   const getAllMembers = useCallback(() => {
     axios
@@ -67,21 +68,82 @@ const BorrowalFormForUser = ({
       });
   }, []);
 
+  const getUserBorrowals = useCallback(() => {
+    axios
+      .get('http://localhost:8080/api/borrowal/getAll')
+      .then((response) => {
+        const borrowals = response.data.borrowalsList;
+        setUserBorrowals(borrowals.filter((borrowal) => borrowal.memberId === user._id));
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Error fetching user borrowals');
+      });
+  }, [user]);
+
   useEffect(() => {
     getAllMembers();
     getAllBooks();
-  }, [getAllMembers, getAllBooks]);
+    getUserBorrowals();
+  }, [getAllMembers, getAllBooks, getUserBorrowals]);
 
   useEffect(() => {
     if (!isUpdateForm) {
       setBorrowal((prev) => ({
         ...prev,
-        requestDate: new Date().toISOString().split('T')[0], 
-        status: 'pending', 
-        bookId: id, 
+        requestDate: new Date().toISOString().split('T')[0],
+        status: 'pending',
+        bookId: id,
       }));
     }
   }, [setBorrowal, isUpdateForm, id]);
+
+  const countPendingBorrowals = () => {
+    return userBorrowals.filter((borrowal) => borrowal.status === 'pending').length;
+  };
+
+  const countAcceptBorrowals = () => {
+    return userBorrowals.filter((borrowal) => borrowal.status === 'accepted').length;
+  };
+
+  const hasAcceptedOverdueBorrowal = (borrowals, userId) => {
+    console.log('Checking for accepted overdue borrowals...');
+    const result = borrowals.some(
+      (borrowal) => {
+        return borrowal.memberId === userId && borrowal.status === 'accepted' && borrowal.dueDate && new Date(borrowal.dueDate) < new Date();
+      }
+    );
+    return result;
+  };
+
+  const handleAddBorrowalWithCheck = () => {
+    axios
+      .get('http://localhost:8080/api/borrowal/getAll')
+      .then((response) => {
+        const borrowals = response.data.borrowalsList;
+        
+        if (hasAcceptedOverdueBorrowal(borrowals, user._id)) {
+          toast.error('You cannot borrow a new book because you have an overdue borrowal.');
+          return;
+        }
+
+        if (countPendingBorrowals() >= 3) {
+          toast.error('You cannot borrow a new book because you have 3 or more pending borrowals.');
+          return;
+        }
+
+        if (countAcceptBorrowals() >= 5) {
+          toast.error('You cannot borrow a new book because you have 5 or more accepted borrowals.');
+          return;
+        }
+
+        handleAddBorrowal();
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Error fetching borrowals');
+      });
+  };
 
   const style = {
     position: 'absolute',
@@ -101,7 +163,7 @@ const BorrowalFormForUser = ({
     if (isUpdateForm) {
       handleUpdateBorrowal();
     } else {
-      handleAddBorrowal();
+      handleAddBorrowalWithCheck();
     }
   };
 
@@ -121,22 +183,22 @@ const BorrowalFormForUser = ({
             <Grid container spacing={0} sx={{ paddingBottom: '4px' }}>
               <Grid item xs={12} md={6} paddingRight={1}>
                 <FormControl sx={{ m: 0 }} fullWidth>
-                <Typography variant="subtitle1" id="member-label" aria-describedby="member-label" paddingBottom={1}>
-                Member
-              </Typography>
-              <Typography variant="body1" id="member-name">
-                {user.name}
-              </Typography>
+                  <Typography variant="subtitle1" id="member-label" aria-describedby="member-label" paddingBottom={1}>
+                    Member
+                  </Typography>
+                  <Typography variant="body1" id="member-name">
+                    {user.name}
+                  </Typography>
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={6} paddingLeft={1}>
                 <FormControl sx={{ m: 0 }} fullWidth>
-                <Typography variant="subtitle1" id="member-label" aria-describedby="member-label" paddingBottom={1}>
-                Member
-              </Typography>
-              <Typography variant="body1" id="member-name">
-                {bookName}
-              </Typography>
+                  <Typography variant="subtitle1" id="book-label" aria-describedby="book-label" paddingBottom={1}>
+                    Book
+                  </Typography>
+                  <Typography variant="body1" id="book-name">
+                    {bookName}
+                  </Typography>
                 </FormControl>
               </Grid>
             </Grid>
