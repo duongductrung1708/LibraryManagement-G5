@@ -88,6 +88,11 @@ app.use("/api/user", UserRouter);
 app.use("/api/review", ReviewRouter);
 app.use("/api/fines", Finerouter);
 
+
+// Mount payment router
+const paymentRouter = require('./routes/paymentRouter');
+app.use('/api/payment', paymentRouter);
+
 app.use((req, res, next) => {
   res.status(404).json({
     success: false,
