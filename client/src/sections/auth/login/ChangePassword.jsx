@@ -30,7 +30,7 @@ const StyledContent = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function ChangePasswordPage() {
-  const { user, setUser } = useAuth();
+  const { user, updateUser } = useAuth(); // Sử dụng updateUser thay vì setUser
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -42,17 +42,22 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    axios.post('http://localhost:8080/api/user/change-password', {
-      userId: user._id,
-      currentPassword,
-      newPassword,
-    }, { withCredentials: true })
-      .then(response => {
+    axios
+      .post(
+        'http://localhost:8080/api/user/change-password',
+        {
+          userId: user._id,
+          currentPassword,
+          newPassword,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
         toast.success('Password changed successfully');
-        setUser({ ...user, firstLogin: false });
-        navigate('/books');
+        updateUser({ firstLogin: false }); // Cập nhật trạng thái firstLogin thành false
+        navigate('/books'); // Chuyển hướng đến trang /books
       })
-      .catch(error => {
+      .catch((error) => {
         toast.error(error.response.data.message);
         console.log(error);
       });
@@ -69,7 +74,7 @@ export default function ChangePasswordPage() {
           sx={{
             position: 'fixed',
             top: { xs: 16, sm: 24, md: 40 },
-            left: { xs: 16, sm: 24, md: 40 }
+            left: { xs: 16, sm: 24, md: 40 },
           }}
         />
 

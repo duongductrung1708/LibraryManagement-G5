@@ -2,10 +2,9 @@ import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+
 import { Alert } from '@mui/lab';
 import {
-  Avatar,
-  Button,
   Card,
   CircularProgress,
   Container,
@@ -28,145 +27,138 @@ import SearchIcon from '@mui/icons-material/Search';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import Label from '../../../components/label';
-import UserTableHead from './UserListHead';
-import UserForm from './UserForm';
-import UserDialog from './UserDialog';
+
+import FineListHead from './FineListHead';
+import FineForm from './FineForm';
+import FineDialog from './FineDialog';
 import { applySortFilter, getComparator } from '../../../utils/tableOperations';
 import { apiUrl, methods, routes } from '../../../constants';
-import ImportUsersModal from './ImportUsersModal';
+import { useAuth } from 'src/hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'photo', label: 'Photo', alignRight: false },
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'dob', label: 'DOB', alignRight: false },
-  { id: 'email', label: 'Email', alignRight: false },
+  { id: 'memberName', label: 'Member Name', alignRight: false },
+  { id: 'bookName', label: 'Book Name', alignRight: false },
+  { id: 'requestDate', label: 'Request Date', alignRight: false },
+  { id: 'borrowedDate', label: 'Borrowed Date', alignRight: false },
+  { id: 'dueDate', label: 'Due Date', alignRight: false },
+  { id: 'fineAmount', label: 'Fine Amount', alignRight: false },
+  { id: 'daysOverdue', label: 'Days Overdue', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: 'phone', label: 'Phone', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
-  { id: '', label: '', alignRight: false },
+  { id: '', label: '', alignRight: true },
 ];
 
 // ----------------------------------------------------------------------
 
-const UserPage = () => {
+const ManageFines = () => {
+  const { user } = useAuth();
   // State variables
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('name');
-  const [filterName, setFilterName] = useState('');
+  const [orderBy, setOrderBy] = useState('borrowalId');
+  const [memberNameFilter, setMemberNameFilter] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   // Data
-  const [user, setUser] = useState({
-    name: '',
-    dob: '',
-    email: '',
-    password: '',
-    status: true,
-    phone: '',
-    isAdmin: false,
-    isLibrarian: false,
-    photoUrl: 'https://www.pngitem.com/pimgs/m/645-6452863_profile-image-memoji-brown-hair-man-with-glasses.png',
+  const [fine, setFine] = useState({
+    status: '',
   });
-  const [users, setUsers] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [fines, setFines] = useState([]);
+  const [selectedFineId, setSelectedFineId] = useState(null);
   const [isTableLoading, setIsTableLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUpdateForm, setIsUpdateForm] = useState(false);
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
+  // Load data on initial page load
   useEffect(() => {
-    getAllUsers();
+    getAllFines();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getAllUsers = () => {
-    setIsTableLoading(true);
+  // API operations
+  const getAllFines = () => {
     axios
-      .get(apiUrl(routes.USER, methods.GET_ALL))
+      .get(apiUrl(routes.FINE, methods.GET_ALL))
       .then((response) => {
-        setUsers(response.data.usersList);
-        setIsTableLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error('Failed to fetch users');
-        setIsTableLoading(false);
-      });
-  };
-
-  const addUser = () => {
-    axios
-      .post(apiUrl(routes.AUTH, methods.POST), user)
-      .then((response) => {
-        toast.success('User added');
-        handleCloseModal();
-        getAllUsers();
-        clearForm();
-      })
-      .catch((error) => {
-        if (error.response?.status === 403) {
-          toast.error('User already exists');
+        // handle success
+        console.log(response.data);
+        if (user.isAdmin || user.isLibrarian) {
+          setFines(response.data.formatfines);
         } else {
-          console.error(error);
-          toast.error('Something went wrong, please try again');
+          setFines(response.data.formatfines.filter((fine) => user._id === fine.memberId));
         }
+        setIsTableLoading(false);
+      })
+      .catch((error) => {
+        // handle error
+        console.log(error);
       });
   };
 
-  const updateUser = () => {
+  const addFine = () => {
     axios
-      .put(apiUrl(routes.USER, methods.PUT, selectedUserId), user)
+      .post(apiUrl(routes.FINE, methods.POST), fine)
       .then((response) => {
-        toast.success('User updated');
+        toast.success('Fine added');
+        console.log(response.data);
         handleCloseModal();
-        handleCloseMenu();
-        getAllUsers();
+        getAllFines();
         clearForm();
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
         toast.error('Something went wrong, please try again');
       });
   };
 
-  const deleteUser = (userId) => {
+  const updateFine = () => {
     axios
-      .delete(apiUrl(routes.USER, methods.DELETE, userId))
+      .put(apiUrl(routes.FINE, methods.PUT, selectedFineId), fine)
       .then((response) => {
-        toast.success('User deleted');
+        toast.success('Fine updated');
+        console.log(response.data);
+        handleCloseModal();
+        handleCloseMenu();
+        getAllFines();
+        clearForm();
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Something went wrong, please try again');
+      });
+  };
+
+  const deleteFine = () => {
+    axios
+      .delete(apiUrl(routes.FINE, methods.DELETE, selectedFineId))
+      .then((response) => {
+        toast.success('Fine deleted');
         handleCloseDialog();
         handleCloseMenu();
-        getAllUsers();
+        console.log(response.data);
+        getAllFines();
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
         toast.error('Something went wrong, please try again');
       });
   };
 
-  const getSelectedUserDetails = () => {
-    const selectedUser = users.find((element) => element._id === selectedUserId);
-    setUser(selectedUser);
+  const getSelectedFineDetails = () => {
+    const selectedFine = fines.find((element) => element._id === selectedFineId);
+    setFine(selectedFine);
   };
 
   const clearForm = () => {
-    setUser({
-      name: '',
-      dob: '',
-      email: '',
-      password: '',
-      phone: '',
-      status: true,
-      isAdmin: false,
-      isLibrarian: false,
-      photoUrl: '',
+    setFine({
+      status: '',
     });
   };
 
+  // Handler functions
   const handleOpenMenu = (event) => {
     setIsMenuOpen(event.currentTarget);
   };
@@ -184,9 +176,10 @@ const UserPage = () => {
   };
 
   const handleFilterByName = (event) => {
-    setFilterName(event.target.value);
+    setMemberNameFilter(event.target.value);
   };
 
+  // Table functions
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -210,55 +203,51 @@ const UserPage = () => {
     setIsModalOpen(false);
   };
 
-  const handleOpenImportModal = () => {
-    setIsImportModalOpen(true);
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'unpaid':
+        return <Label color="warning">Unpaid</Label>;
+      case 'paid':
+        return <Label color="success">Paid</Label>;
+      default:
+        return null;
+    }
   };
 
-  const handleCloseImportModal = () => {
-    setIsImportModalOpen(false);
-  };
+  const filteredFines = applySortFilter(
+    fines.filter((fine) => fine.username.toLowerCase().includes(memberNameFilter.toLowerCase())),
+    getComparator(order, orderBy)
+  );
 
-  const filteredUsers = applySortFilter(users, getComparator(order, orderBy), filterName);
+  function formatDate(date) {
+    const d = new Date(date);
+    let day = '' + d.getDate();
+    let month = '' + (d.getMonth() + 1);
+    const year = d.getFullYear();
+
+    if (day.length < 2) day = '0' + day;
+    if (month.length < 2) month = '0' + month;
+
+    return [day, month, year].join('/');
+  }
 
   return (
     <>
       <Helmet>
-        <title>Users</title>
+        <title>Manage Fines</title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h3" gutterBottom>
-            Users
+            Manage Fines
           </Typography>
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="contained"
-              onClick={() => {
-                setIsUpdateForm(false);
-                handleOpenModal();
-              }}
-              startIcon={<Iconify icon="eva:plus-fill" />}
-            >
-              New User
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => {
-                handleOpenImportModal();
-              }}
-              startIcon={<Iconify icon="eva:cloud-upload-outline" />}
-            >
-              Import New Users
-            </Button>
-          </Stack>
         </Stack>
-
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <OutlinedInput
-            value={filterName}
+            value={memberNameFilter}
             onChange={handleFilterByName}
-            placeholder="Search by name..."
+            placeholder="Search by member name..."
             startAdornment={
               <InputAdornment position="start">
                 <SearchIcon />
@@ -267,7 +256,6 @@ const UserPage = () => {
             sx={{ width: 240 }}
           />
         </Stack>
-
         {isTableLoading ? (
           <Grid style={{ textAlign: 'center' }}>
             <CircularProgress size="lg" />
@@ -275,61 +263,43 @@ const UserPage = () => {
         ) : (
           <Card>
             <Scrollbar>
-              {filteredUsers.length > 0 ? (
+              {filteredFines.length > 0 ? (
                 <TableContainer sx={{ minWidth: 800 }}>
                   <Table>
-                    <UserTableHead
+                    <FineListHead
                       order={order}
                       orderBy={orderBy}
                       headLabel={TABLE_HEAD}
-                      rowCount={filteredUsers.length}
+                      rowCount={filteredFines.length}
                       onRequestSort={handleRequestSort}
                     />
                     <TableBody>
-                      {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
-                        <TableRow hover key={user._id} tabIndex={-1}>
-                          <TableCell align="left">
-                            <Avatar alt={user.name} src={user.photoUrl} />
+                      {filteredFines.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((fine) => (
+                        <TableRow hover key={fine._id} tabIndex={-1}>
+                          <TableCell align="left">{fine.username}</TableCell>
+                          <TableCell align="left">{fine.book}</TableCell>
+                          <TableCell align="left">{formatDate(fine.requestDate)}</TableCell>
+                          <TableCell align="left">{formatDate(fine.borrowedDate)}</TableCell>
+                          <TableCell align="left">{formatDate(fine.dueDate)}</TableCell>
+                          <TableCell align="left">{fine.fineAmount}</TableCell>
+                          <TableCell align="left">{fine.daysOverdue}</TableCell>
+                          <TableCell align="left" style={{ textTransform: 'uppercase' }}>
+                            {getStatusLabel(fine.status)}
                           </TableCell>
-
-                          <TableCell align="left">{user.name}</TableCell>
-
-                          <TableCell align="left">{new Date(user.dob).toLocaleDateString('en-US')}</TableCell>
-
-                          <TableCell align="left">{user.email}</TableCell>
-
-                          <TableCell align="left">
-                            {user.status ? (
-                              <Label color="success">ACTIVE</Label>
-                            ) : (
-                              <Label color="error">DEACTIVE</Label>
-                            )}
-                          </TableCell>
-
-                          <TableCell align="left">{user.phone}</TableCell>
-
-                          <TableCell align="left">
-                            {user.isAdmin ? (
-                              <Label color="error">Admin</Label>
-                            ) : user.isLibrarian ? (
-                              <Label color="warning">Librarian</Label>
-                            ) : (
-                              <Label color="success">Member</Label>
-                            )}
-                          </TableCell>
-
+                          {user.isAdmin || user.isLibrarian ? (
                           <TableCell align="right">
                             <IconButton
                               size="large"
                               color="inherit"
                               onClick={(e) => {
-                                setSelectedUserId(user._id);
+                                setSelectedFineId(fine._id);
                                 handleOpenMenu(e);
                               }}
                             >
                               <Iconify icon={'eva:more-vertical-fill'} />
                             </IconButton>
                           </TableCell>
+                          ) : null}
                         </TableRow>
                       ))}
                     </TableBody>
@@ -337,15 +307,15 @@ const UserPage = () => {
                 </TableContainer>
               ) : (
                 <Alert severity="warning" color="warning">
-                  No users found
+                  No fines found
                 </Alert>
               )}
             </Scrollbar>
-            {filteredUsers.length > 0 && (
+            {filteredFines.length > 0 && (
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
-                count={filteredUsers.length}
+                count={filteredFines.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -377,7 +347,7 @@ const UserPage = () => {
         <MenuItem
           onClick={() => {
             setIsUpdateForm(true);
-            getSelectedUserDetails();
+            getSelectedFineDetails();
             handleCloseMenu();
             handleOpenModal();
           }}
@@ -392,26 +362,25 @@ const UserPage = () => {
         </MenuItem>
       </Popover>
 
-      <UserForm
+      <FineForm
         isUpdateForm={isUpdateForm}
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
-        id={selectedUserId}
-        user={user}
-        setUser={setUser}
-        handleAddUser={addUser}
-        handleUpdateUser={updateUser}
+        id={selectedFineId}
+        fine={fine}
+        setFine={setFine}
+        handleAddFine={addFine}
+        handleUpdateFine={updateFine}
       />
 
-      <UserDialog
+      <FineDialog
         isDialogOpen={isDialogOpen}
-        userId={selectedUserId}
-        handleDeleteUser={deleteUser}
+        fineId={selectedFineId}
+        handleDeleteFine={deleteFine}
         handleCloseDialog={handleCloseDialog}
       />
-      <ImportUsersModal isOpen={isImportModalOpen} onClose={handleCloseImportModal} />
     </>
   );
 };
 
-export default UserPage;
+export default ManageFines;

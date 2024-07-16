@@ -11,7 +11,9 @@ const initializePassport = (passport) => {
         return cb(err, false);
       }
       if (!user) {
+        console.log("acv");
         return cb(null, false, { message: "User not found" });
+
       }
       if (!user.isValidPassword(password)) { return done(null, false, { message: 'Incorrect password.' })}
         return done(null, user);

@@ -19,9 +19,14 @@ const TruncatedTypography = styled(Typography)({
 });
 
 const BookDetails = () => {
-  const { user } = useAuth();
-  console.log(user);
-
+  const [borrowal, setBorrowal] = useState({
+    bookId: '',
+    memberId: '',
+    borrowedDate: '',
+    dueDate: '',
+    status: '',
+  });
+  
   const { id } = useParams();
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
@@ -100,8 +105,9 @@ const BookDetails = () => {
       review,
       reviewedAt: new Date(),
     };
+    console.log(reviewData);
     axios
-      .post(apiUrl(routes.REVIEW, methods.POST), reviewData)
+      .post(apiUrl(routes.REVIEW, methods.POST,id), reviewData)
       .then((response) => {
         toast.success('Review added successfully');
         setReview('');
@@ -112,6 +118,7 @@ const BookDetails = () => {
         toast.error('Failed to add review');
       });
   };
+  console.log(user?._id);
 
   if (isLoading) {
     return (

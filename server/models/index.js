@@ -6,6 +6,7 @@ const Genre = require("./genre.model");
 const Review = require("./review.model");
 const Member = require("./member.model");
 const User = require("./user.model");
+const Fine = require("./fine.model")
 
 mongoose.Promise = global.Promise;
 
@@ -18,18 +19,22 @@ db.genre = Genre;
 db.review = Review;
 db.member = Member;
 db.user = User;
+db.fine = Fine
 
 db.connectDB = async () => {
   try {
+    // Đặt cấu hình strictQuery trước khi kết nối
+    mongoose.set('strictQuery', true);
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    mongoose.set('strictQuery', true);
+
     console.log("Connected to MongoDB successfully");
   } catch (err) {
     console.error("Error connecting to MongoDB:", err.message);
   }
 };
+
 
 module.exports = db;

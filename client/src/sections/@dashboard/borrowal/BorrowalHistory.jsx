@@ -28,7 +28,6 @@ import RejectedIcon from '@mui/icons-material/Cancel';
 import ReturnedIcon from '@mui/icons-material/Replay';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 
@@ -42,7 +41,7 @@ import { apiUrl, methods, routes } from '../../../constants';
 const TABLE_HEAD = [
   { id: 'memberName', label: 'Member Name', alignRight: false },
   { id: 'bookName', label: 'Book Name', alignRight: false },
-  { id: 'requestDate', label: 'Request On', alignRight: false }, // Thêm requestDate vào đây
+  { id: 'requestDate', label: 'Request On', alignRight: false },
   { id: 'borrowedDate', label: 'Borrowed On', alignRight: false },
   { id: 'dueDate', label: 'Due On', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },

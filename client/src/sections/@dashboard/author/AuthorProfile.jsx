@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Helmet } from 'react-helmet-async';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import {  useNavigate, useParams } from 'react-router-dom';
 import { Box, Typography, Avatar, CircularProgress, Stack, Container, Grid, Card, Button } from '@mui/material';
 import { apiUrl, methods, routes } from '../../../constants';
 
@@ -94,19 +94,19 @@ export default function AuthorProfile() {
           <Grid container spacing={3} justifyContent="center">
             {books.map((book) => (
               <Grid item xs={12} sm={4} key={book._id} style={{ paddingLeft: '3rem' }}>
-              <Card>
-                <Box sx={{ position: 'relative' }}>
-                  <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} />
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ mt: 2, textAlign: 'center', cursor: 'pointer' }}
-                    onClick={() => Navigate(`/books/${book._id}`)}
-                  >
-                    {book.name}
-                  </Typography>
-                </Box>
-              </Card>
-            </Grid>
+                <Card>
+                  <Box sx={{ position: 'relative' }}>
+                    <img alt={book.name} src={book.photoUrl} style={{ width: '100%', height: 'auto' }} />
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ mt: 2, textAlign: 'center', cursor: 'pointer' }}
+                      onClick={() => navigate(`/books/${book._id}`)}
+                    >
+                      {book.name}
+                    </Typography>
+                  </Box>
+                </Card>
+              </Grid>
             ))}
           </Grid>
         </Stack>

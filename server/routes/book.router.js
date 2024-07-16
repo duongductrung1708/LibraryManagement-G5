@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router();
 const { bookController } = require("../controllers");
+const validate = require("../middleware/validateUser.middleware")
 
 router.get("/getAll", bookController.getAllBooks)   
 

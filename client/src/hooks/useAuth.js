@@ -1,44 +1,73 @@
-import { createContext, useContext, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
-import { useLocalStorage } from "./useLocalStorage";
+import { createContext, useContext, useMemo, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { useLocalStorage } from './useLocalStorage';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useLocalStorage("user", null);
+  const [user, setUser] = useLocalStorage('user', null);
   const navigate = useNavigate();
 
-  const login = async (data) => {
-    setUser(data);
-    console.log("12345678987654322345678765432345678765",)
-    if (data.isAdmin) {
-      navigate("/dashboard", { replace: true });
-    } else {
-      navigate("/books", { replace: true });
+  useEffect(() => {
+    if (user && user.firstLogin) {
+      navigate('/change-password', { replace: true });
     }
-  };
+  }, [user, navigate]);
 
-  const logout = () => {
+  const login = useCallback(
+    async (data) => {
+      setUser(data);
+      if (data.firstLogin) {
+        navigate('/change-password', { replace: true });
+      } else if (data.isAdmin) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        navigate('/books', { replace: true });
+      }
+    },
+    [setUser, navigate]
+  );
+
+  const logout = useCallback(() => {
     setUser(null);
-    navigate("/login", { replace: true });
-  };
+    navigate('/login', { replace: true });
+  }, [setUser, navigate]);
+
+  const updateUser = useCallback(
+    (updatedData) => {
+      setUser((prevUser) => ({
+        ...prevUser,
+        ...updatedData,
+      }));
+      if (updatedData.firstLogin === false) {
+        navigate('/books', { replace: true });
+      }
+    },
+    [setUser, navigate]
+  );
 
   const value = useMemo(
     () => ({
       user,
       login,
-      logout
+      logout,
+      updateUser,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user]
+    [user, login, logout, updateUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 AuthProvider.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node.isRequired,
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

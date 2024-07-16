@@ -13,14 +13,15 @@ cron.schedule('0 0 * * *', async (next) => {
         const dueEmail = new Set();
         const banEmail = new Set();
         // create time for send mail due date
-        const weekInMillis = 7 * 24 * 60 * 60 * 1000; // 2 ngày tính bằng milliseconds
-        const oneDayInMillis = 1 * 24 * 60 * 60 * 1000; // 2 ngày tính bằng milliseconds
+        const weekInMillis = 7 * 24 * 60 * 60 * 1000; // 7 ngày tính bằng milliseconds
+        const oneDayInMillis = 1 * 24 * 60 * 60 * 1000; // 1 ngày tính bằng milliseconds
         // create present time
         const nowUTC = new Date().toISOString().slice(0, 10);
         //take borrow
         const borrowals = await Borrowal.find({}).populate('memberId')
+
         await borrowals.map(async borrowal => {
-            if(borrowal && borrowal.memberId &&  borrowal.memberId.status == status.UserType.ACTIVE&& borrowal.memberId.email && borrowal.dueDate){
+            if(borrowal && borrowal.memberId &&  borrowal.memberId.status === true&& borrowal.memberId.email && borrowal.dueDate){
                 const warningWeek = new Date(borrowal.dueDate-weekInMillis).toISOString().slice(0, 10);
                 const warningDay= new Date(borrowal.dueDate-oneDayInMillis).toISOString().slice(0, 10);
                 const dueDate = new Date(borrowal.dueDate).toISOString().slice(0, 10);
@@ -49,7 +50,7 @@ cron.schedule('0 0 * * *', async (next) => {
                 const userData = email.split(" ")
                 sendMail({
                     email: userData[0],
-                    subject: 'Thông báo từ ethnic group library: dến hạn trả sách còn 1 tuần!',
+                    subject: 'Thông báo từ ethnic group library: Đến hạn trả sách còn 1 tuần!',
                     html: `
                         <p>Hello,<strong>${userData[1]}</strong></p><br>
                         <p>You need to return the book within <span style="color: blue; font-weight: bold;">7 days</span>. <br>Thanks for use our service <3 </p>
@@ -65,7 +66,7 @@ cron.schedule('0 0 * * *', async (next) => {
                 const userData = email.split(" ")
                 sendMail({
                     email: userData[0],
-                    subject: 'Thông báo từ ethnic group library: dến hạn trả sách còn 1 ngày!',
+                    subject: 'Thông báo từ ethnic group library: Đến hạn trả sách còn 1 ngày!',
                     html: `
                         <p>Hello,<strong>${userData[1]}</strong></p><br>
                         <p>You need to return the book within <span style="color: blue; font-weight: bold;">1 days</span>. <br>Thanks for use our service <3 </p>
