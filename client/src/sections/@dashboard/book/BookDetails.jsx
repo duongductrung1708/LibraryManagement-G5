@@ -19,6 +19,7 @@ const TruncatedTypography = styled(Typography)({
 });
 
 const BookDetails = () => {
+  const { user } = useAuth();
   const [borrowal, setBorrowal] = useState({
     bookId: '',
     memberId: '',
@@ -38,15 +39,6 @@ const BookDetails = () => {
   const [isBorrowalModalOpen, setIsBorrowalModalOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState(null);
   const [review, setReview] = useState('');
-
-  const [borrowal, setBorrowal] = useState({
-    bookId: '',
-    memberId: '',
-    borrowedDate: '',
-    dueDate: '',
-    status: '',
-  });
-
   const getBook = useCallback(() => {
     setIsLoading(true);
     axios
