@@ -1,8 +1,9 @@
 const axios = require('axios').default;
 const CryptoJS = require('crypto-js');
-const bodyParser = require('body-parser');
 const express = require('express');
+const moment = require('moment');
 
+// APP INFO
 const config = {
     app_id: "2553",
     key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
@@ -11,8 +12,9 @@ const config = {
 };
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 
+// Endpoint for ZaloPay callback
 app.post('/callback', (req, res) => {
     let result = {};
 
@@ -21,6 +23,9 @@ app.post('/callback', (req, res) => {
         let reqMac = req.body.mac;
 
         let mac = CryptoJS.HmacSHA256(dataStr, config.key2).toString();
+
+        console.log("Received MAC:", reqMac);
+        console.log("Calculated MAC:", mac);
 
         // Validate callback
         if (reqMac !== mac) {
@@ -37,39 +42,45 @@ app.post('/callback', (req, res) => {
             result.return_message = "success";
         }
     } catch (ex) {
-        result.return_code = 0;
+        result.return_code = 0; // ZaloPay server will retry callback (up to 3 times)
         result.return_message = ex.message;
     }
 
-    // Send response to VNPAY server
+    // Send response to ZaloPay server
     res.json(result);
 });
 
-// Exporting function for payment request
+// Example function to initiate payment request
+const postPayment = function(orderData) {
+    const embed_data = {};
+    const items = [{}];
+    const transID = Math.floor(Math.random() * 1000000);
+    const order = {
+        app_id: config.app_id,
+        app_trans_id: `${moment().format('YYMMDD')}_${transID}`,
+        app_user: "user123",
+        app_time: Date.now(), // milliseconds
+        item: JSON.stringify(items),
+        embed_data: JSON.stringify(embed_data),
+        amount: 50000,
+        description: `Lazada - Payment for the order #${transID}`,
+        bank_code: "zalopayapp",
+    };
+
+    const data = `${config.app_id}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
+    order.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
+
+    axios.post(config.endpoint, null, { params: order })
+        .then(res => {
+            console.log("Payment response:", res.data);
+        })
+        .catch(err => console.error("Payment error:", err));
+};
+
+// Example function to handle VNPay transactions
+const vnpay = {
+};
+
 module.exports = {
-    postPayment: function(orderData) {
-        const embed_data = {};
-        const items = [{}];
-        const transID = Math.floor(Math.random() * 1000000);
-        const order = {
-            app_id: config.app_id,
-            app_trans_id: `${moment().format('YYMMDD')}_${transID}`,
-            app_user: "user123",
-            app_time: Date.now(), // milliseconds
-            item: JSON.stringify(items),
-            embed_data: JSON.stringify(embed_data),
-            amount: 50000,
-            description: `Lazada - Payment for the order #${transID}`,
-            bank_code: "zalopayapp",
-        };
-
-        const data = `${config.app_id}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
-        order.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
-
-        axios.post(config.endpoint, null, { params: order })
-            .then(res => {
-                console.log(res.data);
-            })
-            .catch(err => console.log(err));
-    }
+    postPayment: postPayment,
 };
