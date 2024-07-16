@@ -53,8 +53,10 @@ async function addReview (req, res,next) {
         const bookId = req.params.id
         const userId = req.body.reviewedBy
         if (!userId) return res.status(401).send('Unauthorized');
-        const existingReview = await Review.findOne({ user: userId, book: req.params.id });
+        const existingReview = await Review.findOne({ reviewedBy: userId, book: req.params.id });
+        console.log(existingReview);
         if (existingReview) return res.status(400).send({ message: 'User already submitted a review for this book' });
+        
         const newReview = new Review({
             reviewedBy: req.body.reviewedBy,
             book: bookId,

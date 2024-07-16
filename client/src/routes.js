@@ -16,6 +16,8 @@ import AuthorProfile from "./sections/@dashboard/author/AuthorProfile";
 import ChangePassword from "./sections/auth/login/ChangePassword";
 import GenreDetails from "./sections/@dashboard/genre/GenreDetails";
 import LibraryRulesPage from "./sections/@dashboard/app/LibraryRulesPage";
+import ForgetPassword from "./sections/auth/login/ForgetPassword";
+import ManageFines from "./sections/@dashboard/fine/ManageFines";
 
 export default function Router() {
   const { user } = useAuth();
@@ -25,6 +27,7 @@ export default function Router() {
     { path: "authors", element: <AuthorPage /> },
     { path: "genres", element: <GenrePage /> },
     { path: "borrowals", element: <BorrowalPage /> },
+    { path: "manage-fines", element: <ManageFines />},
     { path: "userprofile/:id", element: <UserProfile /> },
     { path: "userprofile/history/:id", element: <BorrowalHistory /> },
     { path: "books/:id", element: <BookDetails /> },
@@ -42,12 +45,14 @@ export default function Router() {
         { path: "dashboard", element: <DashboardAppPage /> },
         ...commonRoutes,
         { path: "users", element: <UsersPage /> },
+        
       ],
     },
     { path: "login", element: <LoginPage /> },
     { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
+    { path: "forget-password", element: <ForgetPassword /> },
   ]);
 
   const librarianRoutes = useRoutes([
@@ -64,6 +69,7 @@ export default function Router() {
     { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
+    { path: "forget-password", element: <ForgetPassword /> },
   ]);
 
   const memberRoutes = useRoutes([
@@ -79,6 +85,7 @@ export default function Router() {
     { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/404" replace /> },
+    { path: "forget-password", element: <ForgetPassword /> },
   ]);
 
   const guestRoutes = useRoutes([
@@ -86,6 +93,7 @@ export default function Router() {
     { path: "change-password", element: <ChangePassword /> },
     { path: "404", element: <Page404 /> },
     { path: "*", element: <Navigate to="/login" replace /> },
+    { path: "forget-password", element: <ForgetPassword /> },
   ]);
 
   if (user) {

@@ -8,8 +8,6 @@ import {
   Container,
   FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
   Modal,
   Stack,
   TextField,
@@ -98,14 +96,6 @@ const BorrowalFormForUser = ({
   };
 
   const isAdminOrLibrarian = user.isAdmin || user.isLibrarian;
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setBorrowal((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
 
   const handleSubmit = () => {
     if (isUpdateForm) {

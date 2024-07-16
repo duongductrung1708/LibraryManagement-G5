@@ -6,6 +6,7 @@ const Genre = require("./genre.model");
 const Review = require("./review.model");
 const Member = require("./member.model");
 const User = require("./user.model");
+const Fine = require("./fine.model")
 
 mongoose.Promise = global.Promise;
 
@@ -18,6 +19,7 @@ db.genre = Genre;
 db.review = Review;
 db.member = Member;
 db.user = User;
+db.fine = Fine
 
 db.connectDB = async () => {
   try {
