@@ -104,6 +104,7 @@ const BookPage = () => {
     axios
       .get(apiUrl(routes.BOOK, methods.GET_ALL))
       .then((response) => {
+        console.log(response)
         setBooks(response.data.booksList);
         setFilteredBooks(response.data.booksList);
         setIsTableLoading(false);

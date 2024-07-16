@@ -33,6 +33,7 @@ const getBook = async (req, res, next) => {
 };
 
 const getAllBooks = async (req, res, next) => {
+  console.log(req.session)
   try {
     const books = await Book.aggregate([
       {

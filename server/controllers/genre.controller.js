@@ -32,7 +32,8 @@ const getAllGenres = async (req, res) => {
 
 const addGenre = async (req, res) => {
     const newGenre = req.body
-    // console.log(req.session)
+    console.log(req.session)
+    console.log(req.isAuthenticated())
     Genre.create(newGenre, (err, genre) => {
         if (err) {
             return res.status(400).json({ success: false, err });

@@ -3,7 +3,7 @@ const User = require("../models/user.model");
 
 const initializePassport = (passport) => {
   const authenticateUser = (email, password, cb) => {
-
+    console.log("asd123")
     User.findOne({ email: email })
     .select(' _id name email firstLogin isAdmin isLibrarian')
     .exec((err, user) => {
@@ -13,12 +13,11 @@ const initializePassport = (passport) => {
       if (!user) {
         return cb(null, false, { message: "User not found" });
       }
-      else {
-        return cb(null, user);
-      }
+      if (!user.isValidPassword(password)) { return done(null, false, { message: 'Incorrect password.' })}
+        return done(null, user);
     });
   };
-  passport.use(new LocalStrategy({ usernameField: "email" }, authenticateUser));
+  passport.use(new LocalStrategy({ usernameField: "email",  passwordField: 'password'}, authenticateUser));
   passport.serializeUser((user, done) => {
     done(null, user)
   });

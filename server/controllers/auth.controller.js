@@ -17,7 +17,7 @@ const addUser = async (req, res) => {
     if (newUser.password && newUser.password.length < 6) {
       return res.status(400).json({ success: false, message: "password is required and min 6 characters" });
     }
-    const password = newUser.password || newUser.generateRandomPasswordtest(6);
+    const password = !newUser.password ? newUser.password : newUser.generateRandomPasswordtest(6);
     newUser.setPassword(password);
     await newUser.save((err, user) => {
       if (err) {
@@ -123,7 +123,14 @@ const loginUser = async (req, res, next) => {
     if (!user.isValidPassword(req.body.password)) {
       return res.status(401).json({ success: false, message: "Password incorrect" });
     }
+
+    console.log(user)
     passport.authenticate("local", (err, user, info) => {
+      if(err){
+        err.status(500)
+        next(err);
+      }
+      console.log("asd123")
       req.logIn(user, (err) => {
         if (err) {
           throw err;
@@ -131,15 +138,19 @@ const loginUser = async (req, res, next) => {
         const redirectUrl = user.firstLogin ? '/change-password' : user.isAdmin ? '/dashboard' : '/books';
         return res.status(200).json({
           success: true,
-          // user,
+          user,
           redirectUrl
         });
       });
+      
     },)(req, res, next);
+  
   })
 }
 
+
 const logoutUser = async (req, res, next) => {
+  console.log(req.session)
   req.logout((err) => {
     if (err) {
       return next(err);
