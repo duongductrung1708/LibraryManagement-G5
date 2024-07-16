@@ -83,6 +83,37 @@ const BorrowalFormForUser = ({
     }
   }, [setBorrowal, isUpdateForm, id]);
 
+  const hasAcceptedOverdueBorrowal = (borrowals, userId) => {
+    console.log('Checking for accepted overdue borrowals...');
+    const result = borrowals.some(
+      (borrowal) => {
+        console.log(`Checking borrowal: ${borrowal._id}, status: ${borrowal.status}, overdue: ${borrowal.dueDate}`);
+        return borrowal.memberId === userId && borrowal.status === 'accepted' && borrowal.dueDate && new Date(borrowal.dueDate) < new Date();
+      }
+    );
+    console.log(`Result: ${result}`);
+    return result;
+  };
+
+  const handleAddBorrowalWithCheck = () => {
+    axios
+      .get('http://localhost:8080/api/borrowal/getAll')
+      .then((response) => {
+        const borrowals = response.data.borrowalsList;
+        
+        if (hasAcceptedOverdueBorrowal(borrowals, user._id)) {
+          toast.error('You cannot borrow a new book because you have an overdue borrowal.');
+          return;
+        }
+
+        handleAddBorrowal();
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Error fetching borrowals');
+      });
+  };
+
   const style = {
     position: 'absolute',
     top: '50%',
@@ -101,7 +132,7 @@ const BorrowalFormForUser = ({
     if (isUpdateForm) {
       handleUpdateBorrowal();
     } else {
-      handleAddBorrowal();
+      handleAddBorrowalWithCheck();
     }
   };
 
@@ -131,10 +162,10 @@ const BorrowalFormForUser = ({
               </Grid>
               <Grid item xs={12} md={6} paddingLeft={1}>
                 <FormControl sx={{ m: 0 }} fullWidth>
-                <Typography variant="subtitle1" id="member-label" aria-describedby="member-label" paddingBottom={1}>
-                Member
+                <Typography variant="subtitle1" id="book-label" aria-describedby="book-label" paddingBottom={1}>
+                Book
               </Typography>
-              <Typography variant="body1" id="member-name">
+              <Typography variant="body1" id="book-name">
                 {bookName}
               </Typography>
                 </FormControl>

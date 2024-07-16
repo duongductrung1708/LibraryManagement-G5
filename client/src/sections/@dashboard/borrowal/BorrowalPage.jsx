@@ -107,7 +107,18 @@ const BorrowalPage = () => {
       });
   };
 
+  const hasAcceptedOverdueBorrowal = () => {
+    return borrowals.some(
+      (borrowal) => borrowal.memberId === user._id && borrowal.status === 'accepted' && borrowal.dueDate && new Date(borrowal.dueDate) < new Date()
+    );
+  };
+
   const addBorrowal = () => {
+    if (hasAcceptedOverdueBorrowal()) {
+      toast.error('You cannot borrow a new book because you have an overdue borrowal.');
+      return;
+    }
+
     axios
       .post(apiUrl(routes.BORROWAL, methods.POST), borrowal)
       .then((response) => {
@@ -122,7 +133,7 @@ const BorrowalPage = () => {
         toast.error('Something went wrong, please try again');
       });
   };
-
+  
   const updateBorrowal = () => {
     axios
       .put(apiUrl(routes.BORROWAL, methods.PUT, selectedBorrowalId), borrowal)
@@ -340,6 +351,7 @@ const BorrowalPage = () => {
                                 </Label>
                               )}
                             </TableCell>
+                            {user.isAdmin || user.isLibrarian ? (
                             <TableCell align="right">
                               <IconButton
                                 size="large"
@@ -352,6 +364,7 @@ const BorrowalPage = () => {
                                 <Iconify icon={'eva:more-vertical-fill'} />
                               </IconButton>
                             </TableCell>
+                            ) : null}
                           </TableRow>
                         );
                       })}
@@ -378,44 +391,43 @@ const BorrowalPage = () => {
           </Card>
         )}
       </Container>
-
-      <Popover
-        open={Boolean(isMenuOpen)}
-        anchorEl={isMenuOpen}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
+      {user.isAdmin || user.isLibrarian ? (
+        <Popover
+          open={Boolean(isMenuOpen)}
+          anchorEl={isMenuOpen}
+          onClose={handleCloseMenu}
+          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          PaperProps={{
+            sx: {
+              p: 1,
+              width: 140,
+              '& .MuiMenuItem-root': {
+                px: 1,
+                typography: 'body2',
+                borderRadius: 0.75,
+              },
             },
-          },
-        }}
-      >
-        {user.isAdmin || user.isLibrarian ? (
-        <MenuItem
-          onClick={() => {
-            setIsUpdateForm(true);
-            getSelectedBorrowalDetails();
-            handleCloseMenu();
-            handleOpenModal();
           }}
         >
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-        ) : null}
+          <MenuItem
+            onClick={() => {
+              setIsUpdateForm(true);
+              getSelectedBorrowalDetails();
+              handleCloseMenu();
+              handleOpenModal();
+            }}
+          >
+            <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+            Edit
+          </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
+          <MenuItem sx={{ color: 'error.main' }} onClick={handleOpenDialog}>
+            <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
+            Delete
+          </MenuItem>
+        </Popover>
+      ) : null}
 
       {user.isAdmin || user.isLibrarian ? (
         <BorrowalForm
